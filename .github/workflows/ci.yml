@@ -23,22 +23,24 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install pytest flake8
+        pip install pytest-qt pytest-cov
     - name: Compile UI
       run: |
         cd ui
         pwsh -c ./compile.ps1
     - name: Lint with flake8
       run: |
-        pip install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --exclude=.svn,CVS,.bzr,.hg,.git,__pycache__,.tox,.eggs,*.egg,_ui_*.py --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exclude=.svn,CVS,.bzr,.hg,.git,__pycache__,.tox,.eggs,*.egg,_ui_*.py --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        pip install pytest
-        pip install pytest-qt pytest-cov
-        QT_DEBUG_PLUGINS=1 pytest --cov=. --cov-report=html
+    - name: Test
+      if: matrix.os != 'ubuntu-latest'
+      run: pytest --cov=. --cov-report=html
+    - name: Test without UI
+      if: matrix.os == 'ubuntu-latest'
+      run: pytest --ignore test/ui --cov=. --cov-report=html
     - name: Upload reports
       uses: actions/upload-artifact@v1
       with:
