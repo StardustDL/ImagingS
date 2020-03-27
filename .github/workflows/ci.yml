@@ -36,5 +36,11 @@ jobs:
         flake8 . --count --exclude=.svn,CVS,.bzr,.hg,.git,__pycache__,.tox,.eggs,*.egg,_ui_*.py --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pip install pytest pytest-qt
-        pytest
+        pip install pytest
+        pip install pytest-qt pytest-cov
+        QT_DEBUG_PLUGINS=1 pytest --cov=. --cov-report=html
+    - name: Upload reports
+      uses: actions/upload-artifact@v1
+      with:
+        name: test-${{ matrix.os }}-${{ matrix.python-version }}
+        path: ./htmlcov
