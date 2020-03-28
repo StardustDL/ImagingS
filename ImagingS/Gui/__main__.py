@@ -1,5 +1,5 @@
 import sys
-import ui
+import ImagingS.Gui.ui as ui
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
 

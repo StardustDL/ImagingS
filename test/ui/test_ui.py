@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QMainWindow
-from src.ui import MainWindow
+from ImagingS.Gui.ui import MainWindow
 
 
-def test_MainWindow(qtbot):
+def test_MainWindow(qtbot) -> None:
     window = QMainWindow()
     mui = MainWindow()
     mui.setupUi(window)
