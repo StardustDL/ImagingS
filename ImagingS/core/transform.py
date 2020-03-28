@@ -3,7 +3,8 @@ from ImagingS.core import Point, RectArea
 
 
 class Transform(ABC):
-    pass
+    def __init__(self):
+        super().__init__()
 
 
 class Rotate(Transform):

@@ -31,9 +31,7 @@ jobs:
         pip install pytest-qt pytest-cov
         npm install -g pyright
     - name: Compile UI
-      run: |
-        cd ImagingS/Gui/uic
-        pwsh -c ./compile.ps1
+      run: python -m ImagingS.Gui.uic
     - name: Lint
       run: |
         # stop the build if there are Python syntax errors or undefined names

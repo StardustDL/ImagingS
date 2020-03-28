@@ -4,6 +4,13 @@ class Point(object):
         self.y = y
 
 
+class Color(object):
+    def __init__(self, r: int, g: int, b: int) -> None:
+        self.r = r
+        self.g = g
+        self.b = b
+
+
 class Size(object):
     def __init__(self, width: float, height: float) -> None:
         self.width = width
