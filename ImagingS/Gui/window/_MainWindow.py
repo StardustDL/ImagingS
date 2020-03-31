@@ -3,6 +3,7 @@ from ImagingS.document import Document
 from ImagingS.Gui.app import Application
 from ImagingS.core import Color, brush
 from ImagingS.Gui.models import BrushModel
+import qtawesome as qta
 
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog, QInputDialog, QLineEdit, QMessageBox
 
@@ -11,6 +12,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+
+        self.setupIcon()
+
         self.actClose.triggered.connect(self.actClose_triggered)
         self.actQuit.triggered.connect(self.close)
         self.actNew.triggered.connect(self.actNew_triggered)
@@ -26,6 +30,38 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
         Application.current().documentChanged.connect(self.app_documentChanged)
         self.actNew.trigger()
+
+    def setupIcon(self):
+        self.actNew.setIcon(qta.icon("mdi.file"))
+        self.actOpen.setIcon(qta.icon("mdi.folder-open"))
+        self.actSave.setIcon(qta.icon("mdi.content-save"))
+        self.actExport.setIcon(qta.icon("mdi.export"))
+        self.actClose.setIcon(qta.icon("mdi.close"))
+        self.actQuit.setIcon(qta.icon("mdi.exit-to-app"))
+        self.actUndo.setIcon(qta.icon("mdi.undo"))
+        self.actRedo.setIcon(qta.icon("mdi.redo"))
+        self.actDrawings.setIcon(qta.icon("mdi.drawing"))
+        self.actBrushes.setIcon(qta.icon("mdi.brush"))
+        self.actProperties.setIcon(qta.icon("mdi.database"))
+        self.actDrawingLine.setIcon(qta.icon("mdi.vector-line"))
+        self.actDrawingCurve.setIcon(qta.icon("mdi.vector-curve"))
+        self.actDrawingEllipse.setIcon(qta.icon("mdi.vector-ellipse"))
+        self.actDrawingPolygon.setIcon(qta.icon("mdi.vector-polygon"))
+        self.actTransformSkew.setIcon(qta.icon("mdi.skew-more"))
+        self.actTransformScale.setIcon(qta.icon("mdi.relative-scale"))
+        self.actTransformTranslate.setIcon(qta.icon("mdi.cursor-move"))
+        self.actTransformRotate.setIcon(qta.icon("mdi.rotate-left"))
+        self.actTransformMatrix.setIcon(qta.icon("mdi.matrix"))
+        self.actTransformClip.setIcon(qta.icon("mdi.crop"))
+        self.actBrushSolid.setIcon(qta.icon("mdi.solid"))
+        self.actBrushRemove.setIcon(qta.icon("mdi.delete"))
+        self.actDrawingRemove.setIcon(qta.icon("mdi.delete"))
+        self.actBrushClear.setIcon(qta.icon("mdi.delete-sweep"))
+        self.actDrawingClear.setIcon(qta.icon("mdi.delete-sweep"))
+        self.dwgBrushes.setWindowIcon(qta.icon("mdi.brush"))
+        self.dwgDrawings.setWindowIcon(qta.icon("mdi.drawing"))
+        self.dwgProperties.setWindowIcon(qta.icon("mdi.database"))
+        self.setWindowIcon(qta.icon("mdi.pencil-box-multiple"))
 
     def app_documentChanged(self):
         doc = Application.current().document
