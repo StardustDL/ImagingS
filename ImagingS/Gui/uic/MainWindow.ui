@@ -48,6 +48,8 @@
     <addaction name="separator"/>
     <addaction name="actSave"/>
     <addaction name="separator"/>
+    <addaction name="actExport"/>
+    <addaction name="separator"/>
     <addaction name="actClose"/>
     <addaction name="separator"/>
     <addaction name="actQuit"/>
@@ -63,6 +65,9 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
+    <addaction name="actDrawings"/>
+    <addaction name="actBrushes"/>
+    <addaction name="actProperties"/>
    </widget>
    <widget class="QMenu" name="mnuDrawing">
     <property name="title">
@@ -246,6 +251,11 @@
     <string>&amp;Save</string>
    </property>
   </action>
+  <action name="actExport">
+   <property name="text">
+    <string>&amp;Export</string>
+   </property>
+  </action>
   <action name="actClose">
    <property name="text">
     <string>&amp;Close</string>
@@ -324,6 +334,39 @@
   <action name="actBrushSolid">
    <property name="text">
     <string>Solid</string>
+   </property>
+  </action>
+  <action name="actDrawings">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Drawings</string>
+   </property>
+  </action>
+  <action name="actBrushes">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Brushes</string>
+   </property>
+  </action>
+  <action name="actProperties">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Properties</string>
    </property>
   </action>
  </widget>
