@@ -1,5 +1,6 @@
 import json
 from . import Serializable
+import importlib
 
 
 class Encoder(json.JSONEncoder):
@@ -20,7 +21,7 @@ class Decoder(json.JSONDecoder):
         if "__class__" in d:
             class_name = d.pop("__class__")
             module_name = d.pop("__module__")
-            module = __import__(module_name)
+            module = importlib.import_module(module_name)
             class_ = getattr(module, class_name)
             desmethod = getattr(class_, "deserialize")
             inst = desmethod(d.pop("__data__"))

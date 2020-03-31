@@ -70,13 +70,20 @@ if ($args.Count -gt 0) {
         }
         "test" {
             Write-Output "Test..."
+            pytest
+            if (!$?) {
+                exit 1
+            }
+        }
+        "testcov" {
+            Write-Output "Test and coverage..."
             pytest --cov=. --cov-report=term --cov-report=html
             if (!$?) {
                 exit 1
             }
         }
-        "test-noui" {
-            Write-Output "Test (without UI)..."
+        "testcov-noui" {
+            Write-Output "Test and coverage (without UI)..."
             pytest --ignore test/gui --cov=. --cov-report=term --cov-report=html
             if (!$?) {
                 exit 1

@@ -34,10 +34,10 @@ jobs:
       run: pwsh -c ./tools.ps1 lint
     - name: Test
       if: matrix.os != 'ubuntu-latest'
-      run: pwsh -c ./tools.ps1 test
+      run: pwsh -c ./tools.ps1 testcov
     - name: Test without UI
       if: matrix.os == 'ubuntu-latest'
-      run: pwsh -c ./tools.ps1 test-noui
+      run: pwsh -c ./tools.ps1 testcov-noui
     - name: Upload reports
       uses: actions/upload-artifact@v1
       with:

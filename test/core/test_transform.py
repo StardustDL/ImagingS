@@ -10,18 +10,23 @@ def test_Clip() -> None:
 
 def test_Matrix() -> None:
     tr = Matrix(np.array([[1, 2], [3, 4]]))
+    assert tr.matrix[0][0] == 1
     assert Point(1, 3) == tr.transform(Point(1, 0))
     assert Point(2, 4) == tr.transform(Point(0, 1))
 
 
 def test_Rotate() -> None:
     tr = Rotate(Point(0, 0), math.pi / 2)
+    assert Point(0, 0) == tr.center
+    assert math.fabs(tr.angle - math.pi / 2) < 1e-8
     assert Point(0, 1) == tr.transform(Point(1, 0))
     assert Point(-1, 0) == tr.transform(Point(0, 1))
 
 
 def test_Scale() -> None:
     tr = Scale(Point(0, 0), 2)
+    assert Point(0, 0) == tr.center
+    assert 2 == tr.factor
     assert Point(2, 0) == tr.transform(Point(1, 0))
     assert Point(0, 2) == tr.transform(Point(0, 1))
 
@@ -32,5 +37,6 @@ def test_Skew() -> None:
 
 def test_Translate() -> None:
     tr = Translate(Point(1, 1))
+    assert Point(1, 1) == tr.delta
     assert Point(2, 1) == tr.transform(Point(1, 0))
     assert Point(1, 2) == tr.transform(Point(0, 1))

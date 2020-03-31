@@ -2,8 +2,8 @@ from __future__ import annotations
 from ImagingS.core.drawing import Drawing
 from typing import List, Dict, Any
 from ImagingS.core.brush import Brush
-from . import Serializable
-from .json import Decoder, Encoder
+from ImagingS.core.serialization import Serializable
+from ImagingS.core.serialization.json import Decoder, Encoder
 import json
 
 
@@ -17,6 +17,7 @@ class Document(Serializable):
     def deserialize(data: Dict) -> Any:
         result = Document()
         result.__dict__ = data
+        return result
 
     def save(self, file) -> None:
         json.dump(self, file, ensure_ascii=False, cls=Encoder)
