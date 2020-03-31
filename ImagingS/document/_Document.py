@@ -20,7 +20,7 @@ class Document(Serializable):
         return result
 
     def save(self, file) -> None:
-        json.dump(self, file, ensure_ascii=False, cls=Encoder)
+        json.dump(self, file, ensure_ascii=False, indent=4, cls=Encoder)
 
     @staticmethod
     def load(file) -> Document:

@@ -18,9 +18,9 @@ if ($args.Count -gt 0) {
         }
         "clean" {
             Write-Output "Clean generated files.."
-            Get-ChildItem -Include .coverage | Remove-item
-            Get-ChildItem -Include htmlcov | Remove-item -Recurse
-            Get-ChildItem -Include .pytest_cache | Remove-item -Recurse
+            Get-ChildItem -Include .coverage -Recurse | Remove-item
+            Get-ChildItem -Include htmlcov -Recurse | Remove-item -Recurse -Force ./htmlcov
+            Get-ChildItem -Include .pytest_cache -Recurse | Remove-item -Recurse
             Get-ChildItem -Include __pycache__ -Recurse | Remove-item -Recurse
             Get-ChildItem ./ImagingS/Gui/ui -Exclude .gitignore | Remove-item -Recurse
         }
