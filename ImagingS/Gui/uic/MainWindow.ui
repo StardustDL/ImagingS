@@ -60,7 +60,7 @@
      <string>&amp;View</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuDrawing">
+   <widget class="QMenu" name="mnuDrawing">
     <property name="title">
      <string>&amp;Drawing</string>
     </property>
@@ -272,7 +272,7 @@
     <string>Polygon</string>
    </property>
   </action>
-  <action name="actCurve">
+  <action name="actDrawingCurve">
    <property name="text">
     <string>Curve</string>
    </property>

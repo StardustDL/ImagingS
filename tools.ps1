@@ -3,12 +3,18 @@ if ($args.Count -gt 0) {
         "dep" {
             Write-Output "Install dependencies..."
             pip install -r requirements.txt
+            if (!$?) {
+                exit 1
+            }
         }
         "dep-dev" {
             Write-Output "Install dependencies for development..."
             pip install pytest flake8
             pip install pytest-qt pytest-cov
             npm install -g pyright
+            if (!$?) {
+                exit 1
+            }
         }
         "clean" {
             Write-Output "Clean generated files.."
@@ -25,38 +31,64 @@ if ($args.Count -gt 0) {
         "gen-ui" {
             Write-Output "Generate UI files..."
             python -m ImagingS.Gui.uic
+            if (!$?) {
+                exit 1
+            }
         }
         "gui" {
             Write-Output "Run GUI..."
             python -m ImagingS.Gui
+            if (!$?) {
+                exit 1
+            }
         }
         "cli" {
             Write-Output "Run CLI..."
             python -m ImagingS.Cli
+            if (!$?) {
+                exit 1
+            }
         }
         "lint" {
             Write-Output "Lint..."
             Write-Output "Flake8 check..."
             # stop the build if there are Python syntax errors or undefined names
             flake8 . --count --select="E9,F63,F7,F82" --exclude=".svn,CVS,.bzr,.hg,.git,__pycache__,.tox,.eggs,*.egg,_ui_*.py" --show-source --statistics
+            if (!$?) {
+                exit 1
+            }
             # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
             flake8 . --count --exclude=".svn,CVS,.bzr,.hg,.git,__pycache__,.tox,.eggs,*.egg,_ui_*.py" --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+            if (!$?) {
+                exit 1
+            }
             Write-Output "Pyright check..."
             pyright
+            if (!$?) {
+                exit 1
+            }
         }
         "test" {
             Write-Output "Test..."
             pytest --cov=. --cov-report=term --cov-report=html
+            if (!$?) {
+                exit 1
+            }
         }
         "test-noui" {
             Write-Output "Test (without UI)..."
             pytest --ignore test/gui --cov=. --cov-report=term --cov-report=html
+            if (!$?) {
+                exit 1
+            }
         }
         Default {
             Write-Output "Unrecognized command"
+            exit 2
         }
     }
 }
 else {
     Write-Output "Missing command"
+    exit 2
 }
