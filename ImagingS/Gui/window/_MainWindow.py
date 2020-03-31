@@ -2,8 +2,9 @@ import ImagingS.Gui.ui as ui
 from ImagingS.document import Document
 from ImagingS.Gui.app import Application
 from ImagingS.core import Color, brush
+from ImagingS.Gui.models import BrushModel
 
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog, QInputDialog, QLineEdit, QMessageBox
 
 
 class MainWindow(QMainWindow, ui.MainWindow):
@@ -19,16 +20,29 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actProperties.triggered.connect(self.actProperties_triggered)
         self.actBrushes.triggered.connect(self.actBrushes_triggered)
         self.actBrushSolid.triggered.connect(self.actBrushSolid_triggered)
+
+        self.modelBrush = BrushModel(self)
+        self.trvBrushes.setModel(self.modelBrush)
+
         Application.current().documentChanged.connect(self.app_documentChanged)
-        self.app_documentChanged()
+        self.actNew.trigger()
 
     def app_documentChanged(self):
-        hasDoc = Application.current().document is not None
+        doc = Application.current().document
+        hasDoc = doc is not None
         self.actClose.setEnabled(hasDoc)
         self.gvwMain.setEnabled(hasDoc)
         self.mnuDrawing.setEnabled(hasDoc)
         self.mnuTransform.setEnabled(hasDoc)
         self.mnuBrush.setEnabled(hasDoc)
+        self.trvDrawings.setEnabled(hasDoc)
+        self.trvBrushes.setEnabled(hasDoc)
+        self.trvProperties.setEnabled(hasDoc)
+
+        if hasDoc:
+            self.modelBrush.clear_items()
+            for br in doc.brushes:
+                self.modelBrush.append(br)
 
     def actBrushes_triggered(self):
         if self.actBrushes.isChecked():
@@ -50,8 +64,29 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
     def actBrushSolid_triggered(self):
         color = QColorDialog.getColor()
+        if not color.isValid():
+            return
+
+        name = None
+        while name is None:
+            name, ok = QInputDialog.getText(
+                self, "Input Name", "Brush Name:", QLineEdit.Normal, "")
+            if ok:
+                if not name or Application.current().document.brushes.contains(name):
+                    QMessageBox.question(
+                        self, "Invalid Name", "The name is empty or it exists. Please input name again.", QMessageBox.Retry, QMessageBox.Retry)
+                    name = None
+            else:
+                name = None
+                break
+
+        if name is None:
+            return
+
         br = brush.Solid(Color(color.red(), color.green(), color.blue()))
+        br.id = name
         Application.current().document.brushes.append(br)
+        self.modelBrush.append(br)
 
     def actClose_triggered(self):
         Application.current().document = None

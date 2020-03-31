@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1022</width>
-    <height>690</height>
+    <height>689</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -140,7 +140,13 @@
       </widget>
      </item>
      <item>
-      <widget class="QTreeView" name="trvDrawings"/>
+      <widget class="QTreeView" name="trvDrawings">
+       <property name="contextMenuPolicy">
+         <enum>Qt::ActionsContextMenu</enum>
+       </property>
+       <addaction name="actDrawingRemove"/>
+       <addaction name="actDrawingClear"/>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -173,14 +179,20 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QLineEdit" name="lneProperties">
+      <widget class="QLineEdit" name="lneBrushes">
        <property name="placeholderText">
         <string>Filter</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QTreeView" name="trvBrushes"/>
+      <widget class="QTreeView" name="trvBrushes">
+       <property name="contextMenuPolicy">
+        <enum>Qt::ActionsContextMenu</enum>
+       </property>
+       <addaction name="actBrushRemove"/>
+       <addaction name="actBrushClear"/>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -296,6 +308,16 @@
     <string>Ellipse</string>
    </property>
   </action>
+  <action name="actDrawingRemove">
+   <property name="text">
+    <string>Remove</string>
+   </property>
+  </action>
+  <action name="actDrawingClear">
+   <property name="text">
+    <string>Clear</string>
+   </property>
+  </action>
   <action name="actTransformTranslate">
    <property name="text">
     <string>Translate</string>
@@ -334,6 +356,16 @@
   <action name="actBrushSolid">
    <property name="text">
     <string>Solid</string>
+   </property>
+  </action>
+  <action name="actBrushRemove">
+   <property name="text">
+    <string>Remove</string>
+   </property>
+  </action>
+  <action name="actBrushClear">
+   <property name="text">
+    <string>Clear</string>
    </property>
   </action>
   <action name="actDrawings">

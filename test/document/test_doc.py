@@ -30,5 +30,5 @@ def test_sl() -> None:
     with open(file, mode="r") as f:
         docl = Document.load(f)
     
-    assert len(docl.brushes) == 1
-    assert isinstance(docl.brushes[0], Solid)
+    assert len(docl.brushes.items) == 1
+    assert isinstance(docl.brushes.items[0], Solid)

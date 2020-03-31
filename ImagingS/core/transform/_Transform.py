@@ -1,9 +1,9 @@
 from typing import Optional, List
-from ImagingS.core import Point
+from ImagingS.core import IdObject, Point
 from abc import ABC, abstractmethod
 
 
-class Transform(ABC):
+class Transform(IdObject, ABC):
     def __init__(self):
         super().__init__()
 

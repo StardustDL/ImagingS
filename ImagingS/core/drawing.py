@@ -2,6 +2,7 @@ from ImagingS.core import Color, Point, RectArea, Size
 from abc import ABC, abstractmethod
 from ImagingS.core.transform import Transform
 from typing import List, Optional
+from ImagingS.core import IdObject
 
 
 class DrawingContext(ABC):
@@ -18,11 +19,10 @@ class DrawingContext(ABC):
         pass
 
 
-class Drawing(ABC):
+class Drawing(IdObject, ABC):
     def __init__(self) -> None:
         super().__init__()
         self.transform: Optional[Transform] = None
-        self.id: str = ""
 
     @abstractmethod
     def render(self, context: DrawingContext) -> None:

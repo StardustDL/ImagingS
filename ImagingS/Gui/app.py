@@ -32,4 +32,4 @@ class Application(QObject):
     
     @classmethod
     def current(cls) -> Application:
-        return Application._current
+        return cls._current
