@@ -36,4 +36,4 @@ class Drawing(ABC):
 class DrawingGroup(Drawing):
     def __init__(self):
         super().__init__()
-        self.drawings: List[Drawing] = []
+        self.children: List[Drawing] = []

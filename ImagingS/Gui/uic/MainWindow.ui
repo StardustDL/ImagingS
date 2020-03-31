@@ -60,74 +60,53 @@
      <string>&amp;View</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuDrawing">
+    <property name="title">
+     <string>&amp;Drawing</string>
+    </property>
+    <addaction name="actDrawingGeometry"/>
+    <addaction name="actDrawingPolygon"/>
+    <addaction name="actDrawingCurve"/>
+    <addaction name="actDrawingEllipse"/>
+   </widget>
+   <widget class="QMenu" name="mnuTransform">
+    <property name="title">
+     <string>&amp;Transform</string>
+    </property>
+    <addaction name="actTransformTranslate"/>
+    <addaction name="actTransformScale"/>
+    <addaction name="actTransformRotate"/>
+    <addaction name="actTransformSkew"/>
+    <addaction name="actTransformMatrix"/>
+    <addaction name="actTransformClip"/>
+    <addaction name="separator"/>
+    <addaction name="actTransformGroup"/>
+   </widget>
+   <widget class="QMenu" name="mnuBrush">
+    <property name="title">
+     <string>&amp;Brush</string>
+    </property>
+    <addaction name="actBrushSolid"/>
+   </widget>
    <addaction name="mnuFile"/>
    <addaction name="mnuEdit"/>
    <addaction name="mnuView"/>
+   <addaction name="mnuDrawing"/>
+   <addaction name="mnuTransform"/>
+   <addaction name="mnuBrush"/>
   </widget>
   <widget class="QStatusBar" name="stbMain"/>
-  <widget class="QDockWidget" name="dwgToolbox">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="floating">
-    <bool>false</bool>
-   </property>
-   <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
-   </property>
+  <widget class="QDockWidget" name="dwgDrawings">
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>Toolbox</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="wgToolbox">
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <property name="leftMargin">
-      <number>0</number>
-     </property>
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <property name="rightMargin">
-      <number>0</number>
-     </property>
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QLineEdit" name="lneToolbox">
-       <property name="placeholderText">
-        <string>Filter</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QTreeView" name="trvToolbox"/>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="dwgGraphics">
-   <property name="allowedAreas">
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
-   <property name="windowTitle">
-    <string>Graphics</string>
+    <string>Drawings</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="wgGraphics">
+   <widget class="QWidget" name="wgDrawings">
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
       <number>0</number>
@@ -145,14 +124,54 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QLineEdit" name="lneGraphics">
+      <widget class="QLineEdit" name="lneDrawings">
        <property name="placeholderText">
         <string>Filter</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QTreeView" name="trvGraphics"/>
+      <widget class="QTreeView" name="trvDrawings"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dwgBrushes">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Brushes</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="wgBrushes">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLineEdit" name="lneProperties">
+       <property name="placeholderText">
+        <string>Filter</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTreeView" name="trvBrushes"/>
      </item>
     </layout>
    </widget>
@@ -197,6 +216,17 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QToolBar" name="tlbWindow">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
   <action name="actNew">
    <property name="text">
     <string>&amp;New</string>
@@ -230,6 +260,66 @@
   <action name="actRedo">
    <property name="text">
     <string>Redo</string>
+   </property>
+  </action>
+  <action name="actDrawingGeometry">
+   <property name="text">
+    <string>Line</string>
+   </property>
+  </action>
+  <action name="actDrawingPolygon">
+   <property name="text">
+    <string>Polygon</string>
+   </property>
+  </action>
+  <action name="actCurve">
+   <property name="text">
+    <string>Curve</string>
+   </property>
+  </action>
+  <action name="actDrawingEllipse">
+   <property name="text">
+    <string>Ellipse</string>
+   </property>
+  </action>
+  <action name="actTransformTranslate">
+   <property name="text">
+    <string>Translate</string>
+   </property>
+  </action>
+  <action name="actTransformScale">
+   <property name="text">
+    <string>Scale</string>
+   </property>
+  </action>
+  <action name="actTransformRotate">
+   <property name="text">
+    <string>Rotate</string>
+   </property>
+  </action>
+  <action name="actTransformSkew">
+   <property name="text">
+    <string>Skew</string>
+   </property>
+  </action>
+  <action name="actTransformMatrix">
+   <property name="text">
+    <string>Matrix</string>
+   </property>
+  </action>
+  <action name="actTransformClip">
+   <property name="text">
+    <string>Clip</string>
+   </property>
+  </action>
+  <action name="actTransformGroup">
+   <property name="text">
+    <string>Group</string>
+   </property>
+  </action>
+  <action name="actBrushSolid">
+   <property name="text">
+    <string>Solid</string>
    </property>
   </action>
  </widget>

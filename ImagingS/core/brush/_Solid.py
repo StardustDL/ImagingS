@@ -1,5 +1,5 @@
 from . import Brush
-from ImagingS.core import Color
+from ImagingS.core import Color, Point, RectArea
 
 
 class Solid(Brush):
@@ -9,4 +9,7 @@ class Solid(Brush):
 
     @property
     def color(self) -> Color:
+        return self._color
+
+    def color_at(self, position: Point, area: RectArea) -> Color:
         return self._color
