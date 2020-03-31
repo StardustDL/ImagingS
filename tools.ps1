@@ -50,7 +50,7 @@ if ($args.Count -gt 0) {
         }
         "test-noui" {
             Write-Output "Test (without UI)..."
-            pytest --ignore test/ui --cov=. --cov-report=term --cov-report=html
+            pytest --ignore test/gui --cov=. --cov-report=term --cov-report=html
         }
         Default {
             Write-Output "Unrecognized command"

@@ -1,11 +1,12 @@
 from ImagingS.core import Point
+from typing import Optional
 import numpy as np
-from . import Matrix
+from ImagingS.core.transform import Matrix
 
 
 class Scale(Matrix):
     def __init__(self, center: Point, factor: float) -> None:
-        super().__init__(np.matrix(
+        super().__init__(np.array(
             [[factor, 0],
              [0, factor]]))
         self._center = center
@@ -18,3 +19,6 @@ class Scale(Matrix):
     @property
     def factor(self) -> float:
         return self._factor
+
+    def transform(self, origin: Point) -> Optional[Point]:
+        return super().transform(origin - self._center)

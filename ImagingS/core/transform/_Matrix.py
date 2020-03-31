@@ -5,13 +5,13 @@ from . import Transform
 
 
 class Matrix(Transform):
-    def __init__(self, matrix: np.matrix) -> None:
+    def __init__(self, matrix: np.ndarray) -> None:
         super().__init__()
         self._matrix = matrix
 
     @property
-    def matrix(self) -> np.matrix:
+    def matrix(self) -> np.ndarray:
         return self._matrix
 
     def transform(self, origin: Point) -> Optional[Point]:
-        return self._matrix * origin.to_array()
+        return Point.from_array(np.dot(self._matrix, origin.to_array()))

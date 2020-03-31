@@ -1,11 +1,24 @@
 from __future__ import annotations
+from math import fabs
 import numpy as np
 
 
-class Point(object):
+class Point:
     def __init__(self, x: float, y: float) -> None:
         self._x = x
         self._y = y
+
+    def __eq__(self, other: Point) -> bool:
+        return fabs(self._x - other._x) < 1e-8 and fabs(self._y - other._y) < 1e-8
+
+    def __add__(self, other: Point) -> Point:
+        return Point(self._x + other._x, self._y + other._y)
+
+    def __sub__(self, other: Point) -> Point:
+        return Point(self._x - other._x, self._y - other._y)
+
+    def __repr__(self) -> str:
+        return f"Point({self._x}, {self._y})"
 
     @property
     def x(self) -> float:
@@ -24,11 +37,19 @@ class Point(object):
         return Point(arr[0][0], arr[1][0])
 
 
-class Color(object):
+class Color:
     def __init__(self, r: int, g: int, b: int) -> None:
         self._r = r
         self._g = g
         self._b = b
+
+    def __eq__(self, obj) -> bool:
+        if isinstance(obj, Color):
+            return self._r == obj._r and self._g == obj._g and self._b == obj._b
+        return False
+
+    def __repr__(self) -> str:
+        return f"Color({self._r}, {self._g}, {self._b})"
 
     @property
     def r(self) -> float:
@@ -43,10 +64,18 @@ class Color(object):
         return self._b
 
 
-class Size(object):
+class Size:
     def __init__(self, width: float, height: float) -> None:
         self._width = width
         self._height = height
+
+    def __eq__(self, obj) -> bool:
+        if isinstance(obj, Size):
+            return self._width == obj._width and self._height == obj._height
+        return False
+    
+    def __repr__(self) -> str:
+        return f"Size({self._width}, {self._height})"
 
     @property
     def width(self) -> float:
@@ -57,10 +86,15 @@ class Size(object):
         return self._height
 
 
-class RectArea(object):
+class RectArea:
     def __init__(self, origin: Point, size: Size) -> None:
         self._origin = origin
         self._size = size
+
+    def __eq__(self, obj) -> bool:
+        if isinstance(obj, RectArea):
+            return self._origin == obj._origin and self._size == obj._size
+        return False
 
     @property
     def origin(self) -> Point:
