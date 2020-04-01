@@ -37,6 +37,13 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actOpen.triggered.connect(self.actOpen_triggered)
         self.actBrushSolid.triggered.connect(self.actBrushSolid_triggered)
 
+        self.actDrawingCurve.triggered.connect(self.actDrawingCurve_triggered)
+        self.actDrawingLine.triggered.connect(self.actDrawingLine_triggered)
+        self.actDrawingEllipse.triggered.connect(
+            self.actDrawingEllipse_triggered)
+        self.actDrawingPolygon.triggered.connect(
+            self.actDrawingPolygon_triggered)
+
         self.modelBrush = BrushModel(self)
         self.trvBrushes.setModel(self.modelBrush)
         self.trvBrushes.clicked.connect(
@@ -53,9 +60,13 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
     def setupDockWidget(self):
         self.actToggleBrushes = self.dwgBrushes.toggleViewAction()
+        self.actToggleBrushes.setShortcut("Ctrl+Shift+B")
         self.actToggleProperties = self.dwgProperties.toggleViewAction()
+        self.actToggleProperties.setShortcut("Ctrl+Shift+P")
         self.actToggleDrawings = self.dwgDrawings.toggleViewAction()
+        self.actToggleDrawings.setShortcut("Ctrl+Shift+D")
         self.actToggleTransforms = self.dwgTransforms.toggleViewAction()
+        self.actToggleTransforms.setShortcut("Ctrl+Shift+T")
 
         viewActions = [self.actToggleDrawings, self.actToggleBrushes,
                        self.actToggleTransforms, self.actToggleProperties]
@@ -88,8 +99,11 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actBrushSolid.setIcon(qta.icon("mdi.solid"))
         self.actBrushRemove.setIcon(qta.icon("mdi.delete", color="red"))
         self.actDrawingRemove.setIcon(qta.icon("mdi.delete", color="red"))
+        self.actTransformRemove.setIcon(qta.icon("mdi.delete", color="red"))
         self.actBrushClear.setIcon(qta.icon("mdi.delete-sweep", color="red"))
         self.actDrawingClear.setIcon(qta.icon("mdi.delete-sweep", color="red"))
+        self.actTransformClear.setIcon(
+            qta.icon("mdi.delete-sweep", color="red"))
         self.dwgBrushes.setWindowIcon(qta.icon("mdi.brush"))
         self.dwgDrawings.setWindowIcon(qta.icon("mdi.drawing"))
         self.dwgTransforms.setWindowIcon(qta.icon("mdi.axis"))
@@ -146,6 +160,23 @@ class MainWindow(QMainWindow, ui.MainWindow):
         item = Application.current().document.brushes[r]
         if self.modelProperties.obj is not item:
             self.modelProperties.fresh(item)
+
+    def resetDrawingActionChecked(self, checkedAction=None):
+        for act in self.mnuDrawing.actions():
+            if act.isCheckable() and act is not checkedAction:
+                act.setChecked(False)
+
+    def actDrawingCurve_triggered(self):
+        self.resetDrawingActionChecked(self.actDrawingCurve)
+
+    def actDrawingPolygon_triggered(self):
+        self.resetDrawingActionChecked(self.actDrawingPolygon)
+
+    def actDrawingEllipse_triggered(self):
+        self.resetDrawingActionChecked(self.actDrawingEllipse)
+
+    def actDrawingLine_triggered(self):
+        self.resetDrawingActionChecked(self.actDrawingLine)
 
     def actBrushSolid_triggered(self):
         color = QColorDialog.getColor()

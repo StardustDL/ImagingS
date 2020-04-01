@@ -1,5 +1,6 @@
 from ImagingS.core import Color, Point, RectArea, Size
 from abc import ABC, abstractmethod
+from ImagingS.core.serialization import Serializable
 from ImagingS.core.transform import Transform
 from typing import List
 from ImagingS.core import IdObject
@@ -19,7 +20,7 @@ class DrawingContext(ABC):
         pass
 
 
-class Drawing(IdObject, ABC):
+class Drawing(Serializable, IdObject, ABC):
     def __init__(self) -> None:
         super().__init__()
         self.transforms: List[Transform] = []

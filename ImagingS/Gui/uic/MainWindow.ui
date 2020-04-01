@@ -228,9 +228,15 @@
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
        </property>
-       <addaction name="actBrushSolid"/>
-       <addaction name="actBrushRemove"/>
-       <addaction name="actBrushClear"/>
+       <addaction name="actTransformTranslate"/>
+       <addaction name="actTransformScale"/>
+       <addaction name="actTransformRotate"/>
+       <addaction name="actTransformSkew"/>
+       <addaction name="actTransformMatrix"/>
+       <addaction name="actTransformClip"/>
+       <addaction name="actTransformGroup"/>
+       <addaction name="actTransformRemove"/>
+       <addaction name="actTransformClear"/>
       </widget>
      </item>
     </layout>
@@ -358,21 +364,33 @@
    </property>
   </action>
   <action name="actDrawingLine">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Line</string>
    </property>
   </action>
   <action name="actDrawingPolygon">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Polygon</string>
    </property>
   </action>
   <action name="actDrawingCurve">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Curve</string>
    </property>
   </action>
   <action name="actDrawingEllipse">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Ellipse</string>
    </property>
@@ -420,6 +438,16 @@
   <action name="actTransformGroup">
    <property name="text">
     <string>Group</string>
+   </property>
+  </action>
+  <action name="actTransformRemove">
+   <property name="text">
+    <string>Remove</string>
+   </property>
+  </action>
+  <action name="actTransformClear">
+   <property name="text">
+    <string>Clear</string>
    </property>
   </action>
   <action name="actBrushSolid">

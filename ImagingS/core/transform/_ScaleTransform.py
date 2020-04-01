@@ -1,5 +1,5 @@
 from ImagingS.core import Point
-from typing import Optional
+from typing import Optional, Dict, Any
 import numpy as np
 from ImagingS.core.transform import MatrixTransform
 
@@ -22,3 +22,14 @@ class ScaleTransform(MatrixTransform):
 
     def transform(self, origin: Point) -> Optional[Point]:
         return super().transform(origin - self._center)
+
+    def serialize(self) -> Dict:
+        return {
+            "_center": self._center,
+            "_factor": self._factor
+        }
+
+    @staticmethod
+    def deserialize(data: Dict) -> Any:
+        result = ScaleTransform(data["_center"], data["_factor"])
+        return result

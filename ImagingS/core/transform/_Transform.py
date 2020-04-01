@@ -1,9 +1,10 @@
 from typing import Optional, List
 from ImagingS.core import IdObject, Point
 from abc import ABC, abstractmethod
+from ImagingS.core.serialization import Serializable
 
 
-class Transform(IdObject, ABC):
+class Transform(Serializable, IdObject, ABC):
     def __init__(self):
         super().__init__()
 

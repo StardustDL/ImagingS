@@ -1,6 +1,6 @@
 from ImagingS.core import Point
 import numpy as np
-from typing import Optional
+from typing import Optional, Dict, Any
 from math import cos, sin
 from ImagingS.core.transform import MatrixTransform
 
@@ -28,3 +28,16 @@ class SkewTransform(MatrixTransform):
 
     def transform(self, origin: Point) -> Optional[Point]:
         return super().transform(origin - self._center)
+
+    def serialize(self) -> Dict:
+        return {
+            "_center": self._center,
+            "_angle_x": self._angle_x,
+            "_angle_y": self._angle_y,
+        }
+
+    @staticmethod
+    def deserialize(data: Dict) -> Any:
+        result = SkewTransform(
+            data["_center"], data["_angle_x"], data["_angle_y"])
+        return result

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ImagingS.core import IdObjectList, IdObject
+from ImagingS.core import IdObjectList, IdObject, Size
 from ImagingS.core.drawing import Drawing
 from typing import Dict, Any, List
 from ImagingS.core.brush import Brush
@@ -15,16 +15,19 @@ class Document(IdObject, Serializable):
         self.id = str(uuid.uuid1())
         self.brushes: List[Brush] = []
         self.drawings: IdObjectList[Drawing] = IdObjectList()
+        self.size = Size(960, 720)
 
     def serialize(self) -> Dict:
         return {
             "brushes": self.brushes,
-            "drawings": self.drawings.items
+            "drawings": self.drawings.items,
+            "size": self.size
         }
 
     @staticmethod
     def deserialize(data: Dict) -> Any:
         result = Document()
+        result.size = data["size"]
         result.brushes = data["brushes"]
         result.drawings = IdObjectList(data["drawings"])
         return result
