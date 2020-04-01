@@ -29,7 +29,7 @@ class Application(QObject):
 
     def run(self) -> int:
         return self.app.exec_()
-    
+
     @classmethod
     def current(cls) -> Application:
         return cls._current

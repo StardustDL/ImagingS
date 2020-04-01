@@ -1,10 +1,10 @@
-from ImagingS.core import Color, IdObject, Point, RectArea
+from ImagingS.core import Color, Point, RectArea
 from ImagingS.core.serialization import Serializable
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 
 
-class Brush(IdObject, Serializable, ABC):
+class Brush(Serializable, ABC):
     def __init__(self) -> None:
         super().__init__()
 

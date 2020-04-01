@@ -1,14 +1,12 @@
-
 from ImagingS.core import Point
 import numpy as np
 from typing import Optional
 from math import cos, sin
-from ImagingS.core.transform import Matrix
+from ImagingS.core.transform import MatrixTransform
 
 
-class Rotate(Matrix):
+class RotateTransform(MatrixTransform):
     def __init__(self, center: Point, angle: float) -> None:
-        # angle: anticlockwise
         super().__init__(np.array(
             [[cos(angle), -sin(angle)],
              [sin(angle), cos(angle)]]))

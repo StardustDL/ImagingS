@@ -1,9 +1,9 @@
 from . import Brush
-from ImagingS.core import Color, IdObject, Point, RectArea
+from ImagingS.core import Color, Point, RectArea
 from typing import Dict, Any
 
 
-class Solid(Brush):
+class SolidBrush(Brush):
     def __init__(self, color: Color) -> None:
         super().__init__()
         self._color = color
@@ -17,6 +17,5 @@ class Solid(Brush):
 
     @staticmethod
     def deserialize(data: Dict) -> Any:
-        result = Solid(data["_color"])
-        IdObject.apply_id(result, data)
+        result = SolidBrush(data["_color"])
         return result

@@ -3,7 +3,7 @@ from ImagingS.core import Point
 from . import Transform
 
 
-class Translate(Transform):
+class TranslateTransform(Transform):
     def __init__(self, delta: Point) -> None:
         super().__init__()
         self._delta = delta

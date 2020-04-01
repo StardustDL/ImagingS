@@ -1,8 +1,10 @@
 from ._Brush import Brush
-from ._Solid import Solid
+from ._SolidBrush import SolidBrush
+from ._Brushes import Brushes
 
 
 __all__ = (
     "Brush",
-    "Solid"
+    "SolidBrush",
+    "Brushes"
 )

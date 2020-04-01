@@ -1,19 +1,19 @@
 from ._Transform import Transform, TransformGroup
-from ._Clip import Clip
-from ._Matrix import Matrix
-from ._Rotate import Rotate
-from ._Scale import Scale
-from ._Skew import Skew
-from ._Translate import Translate
+from ._ClipTransform import ClipTransform
+from ._MatrixTransform import MatrixTransform
+from ._RotateTransform import RotateTransform
+from ._ScaleTransform import ScaleTransform
+from ._SkewTransform import SkewTransform
+from ._TranslateTransform import TranslateTransform
 
 
 __all__ = (
     "Transform",
     "TransformGroup",
-    "Clip",
-    "Matrix",
-    "Rotate",
-    "Scale",
-    "Skew",
-    "Translate",
+    "ClipTransform",
+    "MatrixTransform",
+    "RotateTransform",
+    "ScaleTransform",
+    "SkewTransform",
+    "TranslateTransform",
 )

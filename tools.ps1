@@ -70,21 +70,21 @@ if ($args.Count -gt 0) {
         }
         "test" {
             Write-Output "Test..."
-            pytest
+            pytest --verbose
             if (!$?) {
                 exit 1
             }
         }
         "testcov" {
             Write-Output "Test and coverage..."
-            pytest --cov=. --cov-report=term --cov-report=html
+            pytest --verbose --cov=. --cov-report=term --cov-report=html
             if (!$?) {
                 exit 1
             }
         }
         "testcov-noui" {
             Write-Output "Test and coverage (without UI)..."
-            pytest --ignore test/gui --cov=. --cov-report=term --cov-report=html
+            pytest --verbose --ignore test/gui --cov=. --cov-report=term --cov-report=html
             if (!$?) {
                 exit 1
             }

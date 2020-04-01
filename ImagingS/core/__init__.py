@@ -141,6 +141,14 @@ class Color(Serializable):
         return self._b
 
 
+class Colors:
+    Black = Color(0, 0, 0)
+    White = Color(255, 255, 255)
+    Red = Color(255, 0, 0)
+    Blue = Color(0, 0, 255)
+    Green = Color(0, 255, 0)
+
+
 class Size(Serializable):
     def __init__(self, width: float, height: float) -> None:
         super().__init__()

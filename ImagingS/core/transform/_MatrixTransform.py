@@ -4,7 +4,7 @@ from ImagingS.core import Point
 from . import Transform
 
 
-class Matrix(Transform):
+class MatrixTransform(Transform):
     def __init__(self, matrix: np.ndarray) -> None:
         super().__init__()
         self._matrix = matrix

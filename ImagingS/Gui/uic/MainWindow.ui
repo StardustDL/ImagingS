@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1022</width>
-    <height>689</height>
+    <width>1028</width>
+    <height>717</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,7 +35,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1022</width>
+     <width>1028</width>
      <height>26</height>
     </rect>
    </property>
@@ -47,6 +47,7 @@
     <addaction name="actOpen"/>
     <addaction name="separator"/>
     <addaction name="actSave"/>
+    <addaction name="actSaveAs"/>
     <addaction name="separator"/>
     <addaction name="actExport"/>
     <addaction name="separator"/>
@@ -65,9 +66,6 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="actDrawings"/>
-    <addaction name="actBrushes"/>
-    <addaction name="actProperties"/>
    </widget>
    <widget class="QMenu" name="mnuDrawing">
     <property name="title">
@@ -106,9 +104,6 @@
   </widget>
   <widget class="QStatusBar" name="stbMain"/>
   <widget class="QDockWidget" name="dwgDrawings">
-   <property name="contextMenuPolicy">
-    <enum>Qt::ActionsContextMenu</enum>
-   </property>
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
@@ -160,14 +155,8 @@
      </item>
     </layout>
    </widget>
-   <addaction name="actDrawings"/>
-   <addaction name="actBrushes"/>
-   <addaction name="actProperties"/>
   </widget>
   <widget class="QDockWidget" name="dwgBrushes">
-   <property name="contextMenuPolicy">
-    <enum>Qt::ActionsContextMenu</enum>
-   </property>
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
@@ -195,19 +184,9 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QLineEdit" name="lneBrushes">
-       <property name="placeholderText">
-        <string>Filter</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QTreeView" name="trvBrushes">
+      <widget class="QListView" name="trvBrushes">
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
-       </property>
-       <property name="rootIsDecorated">
-        <bool>false</bool>
        </property>
        <addaction name="actBrushSolid"/>
        <addaction name="actBrushRemove"/>
@@ -216,14 +195,48 @@
      </item>
     </layout>
    </widget>
-   <addaction name="actDrawings"/>
-   <addaction name="actBrushes"/>
-   <addaction name="actProperties"/>
+  </widget>
+  <widget class="QDockWidget" name="dwgTransforms">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Transforms</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="wgTransforms">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QListView" name="trvTransforms">
+       <property name="contextMenuPolicy">
+        <enum>Qt::ActionsContextMenu</enum>
+       </property>
+       <addaction name="actBrushSolid"/>
+       <addaction name="actBrushRemove"/>
+       <addaction name="actBrushClear"/>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QDockWidget" name="dwgProperties">
-   <property name="contextMenuPolicy">
-    <enum>Qt::ActionsContextMenu</enum>
-   </property>
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
@@ -262,13 +275,10 @@
      </item>
     </layout>
    </widget>
-   <addaction name="actDrawings"/>
-   <addaction name="actBrushes"/>
-   <addaction name="actProperties"/>
   </widget>
   <widget class="QToolBar" name="tlbWindow">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>Tool Box</string>
    </property>
    <attribute name="toolBarArea">
     <enum>LeftToolBarArea</enum>
@@ -285,15 +295,32 @@
    <property name="text">
     <string>&amp;New</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actOpen">
    <property name="text">
     <string>&amp;Open</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actSave">
    <property name="text">
     <string>&amp;Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actSaveAs">
+   <property name="text">
+    <string>Save As</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="actExport">
@@ -305,6 +332,9 @@
    <property name="text">
     <string>&amp;Close</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+F4</string>
+   </property>
   </action>
   <action name="actQuit">
    <property name="text">
@@ -315,10 +345,16 @@
    <property name="text">
     <string>Undo</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
   </action>
   <action name="actRedo">
    <property name="text">
     <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
    </property>
   </action>
   <action name="actDrawingLine">
@@ -399,39 +435,6 @@
   <action name="actBrushClear">
    <property name="text">
     <string>Clear</string>
-   </property>
-  </action>
-  <action name="actDrawings">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Drawings</string>
-   </property>
-  </action>
-  <action name="actBrushes">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Brushes</string>
-   </property>
-  </action>
-  <action name="actProperties">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Properties</string>
    </property>
   </action>
  </widget>

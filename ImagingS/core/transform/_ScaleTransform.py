@@ -1,10 +1,10 @@
 from ImagingS.core import Point
 from typing import Optional
 import numpy as np
-from ImagingS.core.transform import Matrix
+from ImagingS.core.transform import MatrixTransform
 
 
-class Scale(Matrix):
+class ScaleTransform(MatrixTransform):
     def __init__(self, center: Point, factor: float) -> None:
         super().__init__(np.array(
             [[factor, 0],
