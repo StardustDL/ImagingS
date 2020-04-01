@@ -21,7 +21,9 @@ class BrushModel(QStandardItemModel):
     def append(self, brush: Brush) -> None:
         index = self.rowCount()
         if isinstance(brush, Solid):
-            self.appendRow(QStandardItem(_get_color_icon(brush.color), brush.id))
+            fitem = QStandardItem(_get_color_icon(brush.color), brush.id)
+            fitem.setToolTip(brush.color.to_hex())
+            self.appendRow(fitem)
             self.setData(self.index(index, self.VALUE), brush.color.to_hex())
         else:
             raise Exception("Unsupport brush")

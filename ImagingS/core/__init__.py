@@ -47,6 +47,9 @@ class IdObjectList(Generic[T]):
         self._items.append(item)
         self._ids[item.id] = item
 
+    def at(self, index: int) -> T:
+        return self._items[index]
+
     def __delitem__(self, key: str) -> None:
         if not self.contains(key):
             raise KeyError(key)

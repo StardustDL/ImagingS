@@ -118,9 +118,6 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <addaction name="actDrawings"/>
-   <addaction name="actBrushes"/>
-   <addaction name="actProperties"/>
    <widget class="QWidget" name="wgDrawings">
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
@@ -150,6 +147,9 @@
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
        </property>
+       <property name="rootIsDecorated">
+        <bool>false</bool>
+       </property>
        <addaction name="actDrawingLine"/>
        <addaction name="actDrawingPolygon"/>
        <addaction name="actDrawingCurve"/>
@@ -160,6 +160,9 @@
      </item>
     </layout>
    </widget>
+   <addaction name="actDrawings"/>
+   <addaction name="actBrushes"/>
+   <addaction name="actProperties"/>
   </widget>
   <widget class="QDockWidget" name="dwgBrushes">
    <property name="contextMenuPolicy">
@@ -174,9 +177,6 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <addaction name="actDrawings"/>
-   <addaction name="actBrushes"/>
-   <addaction name="actProperties"/>
    <widget class="QWidget" name="wgBrushes">
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
@@ -206,6 +206,9 @@
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
        </property>
+       <property name="rootIsDecorated">
+        <bool>false</bool>
+       </property>
        <addaction name="actBrushSolid"/>
        <addaction name="actBrushRemove"/>
        <addaction name="actBrushClear"/>
@@ -213,6 +216,9 @@
      </item>
     </layout>
    </widget>
+   <addaction name="actDrawings"/>
+   <addaction name="actBrushes"/>
+   <addaction name="actProperties"/>
   </widget>
   <widget class="QDockWidget" name="dwgProperties">
    <property name="contextMenuPolicy">
@@ -227,9 +233,6 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <addaction name="actDrawings"/>
-   <addaction name="actBrushes"/>
-   <addaction name="actProperties"/>
    <widget class="QWidget" name="wgProperties">
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
@@ -259,6 +262,9 @@
      </item>
     </layout>
    </widget>
+   <addaction name="actDrawings"/>
+   <addaction name="actBrushes"/>
+   <addaction name="actProperties"/>
   </widget>
   <widget class="QToolBar" name="tlbWindow">
    <property name="windowTitle">

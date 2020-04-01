@@ -2,10 +2,18 @@ import ImagingS.Gui.ui as ui
 from ImagingS.document import Document
 from ImagingS.Gui.app import Application
 from ImagingS.core import Color, brush
-from ImagingS.Gui.models import BrushModel
+from ImagingS.core.brush import brushes
+from ImagingS.Gui.models import BrushModel, PropertyModel
 import qtawesome as qta
 
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog, QInputDialog, QLineEdit, QMessageBox
+
+
+def _create_new_document() -> Document:
+    result = Document()
+    result.brushes.append(brushes.Black)
+    result.brushes.append(brushes.White)
+    return result
 
 
 class MainWindow(QMainWindow, ui.MainWindow):
@@ -27,6 +35,11 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
         self.modelBrush = BrushModel(self)
         self.trvBrushes.setModel(self.modelBrush)
+        self.trvBrushes.clicked.connect(
+            self.trvBrushes_clicked)
+
+        self.modelProperties = PropertyModel(self)
+        self.trvProperties.setModel(self.modelProperties)
 
         Application.current().documentChanged.connect(self.app_documentChanged)
         self.actNew.trigger()
@@ -80,6 +93,12 @@ class MainWindow(QMainWindow, ui.MainWindow):
             for br in doc.brushes:
                 self.modelBrush.append(br)
 
+    def trvBrushes_clicked(self, index):
+        r = index.row()
+        item = Application.current().document.brushes.at(r)
+        if self.modelProperties.obj is not item:
+            self.modelProperties.fresh(item)
+
     def actBrushes_triggered(self):
         if self.actBrushes.isChecked():
             self.dwgBrushes.show()
@@ -128,7 +147,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         Application.current().document = None
 
     def actNew_triggered(self):
-        Application.current().document = Document()
+        Application.current().document = _create_new_document()
 
     def actSave_triggered(self):
         options = QFileDialog.Options()
