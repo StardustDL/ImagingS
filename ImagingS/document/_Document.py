@@ -1,36 +1,45 @@
 from __future__ import annotations
 from ImagingS.core import IdObjectList, IdObject, Size
 from ImagingS.core.drawing import Drawing
-from typing import Dict, Any, List
+from typing import List
 from ImagingS.core.brush import Brush
-from ImagingS.core.serialization import Serializable
+from ImagingS.core.serialization import PropertySerializable
 from ImagingS.core.serialization.json import Decoder, Encoder
 import json
 import uuid
 
 
-class Document(IdObject, Serializable):
+class Document(PropertySerializable, IdObject):
     def __init__(self) -> None:
         super().__init__()
         self.id = str(uuid.uuid1())
-        self.brushes: List[Brush] = []
-        self.drawings: IdObjectList[Drawing] = IdObjectList()
-        self.size = Size(960, 720)
+        self.brushes = []
+        self.drawings = IdObjectList()
+        self.size = Size.create(960, 720)
 
-    def serialize(self) -> Dict:
-        return {
-            "brushes": self.brushes,
-            "drawings": self.drawings.items,
-            "size": self.size
-        }
+    @property
+    def brushes(self) -> List[Brush]:
+        return self._brushes
 
-    @staticmethod
-    def deserialize(data: Dict) -> Any:
-        result = Document()
-        result.size = data["size"]
-        result.brushes = data["brushes"]
-        result.drawings = IdObjectList(data["drawings"])
-        return result
+    @brushes.setter
+    def brushes(self, value: List[Brush]) -> None:
+        self._brushes = value
+
+    @property
+    def drawings(self) -> IdObjectList[Drawing]:
+        return self._drawings
+
+    @drawings.setter
+    def drawings(self, value: IdObjectList[Drawing]) -> None:
+        self._drawings = value
+
+    @property
+    def size(self) -> Size:
+        return self._size
+
+    @size.setter
+    def size(self, value: Size) -> None:
+        self._size = value
 
     def save(self, file) -> None:
         json.dump(self, file, ensure_ascii=False, indent=4, cls=Encoder)

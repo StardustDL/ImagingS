@@ -1,10 +1,10 @@
 from typing import Optional, List
 from ImagingS.core import IdObject, Point
 from abc import ABC, abstractmethod
-from ImagingS.core.serialization import Serializable
+from ImagingS.core.serialization import PropertySerializable
 
 
-class Transform(Serializable, IdObject, ABC):
+class Transform(PropertySerializable, IdObject, ABC):
     def __init__(self):
         super().__init__()
 
@@ -16,4 +16,20 @@ class Transform(Serializable, IdObject, ABC):
 class TransformGroup(Transform):
     def __init__(self):
         super().__init__()
-        self.children: List[Transform] = []
+        self.children = []
+
+    @property
+    def children(self) -> List[Transform]:
+        return self._children
+
+    @children.setter
+    def children(self, value: List[Transform]) -> None:
+        self._children = value
+
+    def transform(self, origin: Point) -> Optional[Point]:
+        result: Optional[Point] = origin
+        for tr in self.children:
+            result = tr.transform(result)
+            if result is None:
+                return None
+        return result

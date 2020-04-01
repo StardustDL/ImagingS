@@ -1,13 +1,22 @@
+from __future__ import annotations
 import numpy as np
-from typing import Optional, Dict, Any
+from typing import Optional, Dict
 from ImagingS.core import Point
 from . import Transform
 
 
 class MatrixTransform(Transform):
-    def __init__(self, matrix: np.ndarray) -> None:
+    S_Matrix = "_matrix"
+
+    def __init__(self) -> None:
         super().__init__()
-        self._matrix = matrix
+        self.matrix = np.eye(2)
+
+    @staticmethod
+    def create(matrix: np.ndarray) -> MatrixTransform:
+        result = MatrixTransform()
+        result.matrix = matrix
+        return result
 
     @property
     def matrix(self) -> np.ndarray:
@@ -21,17 +30,16 @@ class MatrixTransform(Transform):
         return Point.from_array(np.dot(self._matrix, origin.to_array()))
 
     def serialize(self) -> Dict:
-        return {
-            "00": self.matrix[0][0],
-            "01": self.matrix[0][1],
-            "10": self.matrix[1][0],
-            "11": self.matrix[1][1],
-        }
+        result = super().serialize()
 
-    @staticmethod
-    def deserialize(data: Dict) -> Any:
-        result = MatrixTransform(np.array([
-            [data["00"], data["01"]],
-            [data["10"], data["11"]]
-        ]))
+        if "matrix" in result:
+            del result["matrix"]
+
+        result[self.S_Matrix] = [self.matrix[0][0], self.matrix[0][1],
+                                 self.matrix[1][0], self.matrix[1][1]]
         return result
+
+    def deserialize(self, data: Dict) -> None:
+        if self.S_Matrix in data:
+            mat = data[self.S_Matrix]
+            self.matrix = np.array([[mat[0], mat[1]], [mat[2], mat[3]]])

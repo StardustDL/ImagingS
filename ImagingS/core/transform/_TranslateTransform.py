@@ -1,21 +1,27 @@
-from typing import Optional, Dict, Any
+from __future__ import annotations
+from typing import Optional
 from ImagingS.core import Point
 from . import Transform
 
 
 class TranslateTransform(Transform):
-    def __init__(self, delta: Point) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self._delta = delta
+        self.delta = Point()
+
+    @staticmethod
+    def create(delta: Point) -> TranslateTransform:
+        result = TranslateTransform()
+        result.delta = delta
+        return result
 
     @property
     def delta(self) -> Point:
         return self._delta
 
+    @delta.setter
+    def delta(self, value: Point) -> None:
+        self._delta = value
+
     def transform(self, origin: Point) -> Optional[Point]:
         return origin + self._delta
-
-    @staticmethod
-    def deserialize(data: Dict) -> Any:
-        result = TranslateTransform(data["_delta"])
-        return result

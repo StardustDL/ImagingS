@@ -58,7 +58,7 @@ if ($args.Count -gt 0) {
                 exit 1
             }
             # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-            flake8 . --count --exclude=".svn,CVS,.bzr,.hg,.git,__pycache__,.tox,.eggs,*.egg,_ui_*.py" --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+            flake8 . --count --ignore="E501,E121,E123,E126,E226,E24,E704,W503,W504" --exclude=".svn,CVS,.bzr,.hg,.git,__pycache__,.tox,.eggs,*.egg,_ui_*.py" --exit-zero --max-complexity=10 --max-line-length=127 --statistics
             if (!$?) {
                 exit 1
             }

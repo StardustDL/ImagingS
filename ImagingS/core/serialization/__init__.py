@@ -1,15 +1,9 @@
-from abc import ABC, abstractmethod
-from typing import Any, Dict
+from ._Property import Property, get_properties
+from ._Serializable import Serializable, PropertySerializable
 
-
-class Serializable(ABC):
-    def __init__(self) -> None:
-        super().__init__()
-
-    def serialize(self) -> Dict:
-        return self.__dict__
-
-    @staticmethod
-    @abstractmethod
-    def deserialize(data: Dict) -> Any:
-        pass
+__all__ = (
+    "Property",
+    "get_properties",
+    "Serializable",
+    "PropertySerializable"
+)

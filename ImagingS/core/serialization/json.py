@@ -23,8 +23,12 @@ class Decoder(json.JSONDecoder):
             module_name = d.pop("__module__")
             module = importlib.import_module(module_name)
             class_ = getattr(module, class_name)
-            desmethod = getattr(class_, "deserialize")
-            inst = desmethod(d.pop("__data__"))
+            obj = class_.__new__(class_)
+            if isinstance(obj, Serializable):
+                obj.deserialize(d.pop("__data__"))
+            else:
+                raise Exception(f"Type '{module_name}.{class_name}' is not serializable.")
+            inst = obj
         else:
             inst = d
         return inst

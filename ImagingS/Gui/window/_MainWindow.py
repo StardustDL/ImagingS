@@ -2,8 +2,8 @@ from typing import Optional
 import ImagingS.Gui.ui as ui
 from ImagingS.document import Document
 from ImagingS.Gui.app import Application
-from ImagingS.core import Color, brush
-from ImagingS.core.brush import Brushes, Brush
+from ImagingS.core import Color
+from ImagingS.core.brush import Brushes, Brush, SolidBrush
 from ImagingS.Gui.models import BrushModel, PropertyModel
 import qtawesome as qta
 
@@ -52,9 +52,6 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.modelProperties = PropertyModel(self)
         self.trvProperties.setModel(self.modelProperties)
 
-        self.tabifyDockWidget(self.dwgBrushes, self.dwgTransforms)
-        self.dwgBrushes.raise_()
-
         Application.current().documentChanged.connect(self.app_documentChanged)
         self.actNew.trigger()
 
@@ -65,11 +62,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actToggleProperties.setShortcut("Ctrl+Shift+P")
         self.actToggleDrawings = self.dwgDrawings.toggleViewAction()
         self.actToggleDrawings.setShortcut("Ctrl+Shift+D")
-        self.actToggleTransforms = self.dwgTransforms.toggleViewAction()
-        self.actToggleTransforms.setShortcut("Ctrl+Shift+T")
 
         viewActions = [self.actToggleDrawings, self.actToggleBrushes,
-                       self.actToggleTransforms, self.actToggleProperties]
+                       self.actToggleProperties]
         self.mnuView.addActions(viewActions)
 
     def setupIcon(self):
@@ -84,7 +79,6 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actRedo.setIcon(qta.icon("mdi.redo"))
         self.actToggleDrawings.setIcon(qta.icon("mdi.drawing"))
         self.actToggleBrushes.setIcon(qta.icon("mdi.brush"))
-        self.actToggleTransforms.setIcon(qta.icon("mdi.axis"))
         self.actToggleProperties.setIcon(qta.icon("mdi.database"))
         self.actDrawingLine.setIcon(qta.icon("mdi.vector-line"))
         self.actDrawingCurve.setIcon(qta.icon("mdi.vector-curve"))
@@ -99,14 +93,10 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actBrushSolid.setIcon(qta.icon("mdi.solid"))
         self.actBrushRemove.setIcon(qta.icon("mdi.delete", color="red"))
         self.actDrawingRemove.setIcon(qta.icon("mdi.delete", color="red"))
-        self.actTransformRemove.setIcon(qta.icon("mdi.delete", color="red"))
         self.actBrushClear.setIcon(qta.icon("mdi.delete-sweep", color="red"))
         self.actDrawingClear.setIcon(qta.icon("mdi.delete-sweep", color="red"))
-        self.actTransformClear.setIcon(
-            qta.icon("mdi.delete-sweep", color="red"))
         self.dwgBrushes.setWindowIcon(qta.icon("mdi.brush"))
         self.dwgDrawings.setWindowIcon(qta.icon("mdi.drawing"))
-        self.dwgTransforms.setWindowIcon(qta.icon("mdi.axis"))
         self.dwgProperties.setWindowIcon(qta.icon("mdi.database"))
         self.tlbWindow.setWindowIcon(qta.icon("mdi.toolbox"))
         self.setWindowIcon(qta.icon("mdi.pencil-box-multiple", color="purple"))
@@ -141,7 +131,6 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.dwgDrawings.setEnabled(hasDoc)
         self.dwgBrushes.setEnabled(hasDoc)
         self.dwgProperties.setEnabled(hasDoc)
-        self.dwgTransforms.setEnabled(hasDoc)
         self.tlbWindow.setEnabled(hasDoc)
 
         if hasDoc:
@@ -182,7 +171,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         color = QColorDialog.getColor()
         if not color.isValid():
             return
-        br = brush.SolidBrush(Color(color.red(), color.green(), color.blue()))
+        br = SolidBrush.create(Color.create(color.red(), color.green(), color.blue()))
         Application.current().document.brushes.append(br)
         self.modelBrush.append(br)
 

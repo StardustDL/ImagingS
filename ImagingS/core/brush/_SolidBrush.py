@@ -1,21 +1,26 @@
+from __future__ import annotations
 from . import Brush
-from ImagingS.core import Color, Point, RectArea
-from typing import Dict, Any
+from ImagingS.core import Color, Colors, Point, RectArea
 
 
 class SolidBrush(Brush):
-    def __init__(self, color: Color) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self._color = color
+        self.color = Colors.Black()
+
+    @staticmethod
+    def create(color: Color) -> SolidBrush:
+        result = SolidBrush()
+        result.color = color
+        return result
 
     @property
     def color(self) -> Color:
         return self._color
 
+    @color.setter
+    def color(self, value: Color) -> None:
+        self._color = value
+
     def color_at(self, position: Point, area: RectArea) -> Color:
         return self._color
-
-    @staticmethod
-    def deserialize(data: Dict) -> Any:
-        result = SolidBrush(data["_color"])
-        return result
