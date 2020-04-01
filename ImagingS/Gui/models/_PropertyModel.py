@@ -47,7 +47,7 @@ class PropertyModel(QStandardItemModel):
         self.setHeaderData(PropertyModel.VALUE, Qt.Horizontal, "Value")
         self.obj = None
 
-    def fresh(self, obj) -> None:
+    def fresh(self, obj=None) -> None:
         self.removeRows(0, self.rowCount())
         self.obj = obj
         if obj is None:

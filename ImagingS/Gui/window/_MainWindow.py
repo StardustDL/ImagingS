@@ -3,21 +3,23 @@ import ImagingS.Gui.ui as ui
 from ImagingS.document import Document
 from ImagingS.Gui.app import Application
 from ImagingS.core import Color
-from ImagingS.core.brush import Brushes, Brush, SolidBrush
-from ImagingS.Gui.models import BrushModel, PropertyModel
+from ImagingS.core.brush import Brushes, SolidBrush, Brush
+from ImagingS.Gui.models import BrushModel, PropertyModel, DrawingModel
 import qtawesome as qta
 
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog, QMessageBox
 
 import os
 
 
 def _create_new_document() -> Document:
     result = Document()
-    for name in dir(Brushes):
-        item = getattr(Brushes, name)
-        if isinstance(item, Brush):
-            result.brushes.append(item)
+    for name, item in Brushes.__dict__.items():
+        if name.startswith("__") and name.endswith("__"):
+            continue
+        br = item.__func__()  # static method . __func__
+        if isinstance(br, Brush):
+            result.brushes.append(br)
     return result
 
 
@@ -27,7 +29,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.setupUi(self)
         self.setupDockWidget()
         self.setupIcon()
-        self._current_file: Optional[str] = None
+        self.current_file = None
 
         self.actClose.triggered.connect(self.actClose_triggered)
         self.actQuit.triggered.connect(self.close)
@@ -48,6 +50,11 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.trvBrushes.setModel(self.modelBrush)
         self.trvBrushes.clicked.connect(
             self.trvBrushes_clicked)
+
+        self.modelDrawing = DrawingModel(self)
+        self.trvDrawings.setModel(self.modelDrawing)
+        self.trvDrawings.clicked.connect(
+            self.trvDrawings_clicked)
 
         self.modelProperties = PropertyModel(self)
         self.trvProperties.setModel(self.modelProperties)
@@ -107,7 +114,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
     @current_file.setter
     def current_file(self, value: Optional[str]) -> None:
-        self._current_file = value
+        self._current_file = os.path.realpath(value) if value else None
         if self._current_file is None:
             if Application.current().document is None:
                 self.setWindowTitle("ImagingS")
@@ -117,6 +124,26 @@ class MainWindow(QMainWindow, ui.MainWindow):
             filename = os.path.split(self._current_file)[
                 1].rstrip(".isd.json")
             self.setWindowTitle(f"{filename} - ImagingS")
+
+    def fresh_brushes(self):
+        self.modelBrush.clear_items()
+
+        doc = Application.current().document
+        hasDoc = doc is not None
+
+        if hasDoc:
+            for br in doc.brushes:
+                self.modelBrush.append(br)
+
+    def fresh_drawings(self):
+        self.modelDrawing.clear_items()
+
+        doc = Application.current().document
+        hasDoc = doc is not None
+
+        if hasDoc:
+            for br in doc.drawings:
+                self.modelDrawing.append(br)
 
     def app_documentChanged(self):
         doc = Application.current().document
@@ -133,20 +160,19 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.dwgProperties.setEnabled(hasDoc)
         self.tlbWindow.setEnabled(hasDoc)
 
-        if hasDoc:
-            self.modelBrush.clear_items()
-            for br in doc.brushes:
-                self.modelBrush.append(br)
-            self.modelProperties.fresh(None)
-        else:
-            self.modelBrush.clear_items()
-            self.modelProperties.fresh(None)
-
-        self.current_file = self.current_file  # update title
+        self.fresh_brushes()
+        self.fresh_drawings()
+        self.modelProperties.fresh()
 
     def trvBrushes_clicked(self, index):
         r = index.row()
         item = Application.current().document.brushes[r]
+        if self.modelProperties.obj is not item:
+            self.modelProperties.fresh(item)
+
+    def trvDrawings_clicked(self, index):
+        r = index.row()
+        item = Application.current().document.drawings.at(r)
         if self.modelProperties.obj is not item:
             self.modelProperties.fresh(item)
 
@@ -171,13 +197,14 @@ class MainWindow(QMainWindow, ui.MainWindow):
         color = QColorDialog.getColor()
         if not color.isValid():
             return
-        br = SolidBrush.create(Color.create(color.red(), color.green(), color.blue()))
+        br = SolidBrush.create(Color.create(
+            color.red(), color.green(), color.blue()))
         Application.current().document.brushes.append(br)
         self.modelBrush.append(br)
 
     def actClose_triggered(self):
-        self.current_file = None
         Application.current().document = None
+        self.current_file = None
 
     def actNew_triggered(self):
         Application.current().document = _create_new_document()
@@ -207,6 +234,11 @@ class MainWindow(QMainWindow, ui.MainWindow):
         fileName, _ = QFileDialog.getOpenFileName(
             self, "Open", "", "ImagingS document (*.isd.json)", options=options)
         if fileName:
-            self.current_file = fileName
             with open(fileName, mode="r") as f:
-                Application.current().document = Document.load(f)
+                try:
+                    doc = Document.load(f)
+                except Exception:
+                    QMessageBox.critical(self, "Open Failed", "The file loading failed.")
+                    return
+            Application.current().document = doc
+            self.current_file = fileName

@@ -18,8 +18,12 @@ class BrushModel(QStandardItemModel):
         self.setHeaderData(BrushModel.NAME, Qt.Horizontal, "Name")
 
     def append(self, brush: Brush) -> None:
+        fitem = None
         if isinstance(brush, SolidBrush):
-            fitem = QStandardItem(_get_color_icon(brush.color), brush.color.to_hex())
+            fitem = QStandardItem(_get_color_icon(
+                brush.color), brush.color.to_hex())
+
+        if fitem:
             fitem.setEditable(False)
             self.appendRow(fitem)
         else:

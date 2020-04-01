@@ -138,12 +138,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QTreeView" name="trvDrawings">
+      <widget class="QListView" name="trvDrawings">
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
-       </property>
-       <property name="rootIsDecorated">
-        <bool>false</bool>
        </property>
        <addaction name="actDrawingLine"/>
        <addaction name="actDrawingPolygon"/>

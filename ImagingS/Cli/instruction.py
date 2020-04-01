@@ -69,17 +69,17 @@ class BuiltinInstruction:
     def translate(self, argv: List[str]) -> None:
         drawing = self.doc.drawings[argv[0]]
         drawing.transform = TranslateTransform.create(
-            Point.create(int(argv[1]), int(argv[1])))
+            Point.create(int(argv[1]), int(argv[2])))
 
     def rotate(self, argv: List[str]) -> None:
         drawing = self.doc.drawings[argv[0]]
         drawing.transform = RotateTransform.create(
-            Point.create(int(argv[1]), int(argv[1])), int(argv[2]) / 360 * 2 * math.pi)
+            Point.create(int(argv[1]), int(argv[2])), int(argv[3]) / 360 * 2 * math.pi)
 
     def scale(self, argv: List[str]) -> None:
         drawing = self.doc.drawings[argv[0]]
         drawing.transform = ScaleTransform.create(
-            Point.create(int(argv[1]), int(argv[1])), int(argv[2]))
+            Point.create(int(argv[1]), int(argv[2])), int(argv[3]))
 
     def clip(self, argv: List[str]) -> None:
         drawing = self.doc.drawings[argv[0]]
