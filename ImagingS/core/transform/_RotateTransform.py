@@ -39,7 +39,7 @@ class RotateTransform(MatrixTransform):
              [sin(self._angle), cos(self._angle)]])
 
     def transform(self, origin: Point) -> Optional[Point]:
-        return super().transform(origin - self._center)
+        return super().transform(origin - self.center)
 
     def serialize(self) -> Dict:
         result = super().serialize()

@@ -27,7 +27,8 @@ class MatrixTransform(Transform):
         self._matrix = value
 
     def transform(self, origin: Point) -> Optional[Point]:
-        return Point.from_array(np.dot(self._matrix, origin.to_array()))
+        result = Point.from_array(np.dot(self.matrix, origin.to_array()))
+        return result
 
     def serialize(self) -> Dict:
         result = super().serialize()
@@ -42,4 +43,6 @@ class MatrixTransform(Transform):
     def deserialize(self, data: Dict) -> None:
         if self.S_Matrix in data:
             mat = data[self.S_Matrix]
+            del data[self.S_Matrix]
             self.matrix = np.array([[mat[0], mat[1]], [mat[2], mat[3]]])
+        super().deserialize(data)

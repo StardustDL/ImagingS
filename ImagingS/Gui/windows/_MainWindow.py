@@ -5,7 +5,7 @@ from ImagingS.Gui.app import Application
 from ImagingS.core import Color
 from ImagingS.core.brush import Brushes, SolidBrush, Brush
 from ImagingS.Gui.models import BrushModel, PropertyModel, DrawingModel
-from ImagingS.Gui.graphics import Canvas
+from ImagingS.Gui.graphics import Canvas, converters
 import qtawesome as qta
 
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog, QMessageBox
@@ -153,6 +153,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         hasDoc = doc is not None
 
         if hasDoc:
+            self.gvwMain.resize(converters.convert_size(doc.size))
             for br in doc.drawings:
                 self.modelDrawing.append(br)
                 self.gvwMain.add(br)

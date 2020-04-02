@@ -1,6 +1,6 @@
 from __future__ import annotations
 from ImagingS.core.serialization import PropertySerializable
-from typing import Dict, Generic, Iterator, TypeVar, List
+from typing import Dict, Generic, Iterator, Tuple, TypeVar, List
 from math import fabs
 import numpy as np
 
@@ -107,6 +107,9 @@ class Point(PropertySerializable):
 
     def to_array(self) -> np.ndarray:
         return np.array([[self.x], [self.y]])
+    
+    def as_tuple(self) -> Tuple[float, float]:
+        return self.x, self.y
 
     @staticmethod
     def from_array(arr: np.ndarray) -> Point:
@@ -211,6 +214,9 @@ class Size(PropertySerializable):
 
     def __repr__(self) -> str:
         return f"Size({self.width}, {self.height})"
+    
+    def as_tuple(self) -> Tuple[float, float]:
+        return self.width, self.height
 
     @property
     def width(self) -> float:
@@ -241,6 +247,11 @@ class RectArea(PropertySerializable):
         result.origin = origin
         result.size = size
         return result
+
+    @staticmethod
+    def from_points(top_left: Point, bottom_right: Point) -> RectArea:
+        delta = bottom_right - top_left
+        return RectArea.create(top_left, Size.create(delta.x, delta.y))
 
     def __eq__(self, obj) -> bool:
         if isinstance(obj, RectArea):

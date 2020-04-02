@@ -26,7 +26,8 @@ class Decoder(json.JSONDecoder):
             obj = class_.__new__(class_)
             class_.__init__(obj)
             if isinstance(obj, Serializable):
-                obj.deserialize(d.pop("__data__"))
+                data = d.pop("__data__")
+                obj.deserialize(data)
             else:
                 raise Exception(f"Type '{module_name}.{class_name}' is not serializable.")
             inst = obj

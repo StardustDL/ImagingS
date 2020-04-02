@@ -47,9 +47,7 @@ class BuiltinInstruction:
     def drawEllipse(self, argv: List[str]) -> None:
         lt = Point.create(int(argv[1]), int(argv[2]))
         rb = Point.create(int(argv[3]), int(argv[4]))
-        delta = rb - lt
-        drawing = Ellipse.create(RectArea.create(
-            lt, Size.create(delta.x, delta.y)))
+        drawing = Ellipse.create(RectArea.from_points(lt, rb))
         drawing.id = argv[0]
         drawing.stroke = self.brush
         self.doc.drawings.append(drawing)
@@ -85,9 +83,7 @@ class BuiltinInstruction:
         drawing = self.doc.drawings[argv[0]]
         lt = Point.create(int(argv[1]), int(argv[2]))
         rb = Point.create(int(argv[3]), int(argv[4]))
-        delta = rb - lt
-        trans = ClipTransform.create(RectArea.create(
-            lt, Size.create(delta.x, delta.y)), argv[5])
+        trans = ClipTransform.create(RectArea.from_points(lt, rb), argv[5])
         drawing.transform = trans
 
     def execute(self, ins: str) -> None:
