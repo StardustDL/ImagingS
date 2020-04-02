@@ -37,5 +37,6 @@ class Curve(Geometry):
     def render(self, context: DrawingContext) -> None:
         raise NotImplementedError()
 
-    def boundingArea(self, context: DrawingContext) -> RectArea:
+    @property
+    def boundingArea(self) -> RectArea:
         raise NotImplementedError()

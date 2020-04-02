@@ -1,12 +1,13 @@
 from ImagingS.core import Color
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QStandardItemModel, QIcon, QPixmap, QColor, QStandardItem
+from PyQt5.QtGui import QStandardItemModel, QIcon, QPixmap, QStandardItem
 from ImagingS.core.brush import Brush, SolidBrush
+from ImagingS.Gui.graphics import converters
 
 
 def _get_color_icon(color: Color) -> QIcon:
     pixmap = QPixmap(32, 32)
-    pixmap.fill(QColor(color.r, color.g, color.b))
+    pixmap.fill(converters.convert_color(color))
     return QIcon(pixmap)
 
 

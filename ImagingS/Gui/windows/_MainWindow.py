@@ -5,9 +5,11 @@ from ImagingS.Gui.app import Application
 from ImagingS.core import Color
 from ImagingS.core.brush import Brushes, SolidBrush, Brush
 from ImagingS.Gui.models import BrushModel, PropertyModel, DrawingModel
+from ImagingS.Gui.graphics import Canvas
 import qtawesome as qta
 
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog, QMessageBox
+from PyQt5.QtCore import QSizeF
 
 import os
 
@@ -27,6 +29,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setupCanvas()
         self.setupDockWidget()
         self.setupIcon()
         self.current_file = None
@@ -61,6 +64,13 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
         Application.current().documentChanged.connect(self.app_documentChanged)
         self.actNew.trigger()
+
+    def setupCanvas(self):
+        self.gvwMain = Canvas(self.centralwidget)
+        self.gvwMain.setEnabled(True)
+        self.gvwMain.setObjectName("gvwMain")
+        self.gridLayout.addWidget(self.gvwMain, 0, 0, 1, 1)
+        self.gvwMain.resize(QSizeF(600, 600))
 
     def setupDockWidget(self):
         self.actToggleBrushes = self.dwgBrushes.toggleViewAction()
@@ -137,6 +147,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
     def fresh_drawings(self):
         self.modelDrawing.clear_items()
+        self.gvwMain.clear()
 
         doc = Application.current().document
         hasDoc = doc is not None
@@ -144,6 +155,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         if hasDoc:
             for br in doc.drawings:
                 self.modelDrawing.append(br)
+                self.gvwMain.add(br)
 
     def app_documentChanged(self):
         doc = Application.current().document
@@ -169,12 +181,20 @@ class MainWindow(QMainWindow, ui.MainWindow):
         item = Application.current().document.brushes[r]
         if self.modelProperties.obj is not item:
             self.modelProperties.fresh(item)
+        else:
+            self.modelProperties.fresh()
+            self.trvBrushes.clearSelection()
 
     def trvDrawings_clicked(self, index):
         r = index.row()
         item = Application.current().document.drawings.at(r)
         if self.modelProperties.obj is not item:
             self.modelProperties.fresh(item)
+            self.gvwMain.select(item.id)
+        else:
+            self.modelProperties.fresh()
+            self.gvwMain.select(None)
+            self.trvDrawings.clearSelection()
 
     def resetDrawingActionChecked(self, checkedAction=None):
         for act in self.mnuDrawing.actions():
@@ -238,7 +258,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
                 try:
                     doc = Document.load(f)
                 except Exception:
-                    QMessageBox.critical(self, "Open Failed", "The file loading failed.")
+                    QMessageBox.critical(
+                        self, "Open Failed", "The file loading failed.")
                     return
             Application.current().document = doc
             self.current_file = fileName

@@ -7,9 +7,6 @@ from ImagingS.core import IdObject
 
 
 class DrawingContext(ABC):
-    def __init__(self):
-        super().__init__()
-
     @abstractmethod
     def point(self, position: Point, color: Color) -> None:
         pass
@@ -37,8 +34,9 @@ class Drawing(PropertySerializable, IdObject, ABC):
     def render(self, context: DrawingContext) -> None:
         pass
 
+    @property
     @abstractmethod
-    def boundingArea(self, context: DrawingContext) -> RectArea:
+    def boundingArea(self) -> RectArea:
         pass
 
 
@@ -59,7 +57,8 @@ class DrawingGroup(Drawing):
         for item in self.children:
             item.render(context)
 
-    def boundingArea(self, context: DrawingContext) -> RectArea:
+    @property
+    def boundingArea(self) -> RectArea:
         if len(self.children) == 0:
             return RectArea()
-        return self.children[0].boundingArea(context)
+        return self.children[0].boundingArea

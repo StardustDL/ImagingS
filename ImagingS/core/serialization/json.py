@@ -24,6 +24,7 @@ class Decoder(json.JSONDecoder):
             module = importlib.import_module(module_name)
             class_ = getattr(module, class_name)
             obj = class_.__new__(class_)
+            class_.__init__(obj)
             if isinstance(obj, Serializable):
                 obj.deserialize(d.pop("__data__"))
             else:

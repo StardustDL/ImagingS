@@ -11,8 +11,7 @@ class SkewTransform(MatrixTransform):
         super().__init__()
         self.center = Point()
         self._angle_x = 0  # initial member
-        self._angle_y = 0
-        self.angle_x = 0  # update matrix
+        self.angle_y = 0
 
     @staticmethod
     def create(center: Point, angle_x: float, angle_y: float) -> SkewTransform:
