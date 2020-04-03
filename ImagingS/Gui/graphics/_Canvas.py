@@ -4,8 +4,8 @@ from ImagingS.Gui.interactive import Interactive
 from . import DrawingItem
 
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsRectItem
-from PyQt5.QtCore import QSizeF, QPointF, QRectF
-from PyQt5.QtGui import QMouseEvent
+from PyQt5.QtCore import QSizeF, QPointF, QRectF, Qt
+from PyQt5.QtGui import QMouseEvent, QKeyEvent
 
 
 class Canvas(QGraphicsView):
@@ -23,18 +23,27 @@ class Canvas(QGraphicsView):
 
     @property
     def interactive(self) -> Optional[Interactive]:
-        return self._interative
+        return self._interactive
 
     @interactive.setter
     def interactive(self, value: Optional[Interactive]) -> None:
-        self._interative = value
-        if self._interative is not None:
-            self._interative.start()
-            self._interative.ended.connect(self._interative_ended)
+        self._interactive = value
+        if self._interactive is not None:
+            self._interactive.started.connect(self._interactive_started)
+            self._interactive.ended.connect(self._interactive_ended)
+            self._interactive.start()
 
-    def _interative_ended(self):
-        if self._interative is not None:
+    def _interactive_started(self):
+        if self._interactive is None:
+            return
+        if self._interactive.view_item is not None:
+            self.scene().addItem(self._interactive.view_item)
+
+    def _interactive_ended(self):
+        if self._interactive is not None:
             self._after_interactive()
+            if self._interactive.view_item is not None:
+                self.scene().removeItem(self._interactive.view_item)
         self.interactive = None
 
     def rerender(self) -> None:
@@ -48,7 +57,7 @@ class Canvas(QGraphicsView):
 
         self.clear()
         for item in draws:
-            self.add(item)
+            self.add(item.drawing)
 
     def add(self, drawing: Drawing) -> None:
         item = DrawingItem(drawing, self.scene().sceneRect().size())
@@ -60,8 +69,8 @@ class Canvas(QGraphicsView):
         if name not in self.items:
             return
         item = self.items[name]
-        self.scene().removeItem(item)
         del self.items[name]
+        self.scene().removeItem(item)
         self.rerender()
 
     def select(self, name: Optional[str]) -> None:
@@ -119,3 +128,17 @@ class Canvas(QGraphicsView):
             self.interactive.onMouseDoubleClick(pos)
             self._after_interactive()
         super().mouseDoubleClickEvent(event)
+
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        if self.interactive is not None:
+            self.interactive.onKeyPress(event)
+            self._after_interactive()
+        super().keyPressEvent(event)
+
+    def keyReleaseEvent(self, event: QKeyEvent) -> None:
+        if self.interactive is not None:
+            self.interactive.onKeyRelease(event)
+            self._after_interactive()
+        elif event.key() == Qt.Key_F5:
+            self.rerender()
+        super().keyReleaseEvent(event)

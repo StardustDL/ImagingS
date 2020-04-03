@@ -1,5 +1,6 @@
 from ImagingS.core import Size
-from PyQt5.QtCore import QPointF
+from PyQt5.QtCore import QPointF, Qt
+from PyQt5.QtGui import QKeyEvent
 from . import Interactive
 from ImagingS.core.geometry import Ellipse
 from ImagingS.Gui.graphics import converters
@@ -11,8 +12,8 @@ class EllipseInteractive(Interactive):
         self.drawing = drawing
 
     def start(self) -> None:
-        super().start()
         self._hasStarted = False
+        super().start()
 
     def onMouseRelease(self, point: QPointF) -> None:
         super().onMouseRelease(point)
@@ -23,7 +24,7 @@ class EllipseInteractive(Interactive):
             delta = converters.convert_qpoint(point) - self.drawing.area.origin
             self.drawing.area.size = Size.create(delta.x, delta.y)
             self.drawing.refresh_boundingArea()
-            self._end()
+            self._end(self.S_Success)
 
     def onMouseMove(self, point: QPointF) -> None:
         super().onMouseMove(point)
@@ -31,3 +32,9 @@ class EllipseInteractive(Interactive):
             delta = converters.convert_qpoint(point) - self.drawing.area.origin
             self.drawing.area.size = Size.create(delta.x, delta.y)
             self._needRender()
+
+    def onKeyPress(self, key: QKeyEvent) -> None:
+        super().onKeyPress(key)
+        if key.key() == Qt.Key_Escape:
+            self._needRender()
+            self._end(self.S_Failed)

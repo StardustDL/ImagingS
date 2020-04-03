@@ -7,7 +7,7 @@ from ImagingS.core.brush import Brushes, SolidBrush, Brush
 from ImagingS.core.geometry import Line, Curve, Polygon, Ellipse, Geometry
 from ImagingS.Gui.models import BrushModel, PropertyModel, DrawingModel
 from ImagingS.Gui.graphics import Canvas, converters
-from ImagingS.Gui.interactive import LineInteractive, PolygonInteractive, CurveInteractive, EllipseInteractive
+from ImagingS.Gui.interactive import LineInteractive, PolygonInteractive, CurveInteractive, EllipseInteractive, Interactive
 import uuid
 import qtawesome as qta
 
@@ -69,6 +69,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actNew.trigger()
 
     def setupCanvas(self):
+        self._interactive: Optional[Interactive] = None
+
         self.gvwMain = Canvas(self.centralwidget)
         self.gvwMain.setEnabled(True)
         self.gvwMain.setObjectName("gvwMain")
@@ -210,20 +212,46 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
     def _create_geometry(self, geo: Geometry) -> None:
         geo.stroke = self._current_brush
-        Application.current().document.drawings.append(geo)
-        self.modelDrawing.append(geo)
         self.gvwMain.add(geo)
+
+    def _set_interactive(self, inter: Interactive) -> None:
+        self._interactive = inter
+        if self._interactive is not None:
+            self._interactive.ended.connect(self.interDrawing_ended)
+            self.gvwMain.interactive = self._interactive
+
+    def interDrawing_ended(self) -> None:
+        if self._interactive is None:
+            return
+        drawing = None
+        if isinstance(self._interactive, LineInteractive):
+            self.actDrawingLine.trigger()
+            drawing = self._interactive.drawing
+        elif isinstance(self._interactive, PolygonInteractive):
+            self.actDrawingPolygon.trigger()
+            drawing = self._interactive.drawing
+        elif isinstance(self._interactive, CurveInteractive):
+            self.actDrawingCurve.trigger()
+            drawing = self._interactive.drawing
+        elif isinstance(self._interactive, EllipseInteractive):
+            self.actDrawingEllipse.trigger()
+            drawing = self._interactive.drawing
+        if drawing is None:
+            return
+        if self._interactive.state == Interactive.S_Success:
+            Application.current().document.drawings.append(drawing)
+            self.modelDrawing.append(drawing)
+        else:
+            self.gvwMain.remove(self._interactive.drawing.id)
 
     def actDrawingCurve_triggered(self):
         if not self.actDrawingCurve.isChecked():
             return
         self.resetDrawingActionChecked(self.actDrawingCurve)
-        polygon = Curve()
-        polygon.id = str(uuid.uuid1())
-        self._create_geometry(polygon)
-        inter = CurveInteractive(polygon)
-        inter.ended.connect(self.actDrawingCurve.trigger)
-        self.gvwMain.interactive = inter
+        curve = Curve()
+        curve.id = str(uuid.uuid1())
+        self._create_geometry(curve)
+        self._set_interactive(CurveInteractive(curve))
 
     def actDrawingPolygon_triggered(self):
         if not self.actDrawingPolygon.isChecked():
@@ -232,20 +260,16 @@ class MainWindow(QMainWindow, ui.MainWindow):
         polygon = Polygon()
         polygon.id = str(uuid.uuid1())
         self._create_geometry(polygon)
-        inter = PolygonInteractive(polygon)
-        inter.ended.connect(self.actDrawingPolygon.trigger)
-        self.gvwMain.interactive = inter
+        self._set_interactive(PolygonInteractive(polygon))
 
     def actDrawingEllipse_triggered(self):
         if not self.actDrawingEllipse.isChecked():
             return
         self.resetDrawingActionChecked(self.actDrawingEllipse)
-        line = Ellipse()
-        line.id = str(uuid.uuid1())
-        self._create_geometry(line)
-        inter = EllipseInteractive(line)
-        inter.ended.connect(self.actDrawingEllipse.trigger)
-        self.gvwMain.interactive = inter
+        ell = Ellipse()
+        ell.id = str(uuid.uuid1())
+        self._create_geometry(ell)
+        self._set_interactive(EllipseInteractive(ell))
 
     def actDrawingLine_triggered(self):
         if not self.actDrawingLine.isChecked():
@@ -254,9 +278,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         line = Line()
         line.id = str(uuid.uuid1())
         self._create_geometry(line)
-        inter = LineInteractive(line)
-        inter.ended.connect(self.actDrawingLine.trigger)
-        self.gvwMain.interactive = inter
+        self._set_interactive(LineInteractive(line))
 
     def actBrushSolid_triggered(self):
         color = QColorDialog.getColor()

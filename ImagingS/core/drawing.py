@@ -64,7 +64,7 @@ class Drawing(PropertySerializable, IdObject, ABC):
             self.render(measurer)
             self._boundingArea = measurer.end_measure()
         elif self._boundingArea is None:  # boundingArea is calculating
-            return RectArea.infinite()
+            return RectArea()
         return self._boundingArea
 
     def refresh_boundingArea(self) -> None:
