@@ -34,4 +34,7 @@ class ClipTransform(Transform):
         self._algorithm = value
 
     def transform(self, origin: Point) -> Optional[Point]:
-        raise NotImplementedError()
+        if origin in self.area:
+            return origin
+        else:
+            return None

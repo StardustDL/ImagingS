@@ -2,7 +2,7 @@ from __future__ import annotations
 from ImagingS.core import Point
 import numpy as np
 from typing import Optional, Dict
-from math import cos, sin
+from math import tan
 from ImagingS.core.transform import MatrixTransform
 
 
@@ -23,8 +23,8 @@ class SkewTransform(MatrixTransform):
 
     def __update_matrix(self) -> None:
         self.matrix = np.array(
-            [[cos(self._angle_y), sin(self._angle_x)],
-             [sin(self._angle_y), cos(self._angle_x)]])
+            [[1, tan(self._angle_x)],
+             [tan(self._angle_y), 1]])
 
     @property
     def center(self) -> Point:
@@ -53,7 +53,7 @@ class SkewTransform(MatrixTransform):
         self.__update_matrix()
 
     def transform(self, origin: Point) -> Optional[Point]:
-        return super().transform(origin - self._center)
+        return super().transform(origin - self.center) + self.center
 
     def serialize(self) -> Dict:
         result = super().serialize()

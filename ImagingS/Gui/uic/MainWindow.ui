@@ -239,6 +239,14 @@
    <addaction name="actDrawingPolygon"/>
    <addaction name="actDrawingCurve"/>
    <addaction name="actDrawingEllipse"/>
+   <addaction name="separator"/>
+   <addaction name="actTransformTranslate"/>
+   <addaction name="actTransformScale"/>
+   <addaction name="actTransformRotate"/>
+   <addaction name="actTransformSkew"/>
+   <addaction name="actTransformMatrix"/>
+   <addaction name="actTransformClip"/>
+   <addaction name="actTransformGroup"/>
   </widget>
   <action name="actNew">
    <property name="text">

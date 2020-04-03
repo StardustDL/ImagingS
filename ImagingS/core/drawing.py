@@ -51,6 +51,7 @@ class Drawing(PropertySerializable, IdObject, ABC):
     @transform.setter
     def transform(self, value: Optional[Transform]) -> None:
         self._transform = value
+        self.refresh_boundingArea()
 
     @abstractmethod
     def render(self, context: DrawingContext) -> None:

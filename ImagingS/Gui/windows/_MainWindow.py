@@ -9,6 +9,7 @@ from ImagingS.core.geometry import Line, Curve, Polygon, Ellipse, Geometry
 from ImagingS.Gui.models import BrushModel, PropertyModel, DrawingModel
 from ImagingS.Gui.graphics import Canvas, converters
 from ImagingS.Gui.interactive import LineInteractive, PolygonInteractive, CurveInteractive, EllipseInteractive, Interactive
+from ImagingS.Gui.interactive import TranslateTransformInteractive, SkewTransformInteractive, RotateTransformInteractive
 import uuid
 import qtawesome as qta
 
@@ -55,8 +56,16 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.actDrawingEllipse_triggered)
         self.actDrawingPolygon.triggered.connect(
             self.actDrawingPolygon_triggered)
-        self.actDrawingRemove.triggered.connect(self.actDrawingRemove_triggered)
+        self.actDrawingRemove.triggered.connect(
+            self.actDrawingRemove_triggered)
         self.actDrawingClear.triggered.connect(self.actDrawingClear_triggered)
+
+        self.actTransformTranslate.triggered.connect(
+            self.actTransformTranslate_triggered)
+        self.actTransformSkew.triggered.connect(
+            self.actTransformSkew_triggered)
+        self.actTransformRotate.triggered.connect(
+            self.actTransformRotate_triggered)
 
         self.modelBrush = BrushModel(self)
         self.trvBrushes.setModel(self.modelBrush)
@@ -118,6 +127,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actTransformRotate.setIcon(qta.icon("mdi.rotate-left"))
         self.actTransformMatrix.setIcon(qta.icon("mdi.matrix"))
         self.actTransformClip.setIcon(qta.icon("mdi.crop"))
+        self.actTransformGroup.setIcon(qta.icon("mdi.group"))
         self.actBrushSolid.setIcon(qta.icon("mdi.solid"))
         self.actBrushRemove.setIcon(qta.icon("mdi.delete", color="red"))
         self.actDrawingRemove.setIcon(qta.icon("mdi.delete", color="red"))
@@ -149,8 +159,10 @@ class MainWindow(QMainWindow, ui.MainWindow):
     def set_current_drawing(self, value: Optional[Drawing]) -> None:
         self._current_drawing = value
         if value is not None:
+            self.gvwMain.select(value.id)
             self.stbMain.showMessage(f"Current drawing: {value.id}")
         else:
+            self.gvwMain.select(None)
             self.stbMain.showMessage("")
 
     def current_brush(self) -> Optional[Brush]:
@@ -229,11 +241,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
         if self.modelProperties.obj is not item:
             self.set_current_drawing(item)
             self.modelProperties.fresh(item)
-            self.gvwMain.select(item.id)
         else:
             self.set_current_drawing(None)
             self.modelProperties.fresh()
-            self.gvwMain.select(None)
             self.trvDrawings.clearSelection()
 
     def resetDrawingActionChecked(self, checkedAction=None):
@@ -247,71 +257,99 @@ class MainWindow(QMainWindow, ui.MainWindow):
             geo.stroke = brush
         self.gvwMain.add(geo)
 
-    def _set_interactive(self, inter: Interactive) -> None:
+    def _set_interactive(self, inter: Optional[Interactive]) -> None:
         self._interactive = inter
         if self._interactive is not None:
-            self._interactive.ended.connect(self.interDrawing_ended)
             self.gvwMain.interactive = self._interactive
 
     def interDrawing_ended(self) -> None:
         if self._interactive is None:
             return
-        drawing = None
-        if isinstance(self._interactive, LineInteractive):
+        inter = self._interactive
+        drawing: Optional[Drawing] = None
+        if isinstance(inter, LineInteractive):
+            drawing = inter.drawing
             self.actDrawingLine.trigger()
-            drawing = self._interactive.drawing
-        elif isinstance(self._interactive, PolygonInteractive):
+        elif isinstance(inter, PolygonInteractive):
+            drawing = inter.drawing
             self.actDrawingPolygon.trigger()
-            drawing = self._interactive.drawing
-        elif isinstance(self._interactive, CurveInteractive):
+        elif isinstance(inter, CurveInteractive):
+            drawing = inter.drawing
             self.actDrawingCurve.trigger()
-            drawing = self._interactive.drawing
-        elif isinstance(self._interactive, EllipseInteractive):
+        elif isinstance(inter, EllipseInteractive):
+            drawing = inter.drawing
             self.actDrawingEllipse.trigger()
-            drawing = self._interactive.drawing
         if drawing is None:
             return
-        if self._interactive.state == Interactive.S_Success:
+        if inter.state == Interactive.S_Success:
             Application.current().document.drawings.append(drawing)
             self.modelDrawing.append(drawing)
+            self.set_current_drawing(drawing)
         else:
-            self.gvwMain.remove(self._interactive.drawing.id)
+            self.gvwMain.remove(inter.drawing.id)
+        self._set_interactive(None)
+
+    def interTransform_ended(self) -> None:
+        if self._interactive is None:
+            return
+        inter = self._interactive
+        drawing = self.current_drawing()
+        if drawing is None:
+            return
+        drawing.refresh_boundingArea()
+        if inter.state == Interactive.S_Success:
+            pass
+        else:
+            drawing.transform = None
+        self._set_interactive(None)
 
     def actDrawingCurve_triggered(self):
         if not self.actDrawingCurve.isChecked():
+            self._set_interactive(None)
             return
         self.resetDrawingActionChecked(self.actDrawingCurve)
         curve = Curve()
         curve.id = str(uuid.uuid1())
         self._create_geometry(curve)
-        self._set_interactive(CurveInteractive(curve))
+        inter = CurveInteractive(curve)
+        inter.ended.connect(self.interDrawing_ended)
+        self._set_interactive(inter)
 
     def actDrawingPolygon_triggered(self):
         if not self.actDrawingPolygon.isChecked():
+            self._set_interactive(None)
             return
         self.resetDrawingActionChecked(self.actDrawingPolygon)
         polygon = Polygon()
         polygon.id = str(uuid.uuid1())
         self._create_geometry(polygon)
-        self._set_interactive(PolygonInteractive(polygon))
+        inter = PolygonInteractive(polygon)
+        inter.ended.connect(self.interDrawing_ended)
+        self._set_interactive(inter)
 
     def actDrawingEllipse_triggered(self):
         if not self.actDrawingEllipse.isChecked():
+            self._set_interactive(None)
             return
         self.resetDrawingActionChecked(self.actDrawingEllipse)
         ell = Ellipse()
         ell.id = str(uuid.uuid1())
         self._create_geometry(ell)
-        self._set_interactive(EllipseInteractive(ell))
+        inter = EllipseInteractive(ell)
+        inter.ended.connect(self.interDrawing_ended)
+        self._set_interactive(inter)
 
     def actDrawingLine_triggered(self):
         if not self.actDrawingLine.isChecked():
+            self._set_interactive(None)
             return
         self.resetDrawingActionChecked(self.actDrawingLine)
         line = Line()
         line.id = str(uuid.uuid1())
         self._create_geometry(line)
-        self._set_interactive(LineInteractive(line))
+        inter = LineInteractive(line)
+        inter.ended.connect(self.interDrawing_ended)
+        self._set_interactive(inter)
 
     def actDrawingRemove_triggered(self):
         indexs = self.trvDrawings.selectedIndexes()
@@ -347,6 +385,30 @@ class MainWindow(QMainWindow, ui.MainWindow):
     def actBrushClear_triggered(self):
         Application.current().document.brushes.clear()
         self.fresh_brushes()
+
+    def actTransformTranslate_triggered(self):
+        drawing = self.current_drawing()
+        if drawing is None:
+            return
+        inter = TranslateTransformInteractive(drawing)
+        inter.ended.connect(self.interTransform_ended)
+        self._set_interactive(inter)
+
+    def actTransformSkew_triggered(self):
+        drawing = self.current_drawing()
+        if drawing is None:
+            return
+        inter = SkewTransformInteractive(drawing)
+        inter.ended.connect(self.interTransform_ended)
+        self._set_interactive(inter)
+
+    def actTransformRotate_triggered(self):
+        drawing = self.current_drawing()
+        if drawing is None:
+            return
+        inter = RotateTransformInteractive(drawing)
+        inter.ended.connect(self.interTransform_ended)
+        self._set_interactive(inter)
 
     def actClose_triggered(self):
         Application.current().document = None
