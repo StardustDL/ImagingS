@@ -1,3 +1,4 @@
+from ImagingS.core.drawing import Drawing
 from typing import Optional
 import ImagingS.Gui.ui as ui
 from ImagingS.document import Document
@@ -35,7 +36,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.setupCanvas()
         self.setupDockWidget()
         self.setupIcon()
-        self.current_file = None
+        self.set_current_file(None)
 
         self.actClose.triggered.connect(self.actClose_triggered)
         self.actQuit.triggered.connect(self.close)
@@ -43,7 +44,10 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actSave.triggered.connect(self.actSave_triggered)
         self.actSaveAs.triggered.connect(self.actSaveAs_triggered)
         self.actOpen.triggered.connect(self.actOpen_triggered)
+
         self.actBrushSolid.triggered.connect(self.actBrushSolid_triggered)
+        self.actBrushRemove.triggered.connect(self.actBrushRemove_triggered)
+        self.actBrushClear.triggered.connect(self.actBrushClear_triggered)
 
         self.actDrawingCurve.triggered.connect(self.actDrawingCurve_triggered)
         self.actDrawingLine.triggered.connect(self.actDrawingLine_triggered)
@@ -51,6 +55,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.actDrawingEllipse_triggered)
         self.actDrawingPolygon.triggered.connect(
             self.actDrawingPolygon_triggered)
+        self.actDrawingRemove.triggered.connect(self.actDrawingRemove_triggered)
+        self.actDrawingClear.triggered.connect(self.actDrawingClear_triggered)
 
         self.modelBrush = BrushModel(self)
         self.trvBrushes.setModel(self.modelBrush)
@@ -123,12 +129,10 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.tlbWindow.setWindowIcon(qta.icon("mdi.toolbox"))
         self.setWindowIcon(qta.icon("mdi.pencil-box-multiple", color="purple"))
 
-    @property
     def current_file(self) -> Optional[str]:
         return self._current_file
 
-    @current_file.setter
-    def current_file(self, value: Optional[str]) -> None:
+    def set_current_file(self, value: Optional[str]) -> None:
         self._current_file = os.path.realpath(value) if value else None
         if self._current_file is None:
             if Application.current().document is None:
@@ -138,6 +142,28 @@ class MainWindow(QMainWindow, ui.MainWindow):
         else:
             filename = os.path.split(self._current_file)[1].rstrip(".isd.json")
             self.setWindowTitle(f"{filename} - ImagingS")
+
+    def current_drawing(self) -> Optional[Drawing]:
+        return self._current_drawing
+
+    def set_current_drawing(self, value: Optional[Drawing]) -> None:
+        self._current_drawing = value
+        if value is not None:
+            self.stbMain.showMessage(f"Current drawing: {value.id}")
+        else:
+            self.stbMain.showMessage("")
+
+    def current_brush(self) -> Optional[Brush]:
+        return self._current_brush
+
+    def set_current_brush(self, value: Optional[Brush]) -> None:
+        self._current_brush = value
+        if value is not None:
+            if isinstance(value, SolidBrush):
+                self.stbMain.showMessage(
+                    f"Current brush: {value.color.to_hex()}")
+        else:
+            self.stbMain.showMessage("")
 
     def fresh_brushes(self):
         self.modelBrush.clear_items()
@@ -149,7 +175,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
             for br in doc.brushes:
                 self.modelBrush.append(br)
 
-        self._current_brush = Brushes.Black()
+        self.set_current_brush(None)
         self.dwgBrushes.setEnabled(hasDoc)
 
     def fresh_drawings(self):
@@ -164,6 +190,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
             for br in doc.drawings:
                 self.modelDrawing.append(br)
                 self.gvwMain.add(br)
+
+        self.set_current_drawing(None)
 
         self.gvwMain.setEnabled(hasDoc)
         self.dwgDrawings.setEnabled(hasDoc)
@@ -187,10 +215,11 @@ class MainWindow(QMainWindow, ui.MainWindow):
     def trvBrushes_clicked(self, index):
         r = index.row()
         item = Application.current().document.brushes[r]
-        self._current_brush = item
         if self.modelProperties.obj is not item:
+            self.set_current_brush(item)
             self.modelProperties.fresh(item)
         else:
+            self.set_current_brush(None)
             self.modelProperties.fresh()
             self.trvBrushes.clearSelection()
 
@@ -198,9 +227,11 @@ class MainWindow(QMainWindow, ui.MainWindow):
         r = index.row()
         item = Application.current().document.drawings.at(r)
         if self.modelProperties.obj is not item:
+            self.set_current_drawing(item)
             self.modelProperties.fresh(item)
             self.gvwMain.select(item.id)
         else:
+            self.set_current_drawing(None)
             self.modelProperties.fresh()
             self.gvwMain.select(None)
             self.trvDrawings.clearSelection()
@@ -211,7 +242,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
                 act.setChecked(False)
 
     def _create_geometry(self, geo: Geometry) -> None:
-        geo.stroke = self._current_brush
+        brush = self.current_brush()
+        if brush is not None:
+            geo.stroke = brush
         self.gvwMain.add(geo)
 
     def _set_interactive(self, inter: Interactive) -> None:
@@ -280,6 +313,19 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self._create_geometry(line)
         self._set_interactive(LineInteractive(line))
 
+    def actDrawingRemove_triggered(self):
+        indexs = self.trvDrawings.selectedIndexes()
+        if len(indexs) == 0:
+            return
+        r = indexs[0].row()
+        dr = Application.current().document.drawings.at(r)
+        del Application.current().document.drawings[dr.id]
+        self.fresh_drawings()
+
+    def actDrawingClear_triggered(self):
+        Application.current().document.drawings.clear()
+        self.fresh_drawings()
+
     def actBrushSolid_triggered(self):
         color = QColorDialog.getColor()
         if not color.isValid():
@@ -289,22 +335,36 @@ class MainWindow(QMainWindow, ui.MainWindow):
         Application.current().document.brushes.append(br)
         self.modelBrush.append(br)
 
+    def actBrushRemove_triggered(self):
+        indexs = self.trvBrushes.selectedIndexes()
+        if len(indexs) == 0:
+            return
+        r = indexs[0].row()
+        Application.current().document.brushes.remove(
+            Application.current().document.brushes[r])
+        self.fresh_brushes()
+
+    def actBrushClear_triggered(self):
+        Application.current().document.brushes.clear()
+        self.fresh_brushes()
+
     def actClose_triggered(self):
         Application.current().document = None
-        self.current_file = None
+        self.set_current_file(None)
 
     def actNew_triggered(self):
         Application.current().document = _create_new_document()
 
     def actSave_triggered(self):
-        if self.current_file is None:
+        file = self.current_file()
+        if file is None:
             self.actSaveAs_triggered()
             return
-        if self.current_file.endswith(".isd.json"):
-            with open(self.current_file, mode="w+") as f:
+        if file.endswith(".isd.json"):
+            with open(file, mode="w+") as f:
                 Application.current().document.save(f, Document.FILE_RAW)
         else:
-            with open(self.current_file, mode="wb") as f:
+            with open(file, mode="wb") as f:
                 Application.current().document.save(f)
 
     def actSaveAs_triggered(self):
@@ -320,7 +380,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         else:
             with open(fileName, mode="wb") as f:
                 Application.current().document.save(f)
-        self.current_file = fileName
+        self.set_current_file(fileName)
 
     def actOpen_triggered(self):
         options = QFileDialog.Options()
@@ -334,4 +394,4 @@ class MainWindow(QMainWindow, ui.MainWindow):
                 with open(fileName, mode="rb") as f:
                     doc = Document.load(f)
             Application.current().document = doc
-            self.current_file = fileName
+            self.set_current_file(fileName)

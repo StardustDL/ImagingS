@@ -51,6 +51,9 @@ class IdObjectList(PropertySerializable, Generic[T]):
     def at(self, index: int) -> T:
         return self._items[index]
 
+    def clear(self) -> None:
+        self.items = []
+
     def __delitem__(self, key: str) -> None:
         if not self.contains(key):
             raise KeyError(key)

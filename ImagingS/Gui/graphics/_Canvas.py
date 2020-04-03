@@ -38,12 +38,14 @@ class Canvas(QGraphicsView):
             return
         if self._interactive.view_item is not None:
             self.scene().addItem(self._interactive.view_item)
+            self.rerender()
 
     def _interactive_ended(self):
         if self._interactive is not None:
             self._after_interactive()
             if self._interactive.view_item is not None:
                 self.scene().removeItem(self._interactive.view_item)
+                self.rerender()
         self.interactive = None
 
     def rerender(self) -> None:
