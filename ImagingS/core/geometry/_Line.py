@@ -27,6 +27,7 @@ class Line(Geometry):
     @start.setter
     def start(self, value: Point) -> None:
         self._start = value
+        self.refresh_boundingArea()
 
     @property
     def end(self) -> Point:
@@ -35,6 +36,7 @@ class Line(Geometry):
     @end.setter
     def end(self, value: Point) -> None:
         self._end = value
+        self.refresh_boundingArea()
 
     @property
     def algorithm(self) -> str:

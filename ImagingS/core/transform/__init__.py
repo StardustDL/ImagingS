@@ -1,10 +1,10 @@
 from ._Transform import Transform, TransformGroup
-from ._ClipTransform import ClipTransform
-from ._MatrixTransform import MatrixTransform
-from ._RotateTransform import RotateTransform
-from ._ScaleTransform import ScaleTransform
-from ._SkewTransform import SkewTransform
-from ._TranslateTransform import TranslateTransform
+from ._Clip import ClipTransform
+from ._Matrix import MatrixTransform
+from ._Rotate import RotateTransform
+from ._Scale import ScaleTransform
+from ._Skew import SkewTransform
+from ._Translate import TranslateTransform
 
 
 __all__ = (

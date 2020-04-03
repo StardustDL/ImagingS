@@ -24,7 +24,8 @@ class BoundingAreaMeasurer(DrawingContext):
         self._ry = float("-inf")
 
     def end_measure(self) -> RectArea:
-        result = RectArea.from_points(Point.create(self._lx, self._ly), Point.create(self._rx, self._ry))
+        result = RectArea.from_points(Point.create(
+            self._lx, self._ly), Point.create(self._rx, self._ry))
         return result
 
     def point(self, position: Point, color: Color) -> None:
@@ -66,7 +67,7 @@ class Drawing(PropertySerializable, IdObject, ABC):
             return RectArea.infinite()
         return self._boundingArea
 
-    def _refresh_boundingArea(self) -> None:
+    def refresh_boundingArea(self) -> None:
         if hasattr(self, "_boundingArea"):
             del self._boundingArea
 
@@ -87,9 +88,3 @@ class DrawingGroup(Drawing):
     def render(self, context: DrawingContext) -> None:
         for item in self.children:
             item.render(context)
-
-    @property
-    def boundingArea(self) -> RectArea:
-        if len(self.children) == 0:
-            return RectArea()
-        return self.children[0].boundingArea

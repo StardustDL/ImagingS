@@ -33,6 +33,7 @@ class Polygon(Geometry):
     @vertexes.setter
     def vertexes(self, value: List[Point]) -> None:
         self._vertexes = value
+        self.refresh_boundingArea()
 
     def render(self, context: DrawingContext) -> None:
         cnt = len(self.vertexes)

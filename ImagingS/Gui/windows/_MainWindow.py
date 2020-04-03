@@ -4,8 +4,11 @@ from ImagingS.document import Document
 from ImagingS.Gui.app import Application
 from ImagingS.core import Color
 from ImagingS.core.brush import Brushes, SolidBrush, Brush
+from ImagingS.core.geometry import Line, Curve, Polygon, Ellipse, Geometry
 from ImagingS.Gui.models import BrushModel, PropertyModel, DrawingModel
 from ImagingS.Gui.graphics import Canvas, converters
+from ImagingS.Gui.interactive import LineInteractive, PolygonInteractive, CurveInteractive, EllipseInteractive
+import uuid
 import qtawesome as qta
 
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog, QMessageBox
@@ -129,10 +132,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
             if Application.current().document is None:
                 self.setWindowTitle("ImagingS")
             else:
-                self.setWindowTitle(f"Untitled - ImagingS")
+                self.setWindowTitle("Untitled - ImagingS")
         else:
-            filename = os.path.split(self._current_file)[
-                1].rstrip(".isd.json")
+            filename = os.path.split(self._current_file)[1].rstrip(".isd.json")
             self.setWindowTitle(f"{filename} - ImagingS")
 
     def fresh_brushes(self):
@@ -144,6 +146,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
         if hasDoc:
             for br in doc.brushes:
                 self.modelBrush.append(br)
+
+        self._current_brush = Brushes.Black()
+        self.dwgBrushes.setEnabled(hasDoc)
 
     def fresh_drawings(self):
         self.modelDrawing.clear_items()
@@ -158,21 +163,21 @@ class MainWindow(QMainWindow, ui.MainWindow):
                 self.modelDrawing.append(br)
                 self.gvwMain.add(br)
 
+        self.gvwMain.setEnabled(hasDoc)
+        self.dwgDrawings.setEnabled(hasDoc)
+
     def app_documentChanged(self):
         doc = Application.current().document
         hasDoc = doc is not None
         self.actClose.setEnabled(hasDoc)
         self.actSave.setEnabled(hasDoc)
+        self.actSaveAs.setEnabled(hasDoc)
         self.actExport.setEnabled(hasDoc)
-        self.gvwMain.setEnabled(hasDoc)
         self.mnuDrawing.setEnabled(hasDoc)
         self.mnuTransform.setEnabled(hasDoc)
         self.mnuBrush.setEnabled(hasDoc)
-        self.dwgDrawings.setEnabled(hasDoc)
-        self.dwgBrushes.setEnabled(hasDoc)
         self.dwgProperties.setEnabled(hasDoc)
         self.tlbWindow.setEnabled(hasDoc)
-
         self.fresh_brushes()
         self.fresh_drawings()
         self.modelProperties.fresh()
@@ -180,6 +185,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
     def trvBrushes_clicked(self, index):
         r = index.row()
         item = Application.current().document.brushes[r]
+        self._current_brush = item
         if self.modelProperties.obj is not item:
             self.modelProperties.fresh(item)
         else:
@@ -202,17 +208,55 @@ class MainWindow(QMainWindow, ui.MainWindow):
             if act.isCheckable() and act is not checkedAction:
                 act.setChecked(False)
 
+    def _create_geometry(self, geo: Geometry) -> None:
+        geo.stroke = self._current_brush
+        Application.current().document.drawings.append(geo)
+        self.modelDrawing.append(geo)
+        self.gvwMain.add(geo)
+
     def actDrawingCurve_triggered(self):
+        if not self.actDrawingCurve.isChecked():
+            return
         self.resetDrawingActionChecked(self.actDrawingCurve)
+        polygon = Curve()
+        polygon.id = str(uuid.uuid1())
+        self._create_geometry(polygon)
+        inter = CurveInteractive(polygon)
+        inter.ended.connect(self.actDrawingCurve.trigger)
+        self.gvwMain.interactive = inter
 
     def actDrawingPolygon_triggered(self):
+        if not self.actDrawingPolygon.isChecked():
+            return
         self.resetDrawingActionChecked(self.actDrawingPolygon)
+        polygon = Polygon()
+        polygon.id = str(uuid.uuid1())
+        self._create_geometry(polygon)
+        inter = PolygonInteractive(polygon)
+        inter.ended.connect(self.actDrawingPolygon.trigger)
+        self.gvwMain.interactive = inter
 
     def actDrawingEllipse_triggered(self):
+        if not self.actDrawingEllipse.isChecked():
+            return
         self.resetDrawingActionChecked(self.actDrawingEllipse)
+        line = Ellipse()
+        line.id = str(uuid.uuid1())
+        self._create_geometry(line)
+        inter = EllipseInteractive(line)
+        inter.ended.connect(self.actDrawingEllipse.trigger)
+        self.gvwMain.interactive = inter
 
     def actDrawingLine_triggered(self):
+        if not self.actDrawingLine.isChecked():
+            return
         self.resetDrawingActionChecked(self.actDrawingLine)
+        line = Line()
+        line.id = str(uuid.uuid1())
+        self._create_geometry(line)
+        inter = LineInteractive(line)
+        inter.ended.connect(self.actDrawingLine.trigger)
+        self.gvwMain.interactive = inter
 
     def actBrushSolid_triggered(self):
         color = QColorDialog.getColor()
@@ -241,14 +285,13 @@ class MainWindow(QMainWindow, ui.MainWindow):
     def actSaveAs_triggered(self):
         options = QFileDialog.Options()
         fileName, _ = QFileDialog.getSaveFileName(
-            self, "Save as", "", "ImagingS document (*.isd.json)", options=options)
+            self, "Save As", "", "ImagingS document (*.isd.json)", options=options)
         if not fileName:
             return
 
-        self.current_file = fileName
         with open(fileName, mode="w+") as f:
             Application.current().document.save(f)
-        self.app_documentChanged()
+        self.current_file = fileName
 
     def actOpen_triggered(self):
         options = QFileDialog.Options()

@@ -1,4 +1,7 @@
+from ImagingS.core import Colors
+from ImagingS.Gui.graphics import converters
 from ImagingS.core.drawing import Drawing
+from ImagingS.core.brush import SolidBrush
 from ImagingS.core.geometry import Line, Polygon, Curve, Ellipse, Geometry
 import qtawesome as qta
 from PyQt5.QtCore import Qt
@@ -15,16 +18,20 @@ class DrawingModel(QStandardItemModel):
     def append(self, drawing: Drawing) -> None:
         fitem = None
         if isinstance(drawing, Geometry):
+            if isinstance(drawing.stroke, SolidBrush):
+                color = converters.convert_color(drawing.stroke.color)
+            else:
+                color = converters.convert_color(Colors.Black())
             if isinstance(drawing, Line):
-                fitem = QStandardItem(qta.icon("mdi.vector-line"), drawing.id)
+                fitem = QStandardItem(qta.icon("mdi.vector-line", color=color), drawing.id)
             elif isinstance(drawing, Curve):
-                fitem = QStandardItem(qta.icon("mdi.vector-curve"), drawing.id)
+                fitem = QStandardItem(qta.icon("mdi.vector-curve", color=color), drawing.id)
             elif isinstance(drawing, Ellipse):
                 fitem = QStandardItem(
-                    qta.icon("mdi.vector-ellipse"), drawing.id)
+                    qta.icon("mdi.vector-ellipse", color=color), drawing.id)
             elif isinstance(drawing, Polygon):
                 fitem = QStandardItem(
-                    qta.icon("mdi.vector-polygon"), drawing.id)
+                    qta.icon("mdi.vector-polygon", color=color), drawing.id)
 
         if fitem:
             fitem.setEditable(False)
