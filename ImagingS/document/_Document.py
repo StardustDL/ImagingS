@@ -6,10 +6,13 @@ from ImagingS.core.brush import Brush
 from ImagingS.core.serialization import PropertySerializable
 from ImagingS.core.serialization.json import Decoder, Encoder
 import json
+import lzma
 import uuid
 
 
 class Document(PropertySerializable, IdObject):
+    FILE_ISD, FILE_RAW = range(2)
+
     def __init__(self) -> None:
         super().__init__()
         self.id = str(uuid.uuid1())
@@ -41,9 +44,21 @@ class Document(PropertySerializable, IdObject):
     def size(self, value: Size) -> None:
         self._size = value
 
-    def save(self, file) -> None:
-        json.dump(self, file, ensure_ascii=False, indent=4, cls=Encoder)
+    def save(self, file, type=0) -> None:
+        if type == self.FILE_RAW:
+            json.dump(self, file, ensure_ascii=False, indent=4, cls=Encoder)
+        else:
+            s = json.dumps(self, ensure_ascii=False, cls=Encoder)
+            data = s.encode("utf8")
+            data = lzma.compress(data)
+            file.write(data)
 
-    @staticmethod
-    def load(file) -> Document:
-        return json.load(file, cls=Decoder)
+    @classmethod
+    def load(cls, file, type=0) -> Document:
+        if type == cls.FILE_RAW:
+            return json.load(file, cls=Decoder)
+        else:
+            data = file.read()
+            data = lzma.decompress(data)
+            s = data.decode("utf8")
+            return json.loads(s, cls=Decoder)

@@ -18,7 +18,7 @@ class BuiltinInstruction:
         self.doc.size = Size.create(int(argv[0]), int(argv[1]))
 
     def saveCanvas(self, argv: List[str]) -> None:
-        with open(os.path.join(self.output_dir, f"{argv[0]}.isd.json"), "w+") as f:
+        with open(os.path.join(self.output_dir, f"{argv[0]}.isd"), "wb") as f:
             self.doc.save(f)
 
     def setColor(self, argv: List[str]) -> None:

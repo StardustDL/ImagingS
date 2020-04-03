@@ -42,9 +42,9 @@ def test_sl() -> None:
     doc.drawings.append(ell)
 
     file = os.path.join(curdir, "doc.json")
-    with open(file, mode="w+") as f:
+    with open(file, mode="wb") as f:
         doc.save(f)
-    with open(file, mode="r") as f:
+    with open(file, mode="rb") as f:
         docl = Document.load(f)
 
     assert len(docl.brushes) == 2

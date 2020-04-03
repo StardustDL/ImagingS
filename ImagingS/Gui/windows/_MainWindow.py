@@ -11,7 +11,7 @@ from ImagingS.Gui.interactive import LineInteractive, PolygonInteractive, CurveI
 import uuid
 import qtawesome as qta
 
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog
 from PyQt5.QtCore import QSizeF
 
 import os
@@ -278,32 +278,38 @@ class MainWindow(QMainWindow, ui.MainWindow):
         if self.current_file is None:
             self.actSaveAs_triggered()
             return
-
-        with open(self.current_file, mode="w+") as f:
-            Application.current().document.save(f)
+        if self.current_file.endswith(".isd.json"):
+            with open(self.current_file, mode="w+") as f:
+                Application.current().document.save(f, Document.FILE_RAW)
+        else:
+            with open(self.current_file, mode="wb") as f:
+                Application.current().document.save(f)
 
     def actSaveAs_triggered(self):
         options = QFileDialog.Options()
         fileName, _ = QFileDialog.getSaveFileName(
-            self, "Save As", "", "ImagingS document (*.isd.json)", options=options)
+            self, "Save As", "", "ImagingS Document (*.isd);; ImagingS Raw Document (*.isd.json)", options=options)
         if not fileName:
             return
 
-        with open(fileName, mode="w+") as f:
-            Application.current().document.save(f)
+        if fileName.endswith(".isd.json"):
+            with open(fileName, mode="w+") as f:
+                Application.current().document.save(f, Document.FILE_RAW)
+        else:
+            with open(fileName, mode="wb") as f:
+                Application.current().document.save(f)
         self.current_file = fileName
 
     def actOpen_triggered(self):
         options = QFileDialog.Options()
         fileName, _ = QFileDialog.getOpenFileName(
-            self, "Open", "", "ImagingS document (*.isd.json)", options=options)
+            self, "Open", "", "ImagingS Document (*.isd);; ImagingS Raw Document (*.isd.json)", options=options)
         if fileName:
-            with open(fileName, mode="r") as f:
-                try:
+            if fileName.endswith(".isd.json"):
+                with open(fileName, mode="r") as f:
+                    doc = Document.load(f, Document.FILE_RAW)
+            else:
+                with open(fileName, mode="rb") as f:
                     doc = Document.load(f)
-                except Exception:
-                    QMessageBox.critical(
-                        self, "Open Failed", "The file loading failed.")
-                    return
             Application.current().document = doc
             self.current_file = fileName
