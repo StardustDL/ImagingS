@@ -12,6 +12,7 @@ from ImagingS.Gui.interactive import LineInteractive, PolygonInteractive, CurveI
 from ImagingS.Gui.interactive import TranslateTransformInteractive, SkewTransformInteractive, RotateTransformInteractive
 import uuid
 import qtawesome as qta
+from io import StringIO
 
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog
 from PyQt5.QtCore import QSizeF
@@ -78,7 +79,11 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.trvDrawings_clicked)
 
         self.modelProperties = PropertyModel(self)
+        self.modelCode = PropertyModel(self)
         self.trvProperties.setModel(self.modelProperties)
+        self.trvCode.setModel(self.modelCode)
+
+        self.tbxMain.currentChanged.connect(self.tbxMain_currentChanged)
 
         Application.current().documentChanged.connect(self.app_documentChanged)
         self.actNew.trigger()
@@ -89,7 +94,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.gvwMain = Canvas(self.centralwidget)
         self.gvwMain.setEnabled(True)
         self.gvwMain.setObjectName("gvwMain")
-        self.gridLayout.addWidget(self.gvwMain, 0, 0, 1, 1)
+        self.grdVisual.addWidget(self.gvwMain, 0, 0, 1, 1)
         self.gvwMain.resize(QSizeF(600, 600))
 
     def setupDockWidget(self):
@@ -139,6 +144,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.dwgBrushes.setWindowIcon(qta.icon("mdi.brush"))
         self.dwgDrawings.setWindowIcon(qta.icon("mdi.drawing"))
         self.dwgProperties.setWindowIcon(qta.icon("mdi.database"))
+        self.tbxMain.setItemIcon(0, qta.icon("mdi.image"))
+        self.tbxMain.setItemIcon(1, qta.icon("mdi.code-tags"))
         self.tlbWindow.setWindowIcon(qta.icon("mdi.toolbox"))
         self.setWindowIcon(qta.icon("mdi.pencil-box-multiple", color="purple"))
 
@@ -207,9 +214,24 @@ class MainWindow(QMainWindow, ui.MainWindow):
                 self.gvwMain.add(br)
 
         self.set_current_drawing(None)
-
-        self.gvwMain.setEnabled(hasDoc)
         self.dwgDrawings.setEnabled(hasDoc)
+
+    def fresh_code(self):
+        doc = Application.current().document
+        hasDoc = doc is not None
+
+        if not hasDoc:
+            return
+
+        io = StringIO()
+        doc.save(io, Document.FILE_RAW)
+        self.tetCode.setText(io.getvalue())
+        self.modelCode.fresh(doc)
+        width = self.trvCode.size().width() / 2
+        if width > 0:
+            self.trvCode.setColumnWidth(0, width)
+            self.trvCode.setColumnWidth(1, width)
+        self.trvCode.expandAll()
 
     def app_documentChanged(self):
         doc = Application.current().document
@@ -223,10 +245,30 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.mnuBrush.setEnabled(hasDoc)
         self.dwgProperties.setEnabled(hasDoc)
         self.tlbWindow.setEnabled(hasDoc)
+        self.tbxMain.setEnabled(hasDoc)
         self.fresh_brushes()
         self.fresh_drawings()
+        self.fresh_code()
         self.modelProperties.fresh(doc)
         self.trvProperties.expandAll()
+
+    def tbxMain_currentChanged(self, index):
+        if index == 0:  # Visual
+            code = self.tetCode.toPlainText()
+            io = StringIO(code)
+            try:
+                tdoc = Document.load(io, Document.FILE_RAW)
+            except Exception:
+                self.stbMain.showMessage("Load document from code failed.")
+                self._error_code = True
+                self.tbxMain.setCurrentIndex(1)
+            else:
+                Application.current().document = tdoc
+        else:  # Code
+            if hasattr(self, "_error_code"):
+                del self._error_code
+            else:
+                self.fresh_code()
 
     def trvBrushes_clicked(self, index):
         r = index.row()
