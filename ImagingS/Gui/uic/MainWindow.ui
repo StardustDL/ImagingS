@@ -220,7 +220,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QTreeView" name="trvProperties"/>
+      <widget class="QTreeView" name="trvProperties">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>

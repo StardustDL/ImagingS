@@ -5,7 +5,7 @@ from ImagingS.core.brush import Brush, SolidBrush
 from ImagingS.Gui.graphics import converters
 
 
-def _get_color_icon(color: Color) -> QIcon:
+def get_color_icon(color: Color) -> QIcon:
     pixmap = QPixmap(32, 32)
     pixmap.fill(converters.convert_color(color))
     return QIcon(pixmap)
@@ -21,7 +21,7 @@ class BrushModel(QStandardItemModel):
     def append(self, brush: Brush) -> None:
         fitem = None
         if isinstance(brush, SolidBrush):
-            fitem = QStandardItem(_get_color_icon(
+            fitem = QStandardItem(get_color_icon(
                 brush.color), brush.color.to_hex())
 
         if fitem:

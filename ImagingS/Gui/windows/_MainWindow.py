@@ -100,6 +100,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actToggleDrawings = self.dwgDrawings.toggleViewAction()
         self.actToggleDrawings.setShortcut("Ctrl+Shift+D")
 
+        self.tabifyDockWidget(self.dwgBrushes, self.dwgProperties)
+        self.dwgBrushes.raise_()
+
         viewActions = [self.actToggleDrawings, self.actToggleBrushes,
                        self.actToggleProperties]
         self.mnuView.addActions(viewActions)
@@ -222,28 +225,35 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.tlbWindow.setEnabled(hasDoc)
         self.fresh_brushes()
         self.fresh_drawings()
-        self.modelProperties.fresh()
+        self.modelProperties.fresh(doc)
+        self.trvProperties.expandAll()
 
     def trvBrushes_clicked(self, index):
         r = index.row()
-        item = Application.current().document.brushes[r]
+        doc = Application.current().document
+        item = doc.brushes[r]
         if self.modelProperties.obj is not item:
             self.set_current_brush(item)
             self.modelProperties.fresh(item)
+            self.trvProperties.expandAll()
         else:
             self.set_current_brush(None)
-            self.modelProperties.fresh()
+            self.modelProperties.fresh(doc)
+            self.trvProperties.expandAll()
             self.trvBrushes.clearSelection()
 
     def trvDrawings_clicked(self, index):
         r = index.row()
-        item = Application.current().document.drawings.at(r)
+        doc = Application.current().document
+        item = doc.drawings.at(r)
         if self.modelProperties.obj is not item:
             self.set_current_drawing(item)
             self.modelProperties.fresh(item)
+            self.trvProperties.expandAll()
         else:
             self.set_current_drawing(None)
-            self.modelProperties.fresh()
+            self.modelProperties.fresh(doc)
+            self.trvProperties.expandAll()
             self.trvDrawings.clearSelection()
 
     def resetDrawingActionChecked(self, checkedAction=None):

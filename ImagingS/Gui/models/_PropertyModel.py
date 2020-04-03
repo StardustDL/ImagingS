@@ -1,41 +1,15 @@
-from typing import Iterator
+from ImagingS.document import Document
+from ImagingS.core import Color, Size, Point, RectArea
+from ImagingS.core.brush import Brush, SolidBrush
+from ImagingS.core.drawing import Drawing
+from ImagingS.core.geometry import Line, Curve, Polygon, Ellipse
+from ImagingS.core.transform import Transform, TranslateTransform, SkewTransform, RotateTransform, TransformGroup, ScaleTransform, MatrixTransform, ClipTransform
+from typing import Dict, List, Optional
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
-
-
-class Property:
-    def __init__(self, name: str, onwer, prop: property):
-        self.name = name
-        self.onwer = onwer
-        self._get = prop.fget
-        self._set = prop.fset
-        self._del = prop.fdel
-
-    def can_get(self):
-        return self._get is not None
-
-    def can_set(self):
-        return self._set is not None
-
-    def can_del(self):
-        return self._del is not None
-
-    def get(self):
-        return self._get.__call__(self.onwer)
-
-    def set(self, val):
-        return self._set.__call__(self.onwer, val)
-
-    def delete(self):
-        return self._del.__call__(self.onwer)
-
-
-def _get_props(obj) -> Iterator[Property]:
-    cls = obj.__class__
-    for name in dir(cls):
-        item = getattr(cls, name)
-        if isinstance(item, property):
-            yield Property(name, obj, item)
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QIcon
+from ImagingS.core.serialization import get_properties
+from ._BrushModel import get_color_icon
+import qtawesome as qta
 
 
 class PropertyModel(QStandardItemModel):
@@ -52,8 +26,89 @@ class PropertyModel(QStandardItemModel):
         self.obj = obj
         if obj is None:
             return
-        for prop in _get_props(obj):
-            index = self.rowCount()
-            item = QStandardItem(prop.name)
-            self.appendRow(item)
-            self.setData(self.index(index, self.VALUE), prop.get())
+        item = QStandardItem(obj.__class__.__name__)
+        self.__set_icon(item, obj)
+        self.appendRow(item)
+        self.__add_prop_children(item, obj)
+
+    def __set_icon(self, item: QStandardItem, value) -> None:
+        if value is None or isinstance(value, str) or isinstance(value, int) or isinstance(value, float):
+            pass
+        elif isinstance(value, list):
+            item.setIcon(qta.icon("mdi.format-list-numbered"))
+        elif isinstance(value, dict):
+            item.setIcon(qta.icon("mdi.format-list-numbered"))
+        elif isinstance(value, set):
+            item.setIcon(qta.icon("mdi.format-list-numbered"))
+        elif isinstance(value, Color):
+            item.setIcon(get_color_icon(value))
+        elif isinstance(value, Document):
+            item.setIcon(qta.icon("mdi.file-document"))
+        elif isinstance(value, Size):
+            item.setIcon(qta.icon("mdi.format-size"))
+        elif isinstance(value, RectArea):
+            item.setIcon(qta.icon("mdi.rectangle-outline"))
+        elif isinstance(value, Point):
+            item.setIcon(qta.icon("mdi.circle-medium"))
+        elif isinstance(value, TranslateTransform):
+            item.setIcon(qta.icon("mdi.cursor-move"))
+        elif isinstance(value, SkewTransform):
+            item.setIcon(qta.icon("mdi.skew-more"))
+        elif isinstance(value, RotateTransform):
+            item.setIcon(qta.icon("mdi.rotate-left"))
+        elif isinstance(value, ScaleTransform):
+            item.setIcon(qta.icon("mdi.relative-scale"))
+        elif isinstance(value, MatrixTransform):
+            item.setIcon(qta.icon("mdi.matrix"))
+        elif isinstance(value, ClipTransform):
+            item.setIcon(qta.icon("mdi.crop"))
+        elif isinstance(value, TransformGroup):
+            item.setIcon(qta.icon("mdi.group"))
+        elif isinstance(value, SolidBrush):
+            item.setIcon(qta.icon("mdi.solid"))
+        elif isinstance(value, Line):
+            item.setIcon(qta.icon("mdi.vector-line"))
+        elif isinstance(value, Curve):
+            item.setIcon(qta.icon("mdi.vector-curve"))
+        elif isinstance(value, Ellipse):
+            item.setIcon(qta.icon("mdi.vector-ellipse"))
+        elif isinstance(value, Polygon):
+            item.setIcon(qta.icon("mdi.vector-polygon"))
+        elif isinstance(value, Brush):
+            item.setIcon(qta.icon("mdi.brush"))
+        elif isinstance(value, Drawing):
+            item.setIcon(qta.icon("mdi.drawing"))
+        elif isinstance(value, Transform):
+            item.setIcon(qta.icon("mdi.axis"))
+
+    def __add_dict_children(self, root: QStandardItem, li: Dict) -> None:
+        for k, v in li.items():
+            self.__add_child(root, str(k), v)
+
+    def __add_list_children(self, root: QStandardItem, li: List) -> None:
+        for i, value in enumerate(li):
+            self.__add_child(root, str(i), value)
+
+    def __add_prop_children(self, root: QStandardItem, obj) -> None:
+        for prop in get_properties(obj):
+            self.__add_child(root, prop.name, prop.get())
+
+    def __add_child(self, root: QStandardItem, name: str, value) -> None:
+        item = QStandardItem(name)
+        self.__set_icon(item, value)
+        root.appendRow(item)
+        index = self.indexFromItem(item).row()
+        if value is None or isinstance(value, str) or isinstance(value, int) or isinstance(value, float):
+            root.setChild(index, self.VALUE, QStandardItem(str(value)))
+        elif isinstance(value, list):
+            root.setChild(index, self.VALUE, QStandardItem("List"))
+            self.__add_list_children(item, value)
+        elif isinstance(value, dict):
+            root.setChild(index, self.VALUE, QStandardItem("Dictionary"))
+        elif isinstance(value, set):
+            root.setChild(index, self.VALUE, QStandardItem("Set"))
+            self.__add_list_children(item, list(value))
+        else:
+            root.setChild(index, self.VALUE, QStandardItem(
+                value.__class__.__name__))
+            self.__add_prop_children(item, value)

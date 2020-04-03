@@ -24,3 +24,6 @@ class SolidBrush(Brush):
 
     def color_at(self, position: Point, area: RectArea) -> Color:
         return self._color
+
+    def __repr__(self) -> str:
+        return f"SolidBrush({self.color})"
