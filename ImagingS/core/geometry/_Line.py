@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Iterator
-from ImagingS.core import Point, RectArea
+from ImagingS.core import Point
 from ImagingS.core.drawing import DrawingContext
 from . import Geometry
 
@@ -27,7 +27,6 @@ class Line(Geometry):
     @start.setter
     def start(self, value: Point) -> None:
         self._start = value
-        self.__update_bounding_area()
 
     @property
     def end(self) -> Point:
@@ -36,7 +35,6 @@ class Line(Geometry):
     @end.setter
     def end(self, value: Point) -> None:
         self._end = value
-        self.__update_bounding_area()
 
     @property
     def algorithm(self) -> str:
@@ -80,20 +78,5 @@ class Line(Geometry):
             rp = p
             if self.transform is not None:
                 rp = self.transform.transform(p)
-            if rp:
+            if rp and rp in context.area():
                 context.point(rp, self.stroke.color_at(rp, self.boundingArea))
-
-    @property
-    def boundingArea(self) -> RectArea:
-        return self._bounding_area
-
-    def __update_bounding_area(self):
-        x0, y0 = self.start.as_tuple()
-        x1, y1 = self.end.as_tuple()
-
-        x = min(x0, x1)
-        y = min(y0, y1)
-        x2 = max(x0, x1)
-        y2 = max(y0, y1)
-        self._bounding_area = RectArea.from_points(
-            Point.create(x, y), Point.create(x2, y2))

@@ -20,7 +20,7 @@ class SkewTransform(MatrixTransform):
         result.angle_x = angle_x
         result.angle_y = angle_y
         return result
-    
+
     def __update_matrix(self) -> None:
         self.matrix = np.array(
             [[cos(self._angle_y), sin(self._angle_x)],

@@ -25,7 +25,7 @@ def convert_qpoint(o: Union[QPointF, QPoint]) -> Point:
 
 
 def convert_qsize(o: Union[QSizeF, QSize]) -> Size:
-    return Size.create(o.width, o.height)
+    return Size.create(o.width(), o.height())
 
 
 def convert_qrect_area(o: Union[QRectF, QRect]) -> RectArea:

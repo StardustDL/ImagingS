@@ -1,3 +1,4 @@
+from ImagingS.core import Point, RectArea
 from ImagingS.core.drawing import Drawing
 from . import PainterDrawingContext
 from . import converters
@@ -29,7 +30,7 @@ class DrawingItem(QGraphicsItem):
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: Optional[QWidget] = ...) -> None:
         context = PainterDrawingContext(
-            painter, converters.convert_qsize(self._size))
+            painter, RectArea.create(Point(), converters.convert_qsize(self._size)))
         self.drawing.render(context)
         if self.is_active:
             painter.setPen(QColor(255, 0, 0))

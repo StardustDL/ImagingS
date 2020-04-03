@@ -17,17 +17,24 @@ class Canvas(QGraphicsView):
         self._sceneBorder = QGraphicsRectItem()
         self.scene().addItem(self._sceneBorder)
 
+    def rerender(self) -> None:
+        self.updateScene([self.sceneRect()])
+
     def resize(self, size: QSizeF):
         self.scene().setSceneRect(QRectF(QPointF(), size))
         self._sceneBorder.setRect(self.scene().sceneRect())
-        # self.setFixedSize(QSize(size.width() + 5, size.height() + 5))
-        self.update()
+
+        draws = self.items.values()
+
+        self.clear()
+        for item in draws:
+            self.add(item)
 
     def add(self, drawing: Drawing) -> None:
-        item = DrawingItem(drawing, self.size())
+        item = DrawingItem(drawing, self.scene().sceneRect().size())
         self.items[drawing.id] = item
         self.scene().addItem(item)
-        self.update()
+        self.rerender()
 
     def remove(self, name: str) -> None:
         if name not in self.items:
@@ -35,14 +42,14 @@ class Canvas(QGraphicsView):
         item = self.items[name]
         self.scene().removeItem(item)
         del self.items[name]
-        self.update()
+        self.rerender()
 
     def select(self, name: Optional[str]) -> None:
         if name is None:
             if self._active_item is not None:
                 self._active_item.is_active = False
                 self._active_item = None
-                self.update()
+                self.rerender()
             return
         if name not in self.items:
             return
@@ -51,9 +58,10 @@ class Canvas(QGraphicsView):
         item = self.items[name]
         self._active_item = item
         item.is_active = True
-        self.update()
+        self.rerender()
 
     def clear(self) -> None:
         for draw in self.items.values():
             self.scene().removeItem(draw)
         self.items.clear()
+        self.rerender()

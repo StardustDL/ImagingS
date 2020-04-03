@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import List
-from ImagingS.core import Point, RectArea
+from ImagingS.core import Point
 from ImagingS.core.drawing import DrawingContext
 from . import Geometry, Line
 
@@ -33,7 +33,6 @@ class Polygon(Geometry):
     @vertexes.setter
     def vertexes(self, value: List[Point]) -> None:
         self._vertexes = value
-        self.__update_bounding_area()
 
     def render(self, context: DrawingContext) -> None:
         cnt = len(self.vertexes)
@@ -46,19 +45,3 @@ class Polygon(Geometry):
             ln.stroke = self.stroke
             ln.transform = self.transform
             ln.render(context)
-
-    @property
-    def boundingArea(self) -> RectArea:
-        return self._bounding_area
-    
-    def __update_bounding_area(self):
-        if len(self.vertexes) == 0:
-            self._bounding_area = RectArea()
-            return
-        xn, yn = self.vertexes[0].as_tuple()
-        xx, yx = xn, yn
-        for p in self.vertexes:
-            tx, ty = p.as_tuple()
-            xn, yn = min(xn, tx), min(yn, ty)
-            xx, yx = max(xx, tx), max(yx, ty)
-        self._bounding_area = RectArea.from_points(Point.create(xn, yn), Point.create(xx, yx))
