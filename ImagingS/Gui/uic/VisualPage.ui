@@ -6,13 +6,143 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>530</width>
     <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Visual</string>
   </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QToolBar" name="tlbMain">
+     <property name="windowTitle">
+      <string>Visual Tool Box</string>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <addaction name="actDrawingLine"/>
+     <addaction name="actDrawingPolygon"/>
+     <addaction name="actDrawingCurve"/>
+     <addaction name="actDrawingEllipse"/>
+     <addaction name="separator"/>
+     <addaction name="actTransformTranslate"/>
+     <addaction name="actTransformScale"/>
+     <addaction name="actTransformRotate"/>
+     <addaction name="actTransformSkew"/>
+     <addaction name="actTransformMatrix"/>
+     <addaction name="actTransformClip"/>
+     <addaction name="actTransformGroup"/>
+     <addaction name="actTransformClear"/>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widMain" native="true">
+     <layout class="QGridLayout" name="grdMain">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+  <action name="actDrawingLine">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Line</string>
+   </property>
+  </action>
+  <action name="actDrawingPolygon">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Polygon</string>
+   </property>
+  </action>
+  <action name="actDrawingCurve">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Curve</string>
+   </property>
+  </action>
+  <action name="actDrawingEllipse">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Ellipse</string>
+   </property>
+  </action>
+  <action name="actTransformTranslate">
+   <property name="text">
+    <string>Translate</string>
+   </property>
+  </action>
+  <action name="actTransformScale">
+   <property name="text">
+    <string>Scale</string>
+   </property>
+  </action>
+  <action name="actTransformRotate">
+   <property name="text">
+    <string>Rotate</string>
+   </property>
+  </action>
+  <action name="actTransformSkew">
+   <property name="text">
+    <string>Skew</string>
+   </property>
+  </action>
+  <action name="actTransformMatrix">
+   <property name="text">
+    <string>Matrix</string>
+   </property>
+  </action>
+  <action name="actTransformClip">
+   <property name="text">
+    <string>Clip</string>
+   </property>
+  </action>
+  <action name="actTransformGroup">
+   <property name="text">
+    <string>Group</string>
+   </property>
+  </action>
+  <action name="actTransformClear">
+   <property name="text">
+    <string>Clear</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

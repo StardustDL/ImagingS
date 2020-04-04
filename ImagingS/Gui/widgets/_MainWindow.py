@@ -5,18 +5,12 @@ from ImagingS.document import Document
 from ImagingS.Gui.app import Application
 from ImagingS.core import Color
 from ImagingS.core.brush import Brushes, SolidBrush, Brush
-from ImagingS.core.geometry import Line, Curve, Polygon, Ellipse, Geometry
 from ImagingS.Gui.models import BrushModel, PropertyModel, DrawingModel
-from ImagingS.Gui.graphics import Canvas, converters
-from ImagingS.Gui.interactive import LineInteractive, PolygonInteractive, CurveInteractive, EllipseInteractive, Interactive
-from ImagingS.Gui.interactive import TranslateTransformInteractive, SkewTransformInteractive, RotateTransformInteractive
-import uuid
 import qtawesome as qta
 
-from . import CodePage
+from . import CodePage, VisualPage
 
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog
-from PyQt5.QtCore import QSizeF
 
 import os
 
@@ -36,11 +30,11 @@ class MainWindow(QMainWindow, ui.MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setupCanvas()
+        self.setupVisual()
         self.setupCode()
         self.setupDockWidget()
         self.setupIcon()
-        self.set_current_file(None)
+        self.current_file = None
 
         self.actClose.triggered.connect(self.actClose_triggered)
         self.actQuit.triggered.connect(self.close)
@@ -53,24 +47,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actBrushRemove.triggered.connect(self.actBrushRemove_triggered)
         self.actBrushClear.triggered.connect(self.actBrushClear_triggered)
 
-        self.actDrawingCurve.triggered.connect(self.actDrawingCurve_triggered)
-        self.actDrawingLine.triggered.connect(self.actDrawingLine_triggered)
-        self.actDrawingEllipse.triggered.connect(
-            self.actDrawingEllipse_triggered)
-        self.actDrawingPolygon.triggered.connect(
-            self.actDrawingPolygon_triggered)
         self.actDrawingRemove.triggered.connect(
             self.actDrawingRemove_triggered)
         self.actDrawingClear.triggered.connect(self.actDrawingClear_triggered)
-
-        self.actTransformTranslate.triggered.connect(
-            self.actTransformTranslate_triggered)
-        self.actTransformSkew.triggered.connect(
-            self.actTransformSkew_triggered)
-        self.actTransformRotate.triggered.connect(
-            self.actTransformRotate_triggered)
-        self.actTransformClear.triggered.connect(
-            self.actTransformClear_triggered)
 
         self.modelBrush = BrushModel(self)
         self.trvBrushes.setModel(self.modelBrush)
@@ -94,18 +73,24 @@ class MainWindow(QMainWindow, ui.MainWindow):
         Application.current().documentChanged.connect(self.app_documentChanged)
         self.actNew.trigger()
 
-    def setupCanvas(self):
-        self._interactive: Optional[Interactive] = None
-
-        self.gvwMain = Canvas(self.centralwidget)
-        self.gvwMain.setObjectName("gvwMain")
-        self.grdVisual.addWidget(self.gvwMain, 0, 0, 1, 1)
-        self.gvwMain.resize(QSizeF(600, 600))
-
     def setupCode(self):
         self.widCode = CodePage()
         self.widCode.setObjectName("widCode")
         self.grdCode.addWidget(self.widCode, 0, 0, 1, 1)
+        self.widCode.messaged.connect(self.widVisualCode_messaged)
+
+    def setupVisual(self):
+        self.widVisual = VisualPage()
+        self.widVisual.setObjectName("widVisual")
+        self.grdVisual.addWidget(self.widVisual, 0, 0, 1, 1)
+        self.widVisual.messaged.connect(self.widVisualCode_messaged)
+        self.widVisual.drawingCreated.connect(self.widVisual_drawingCreated)
+
+        for act in self.widVisual.actionDrawings:
+            self.mnuDrawing.addAction(act)
+
+        for act in self.widVisual.actionTransforms:
+            self.mnuTransform.addAction(act)
 
     def setupDockWidget(self):
         self.actToggleBrushes = self.dwgBrushes.toggleViewAction()
@@ -115,8 +100,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actToggleDrawings = self.dwgDrawings.toggleViewAction()
         self.actToggleDrawings.setShortcut("Ctrl+Shift+D")
 
-        self.tabifyDockWidget(self.dwgBrushes, self.dwgProperties)
-        self.dwgBrushes.raise_()
+        self.tabifyDockWidget(self.dwgDrawings, self.dwgBrushes)
+        self.dwgDrawings.raise_()
 
         viewActions = [self.actToggleDrawings, self.actToggleBrushes,
                        self.actToggleProperties]
@@ -135,36 +120,24 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actToggleDrawings.setIcon(qta.icon("mdi.drawing"))
         self.actToggleBrushes.setIcon(qta.icon("mdi.brush"))
         self.actToggleProperties.setIcon(qta.icon("mdi.database"))
-        self.actDrawingLine.setIcon(qta.icon("mdi.vector-line"))
-        self.actDrawingCurve.setIcon(qta.icon("mdi.vector-curve"))
-        self.actDrawingEllipse.setIcon(qta.icon("mdi.vector-ellipse"))
-        self.actDrawingPolygon.setIcon(qta.icon("mdi.vector-polygon"))
-        self.actTransformSkew.setIcon(qta.icon("mdi.skew-more"))
-        self.actTransformScale.setIcon(qta.icon("mdi.relative-scale"))
-        self.actTransformTranslate.setIcon(qta.icon("mdi.cursor-move"))
-        self.actTransformRotate.setIcon(qta.icon("mdi.rotate-left"))
-        self.actTransformMatrix.setIcon(qta.icon("mdi.matrix"))
-        self.actTransformClip.setIcon(qta.icon("mdi.crop"))
-        self.actTransformGroup.setIcon(qta.icon("mdi.group"))
         self.actBrushSolid.setIcon(qta.icon("mdi.solid"))
-        self.actBrushRemove.setIcon(qta.icon("mdi.delete", color="red"))
-        self.actDrawingRemove.setIcon(qta.icon("mdi.delete", color="red"))
-        self.actBrushClear.setIcon(qta.icon("mdi.delete-sweep", color="red"))
-        self.actDrawingClear.setIcon(qta.icon("mdi.delete-sweep", color="red"))
-        self.actTransformClear.setIcon(
-            qta.icon("mdi.delete-sweep", color="red"))
+        self.actBrushRemove.setIcon(qta.icon("mdi.close", color="red"))
+        self.actDrawingRemove.setIcon(qta.icon("mdi.close", color="red"))
+        self.actBrushClear.setIcon(qta.icon("mdi.delete", color="red"))
+        self.actDrawingClear.setIcon(qta.icon("mdi.delete", color="red"))
         self.dwgBrushes.setWindowIcon(qta.icon("mdi.brush"))
         self.dwgDrawings.setWindowIcon(qta.icon("mdi.drawing"))
         self.dwgProperties.setWindowIcon(qta.icon("mdi.database"))
         self.tbxMain.setItemIcon(0, qta.icon("mdi.image"))
         self.tbxMain.setItemIcon(1, qta.icon("mdi.code-tags"))
-        self.tlbWindow.setWindowIcon(qta.icon("mdi.toolbox"))
         self.setWindowIcon(qta.icon("mdi.pencil-box-multiple", color="purple"))
 
+    @property
     def current_file(self) -> Optional[str]:
         return self._current_file
 
-    def set_current_file(self, value: Optional[str]) -> None:
+    @current_file.setter
+    def current_file(self, value: Optional[str]) -> None:
         self._current_file = os.path.realpath(value) if value else None
         if self._current_file is None:
             if Application.current().document is None:
@@ -174,30 +147,6 @@ class MainWindow(QMainWindow, ui.MainWindow):
         else:
             filename = os.path.split(self._current_file)[1].rstrip(".isd.json")
             self.setWindowTitle(f"{filename} - ImagingS")
-
-    def current_drawing(self) -> Optional[Drawing]:
-        return self._current_drawing
-
-    def set_current_drawing(self, value: Optional[Drawing]) -> None:
-        self._current_drawing = value
-        if value is not None:
-            self.gvwMain.select(value.id)
-            self.stbMain.showMessage(f"Current drawing: {value.id}")
-        else:
-            self.gvwMain.select(None)
-            self.stbMain.showMessage("")
-
-    def current_brush(self) -> Optional[Brush]:
-        return self._current_brush
-
-    def set_current_brush(self, value: Optional[Brush]) -> None:
-        self._current_brush = value
-        if value is not None:
-            if isinstance(value, SolidBrush):
-                self.stbMain.showMessage(
-                    f"Current brush: {value.color.to_hex()}")
-        else:
-            self.stbMain.showMessage("")
 
     def fresh_brushes(self):
         self.modelBrush.clear_items()
@@ -209,23 +158,16 @@ class MainWindow(QMainWindow, ui.MainWindow):
             for br in doc.brushes:
                 self.modelBrush.append(br)
 
-        self.set_current_brush(None)
         self.dwgBrushes.setEnabled(hasDoc)
 
     def fresh_drawings(self):
         self.modelDrawing.clear_items()
-        self.gvwMain.clear()
-
         doc = Application.current().document
         hasDoc = doc is not None
-
         if hasDoc:
-            self.gvwMain.resize(converters.convert_size(doc.size))
             for br in doc.drawings:
                 self.modelDrawing.append(br)
-                self.gvwMain.add(br)
-
-        self.set_current_drawing(None)
+        self.widVisual.document = doc
         self.dwgDrawings.setEnabled(hasDoc)
 
     def app_documentChanged(self):
@@ -239,15 +181,21 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.mnuTransform.setEnabled(hasDoc)
         self.mnuBrush.setEnabled(hasDoc)
         self.dwgProperties.setEnabled(hasDoc)
-        self.tlbWindow.setEnabled(hasDoc)
         self.tbxMain.setEnabled(hasDoc)
         self.fresh_brushes()
         self.fresh_drawings()
 
         self.widCode.document = doc
+        self.widVisual.document = doc
 
         self.modelProperties.fresh(doc)
         self.trvProperties.expandAll()
+
+    def widVisualCode_messaged(self, message: str) -> None:
+        self.stbMain.showMessage(message)
+
+    def widVisual_drawingCreated(self, drawing: Drawing) -> None:
+        self.modelDrawing.append(drawing)
 
     def widCode_uploaded(self):
         tdoc = self.widCode.load_document()
@@ -267,11 +215,11 @@ class MainWindow(QMainWindow, ui.MainWindow):
         doc = Application.current().document
         item = doc.brushes[r]
         if self.modelProperties.obj is not item:
-            self.set_current_brush(item)
+            self.widVisual.brush = item
             self.modelProperties.fresh(item)
             self.trvProperties.expandAll()
         else:
-            self.set_current_brush(None)
+            self.widVisual.brush = None
             self.modelProperties.fresh(doc)
             self.trvProperties.expandAll()
             self.trvBrushes.clearSelection()
@@ -281,119 +229,14 @@ class MainWindow(QMainWindow, ui.MainWindow):
         doc = Application.current().document
         item = doc.drawings.at(r)
         if self.modelProperties.obj is not item:
-            self.set_current_drawing(item)
+            self.widVisual.drawing = item
             self.modelProperties.fresh(item)
             self.trvProperties.expandAll()
         else:
-            self.set_current_drawing(None)
+            self.widVisual.drawing = None
             self.modelProperties.fresh(doc)
             self.trvProperties.expandAll()
             self.trvDrawings.clearSelection()
-
-    def resetDrawingActionChecked(self, checkedAction=None):
-        for act in self.mnuDrawing.actions():
-            if act.isCheckable() and act is not checkedAction:
-                act.setChecked(False)
-
-    def _create_geometry(self, geo: Geometry) -> None:
-        brush = self.current_brush()
-        if brush is not None:
-            geo.stroke = brush
-        self.gvwMain.add(geo)
-
-    def _set_interactive(self, inter: Optional[Interactive]) -> None:
-        self._interactive = inter
-        if self._interactive is not None:
-            self.gvwMain.interactive = self._interactive
-
-    def interDrawing_ended(self) -> None:
-        if self._interactive is None:
-            return
-        inter = self._interactive
-        drawing: Optional[Drawing] = None
-        if isinstance(inter, LineInteractive):
-            drawing = inter.drawing
-            self.actDrawingLine.trigger()
-        elif isinstance(inter, PolygonInteractive):
-            drawing = inter.drawing
-            self.actDrawingPolygon.trigger()
-        elif isinstance(inter, CurveInteractive):
-            drawing = inter.drawing
-            self.actDrawingCurve.trigger()
-        elif isinstance(inter, EllipseInteractive):
-            drawing = inter.drawing
-            self.actDrawingEllipse.trigger()
-        if drawing is None:
-            return
-        if inter.state == Interactive.S_Success:
-            Application.current().document.drawings.append(drawing)
-            self.modelDrawing.append(drawing)
-            self.set_current_drawing(drawing)
-        else:
-            self.gvwMain.remove(inter.drawing.id)
-        self._set_interactive(None)
-
-    def interTransform_ended(self) -> None:
-        if self._interactive is None:
-            return
-        inter = self._interactive
-        drawing = self.current_drawing()
-        if drawing is None:
-            return
-        drawing.refresh_boundingArea()
-        if inter.state == Interactive.S_Success:
-            pass
-        else:
-            drawing.transform = None
-        self._set_interactive(None)
-
-    def actDrawingCurve_triggered(self):
-        if not self.actDrawingCurve.isChecked():
-            self._set_interactive(None)
-            return
-        self.resetDrawingActionChecked(self.actDrawingCurve)
-        curve = Curve()
-        curve.id = str(uuid.uuid1())
-        self._create_geometry(curve)
-        inter = CurveInteractive(curve)
-        inter.ended.connect(self.interDrawing_ended)
-        self._set_interactive(inter)
-
-    def actDrawingPolygon_triggered(self):
-        if not self.actDrawingPolygon.isChecked():
-            self._set_interactive(None)
-            return
-        self.resetDrawingActionChecked(self.actDrawingPolygon)
-        polygon = Polygon()
-        polygon.id = str(uuid.uuid1())
-        self._create_geometry(polygon)
-        inter = PolygonInteractive(polygon)
-        inter.ended.connect(self.interDrawing_ended)
-        self._set_interactive(inter)
-
-    def actDrawingEllipse_triggered(self):
-        if not self.actDrawingEllipse.isChecked():
-            self._set_interactive(None)
-            return
-        self.resetDrawingActionChecked(self.actDrawingEllipse)
-        ell = Ellipse()
-        ell.id = str(uuid.uuid1())
-        self._create_geometry(ell)
-        inter = EllipseInteractive(ell)
-        inter.ended.connect(self.interDrawing_ended)
-        self._set_interactive(inter)
-
-    def actDrawingLine_triggered(self):
-        if not self.actDrawingLine.isChecked():
-            self._set_interactive(None)
-            return
-        self.resetDrawingActionChecked(self.actDrawingLine)
-        line = Line()
-        line.id = str(uuid.uuid1())
-        self._create_geometry(line)
-        inter = LineInteractive(line)
-        inter.ended.connect(self.interDrawing_ended)
-        self._set_interactive(inter)
 
     def actDrawingRemove_triggered(self):
         indexs = self.trvDrawings.selectedIndexes()
@@ -430,46 +273,15 @@ class MainWindow(QMainWindow, ui.MainWindow):
         Application.current().document.brushes.clear()
         self.fresh_brushes()
 
-    def actTransformTranslate_triggered(self):
-        drawing = self.current_drawing()
-        if drawing is None:
-            return
-        inter = TranslateTransformInteractive(drawing)
-        inter.ended.connect(self.interTransform_ended)
-        self._set_interactive(inter)
-
-    def actTransformSkew_triggered(self):
-        drawing = self.current_drawing()
-        if drawing is None:
-            return
-        inter = SkewTransformInteractive(drawing)
-        inter.ended.connect(self.interTransform_ended)
-        self._set_interactive(inter)
-
-    def actTransformRotate_triggered(self):
-        drawing = self.current_drawing()
-        if drawing is None:
-            return
-        inter = RotateTransformInteractive(drawing)
-        inter.ended.connect(self.interTransform_ended)
-        self._set_interactive(inter)
-
-    def actTransformClear_triggered(self):
-        drawing = self.current_drawing()
-        if drawing is None:
-            return
-        drawing.transform = None
-        self.gvwMain.rerender()
-
     def actClose_triggered(self):
         Application.current().document = None
-        self.set_current_file(None)
+        self.current_file = None
 
     def actNew_triggered(self):
         Application.current().document = _create_new_document()
 
     def actSave_triggered(self):
-        file = self.current_file()
+        file = self.current_file
         if file is None:
             self.actSaveAs_triggered()
             return
@@ -493,7 +305,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         else:
             with open(fileName, mode="wb") as f:
                 Application.current().document.save(f)
-        self.set_current_file(fileName)
+        self.current_file = fileName
 
     def actOpen_triggered(self):
         options = QFileDialog.Options()
@@ -507,4 +319,4 @@ class MainWindow(QMainWindow, ui.MainWindow):
                 with open(fileName, mode="rb") as f:
                     doc = Document.load(f)
             Application.current().document = doc
-            self.set_current_file(fileName)
+            self.current_file = fileName

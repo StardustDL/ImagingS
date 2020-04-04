@@ -108,7 +108,7 @@ class PropertyModel(QStandardItemModel):
         elif isinstance(value, Drawing):
             item.setIcon(qta.icon("mdi.drawing"))
         elif isinstance(value, Transform) or name == "transform":
-            item.setIcon(qta.icon("mdi.axis"))
+            item.setIcon(qta.icon("mdi.flash"))
         elif isinstance(value, list):
             item.setIcon(qta.icon("mdi.format-list-numbered"))
         elif isinstance(value, dict):

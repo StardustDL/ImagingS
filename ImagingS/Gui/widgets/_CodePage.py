@@ -11,6 +11,7 @@ from PyQt5.QtCore import pyqtSignal
 
 class CodePage(QWidget, ui.CodePage):
     uploaded = pyqtSignal()
+    messaged = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -33,14 +34,14 @@ class CodePage(QWidget, ui.CodePage):
         self.setWindowIcon(qta.icon("mdi.code-tags"))
 
     def fresh(self) -> None:
-        if self._document is None:
+        if self.document is None:
             self.tetCode.setText("")
             self.modelCode.fresh()
         else:
             io = StringIO()
-            self._document.save(io, Document.FILE_RAW)
+            self.document.save(io, Document.FILE_RAW)
             self.tetCode.setText(io.getvalue())
-            self.modelCode.fresh(self._document)
+            self.modelCode.fresh(self.document)
             width = self.trvCode.size().width() / 2
             if width > 0:
                 self.trvCode.setColumnWidth(0, width)

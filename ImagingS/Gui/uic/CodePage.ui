@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Code</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -33,6 +33,9 @@
     <widget class="QToolBar" name="tlbWindow">
      <property name="windowTitle">
       <string>Code Tool Box</string>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
      <addaction name="actBuild"/>
      <addaction name="actRestore"/>
