@@ -10,6 +10,7 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from ImagingS.core.serialization import get_properties
 from ._BrushModel import get_color_icon
 import qtawesome as qta
+from ImagingS.Gui import icons
 
 
 class PropertyModel(QStandardItemModel):
@@ -34,21 +35,21 @@ class PropertyModel(QStandardItemModel):
 
     def __set_icon(self, item: QStandardItem, name, value) -> None:
         if name == "vertexes" or name == "control_points":
-            item.setIcon(qta.icon("mdi.vector-point"))
+            item.setIcon(icons.vertex)
         elif name == "stroke":
-            item.setIcon(qta.icon("mdi.border-color"))
+            item.setIcon(icons.stroke)
         elif name == "fill":
-            item.setIcon(qta.icon("mdi.format-color-fill"))
+            item.setIcon(icons.fill)
         elif name == "x":
-            item.setIcon(qta.icon("mdi.axis-x-arrow"))
+            item.setIcon(icons.x)
         elif name == "y":
-            item.setIcon(qta.icon("mdi.axis-y-arrow"))
+            item.setIcon(icons.y)
         elif name == "id":
-            item.setIcon(qta.icon("mdi.identifier"))
+            item.setIcon(icons.id)
         elif name.startswith("angle"):
-            item.setIcon(qta.icon("mdi.angle-acute"))
+            item.setIcon(icons.angle)
         elif name == "matrix":
-            item.setIcon(qta.icon("mdi.matrix"))
+            item.setIcon(icons.matrix)
         elif name == "r":
             item.setIcon(qta.icon("mdi.alpha-r-circle"))
         elif name == "g":
@@ -60,61 +61,61 @@ class PropertyModel(QStandardItemModel):
         elif name == "height":
             item.setIcon(qta.icon("mdi.alpha-h-circle"))
         elif name == "brushes":
-            item.setIcon(qta.icon("mdi.brush"))
+            item.setIcon(icons.brush)
         elif name == "drawings":
-            item.setIcon(qta.icon("mdi.drawing"))
+            item.setIcon(icons.drawing)
         elif name == "matrix":
-            item.setIcon(qta.icon("mdi.matrix"))
+            item.setIcon(icons.matrix)
         elif name == "center":
-            item.setIcon(qta.icon("mdi.image-filter-center-focus"))
+            item.setIcon(icons.center)
         elif name == "algorithm":
             item.setIcon(qta.icon("mdi.lightbulb"))
         elif isinstance(value, Color):
             item.setIcon(get_color_icon(value))
         elif isinstance(value, Document):
-            item.setIcon(qta.icon("mdi.file-document"))
+            item.setIcon(icons.document)
         elif isinstance(value, Size):
-            item.setIcon(qta.icon("mdi.format-size"))
+            item.setIcon(icons.size)
         elif isinstance(value, RectArea):
-            item.setIcon(qta.icon("mdi.rectangle-outline"))
+            item.setIcon(icons.rect)
         elif isinstance(value, Point):
-            item.setIcon(qta.icon("mdi.circle-medium"))
+            item.setIcon(icons.point)
         elif isinstance(value, TranslateTransform):
-            item.setIcon(qta.icon("mdi.cursor-move"))
+            item.setIcon(icons.translateTransform)
         elif isinstance(value, SkewTransform):
-            item.setIcon(qta.icon("mdi.skew-more"))
+            item.setIcon(icons.skewTransform)
         elif isinstance(value, RotateTransform):
-            item.setIcon(qta.icon("mdi.rotate-left"))
+            item.setIcon(icons.rotateTransform)
         elif isinstance(value, ScaleTransform):
-            item.setIcon(qta.icon("mdi.relative-scale"))
+            item.setIcon(icons.scaleTransform)
         elif isinstance(value, MatrixTransform):
-            item.setIcon(qta.icon("mdi.matrix"))
+            item.setIcon(icons.matrixTransform)
         elif isinstance(value, ClipTransform):
-            item.setIcon(qta.icon("mdi.crop"))
+            item.setIcon(icons.clipTransform)
         elif isinstance(value, TransformGroup):
-            item.setIcon(qta.icon("mdi.group"))
+            item.setIcon(icons.groupTransform)
         elif isinstance(value, SolidBrush):
-            item.setIcon(qta.icon("mdi.solid"))
+            item.setIcon(icons.solidBrush)
         elif isinstance(value, Line):
-            item.setIcon(qta.icon("mdi.vector-line"))
+            item.setIcon(icons.line)
         elif isinstance(value, Curve):
-            item.setIcon(qta.icon("mdi.vector-curve"))
+            item.setIcon(icons.curve)
         elif isinstance(value, Ellipse):
-            item.setIcon(qta.icon("mdi.vector-ellipse"))
+            item.setIcon(icons.ellipse)
         elif isinstance(value, Polygon):
-            item.setIcon(qta.icon("mdi.vector-polygon"))
+            item.setIcon(icons.polygon)
         elif isinstance(value, Brush):
-            item.setIcon(qta.icon("mdi.brush"))
+            item.setIcon(icons.brush)
         elif isinstance(value, Drawing):
-            item.setIcon(qta.icon("mdi.drawing"))
+            item.setIcon(icons.drawing)
         elif isinstance(value, Transform) or name == "transform":
-            item.setIcon(qta.icon("mdi.flash"))
+            item.setIcon(icons.transform)
         elif isinstance(value, list):
-            item.setIcon(qta.icon("mdi.format-list-numbered"))
+            item.setIcon(icons.list)
         elif isinstance(value, dict):
-            item.setIcon(qta.icon("mdi.dictionary"))
+            item.setIcon(icons.dictionary)
         elif isinstance(value, set):
-            item.setIcon(qta.icon("mdi.code-braces"))
+            item.setIcon(icons.set)
 
     def __add_dict_children(self, root: QStandardItem, li: Dict) -> None:
         for k, v in li.items():

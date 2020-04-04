@@ -52,7 +52,7 @@ class CodePage(QWidget, ui.CodePage):
         doc = self.load_document()
         self.modelCode.fresh(doc)
         if doc is None:
-            return
+            self.messaged.emit("Loading document from code FAILED.")
         self.uploaded.emit()
 
     @property
@@ -79,6 +79,8 @@ class CodePage(QWidget, ui.CodePage):
     def actBuild_triggered(self) -> None:
         doc = self.load_document()
         self.modelCode.fresh(doc)
+        if doc is None:
+            self.messaged.emit("Loading document from code FAILED.")
 
     def actRestore_triggered(self) -> None:
         self.fresh()

@@ -1,12 +1,13 @@
+from ImagingS.core import Size
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QKeyEvent
-from . import Interactive
-from ImagingS.core.geometry import Curve
+from .. import Interactive
+from ImagingS.core.geometry import Ellipse
 from ImagingS.Gui.graphics import converters
 
 
-class CurveInteractive(Interactive):
-    def __init__(self, drawing: Curve) -> None:
+class EllipseInteractive(Interactive):
+    def __init__(self, drawing: Ellipse) -> None:
         super().__init__()
         self.drawing = drawing
 
@@ -17,25 +18,20 @@ class CurveInteractive(Interactive):
     def onMouseRelease(self, point: QPointF) -> None:
         super().onMouseRelease(point)
         if not self._hasStarted:
-            self.drawing.control_points.append(
-                converters.convert_qpoint(point))
-            self.drawing.control_points.append(
-                converters.convert_qpoint(point))  # for next vertex
+            self.drawing.area.origin = converters.convert_qpoint(point)
             self._hasStarted = True
         else:
-            self.drawing.control_points.append(
-                converters.convert_qpoint(point))  # for next vertex
+            delta = converters.convert_qpoint(point) - self.drawing.area.origin
+            self.drawing.area.size = Size.create(delta.x, delta.y)
+            self.drawing.refresh_boundingArea()
+            self._end(self.S_Success)
 
     def onMouseMove(self, point: QPointF) -> None:
         super().onMouseMove(point)
         if self._hasStarted:
-            self.drawing.control_points[-1] = converters.convert_qpoint(point)
+            delta = converters.convert_qpoint(point) - self.drawing.area.origin
+            self.drawing.area.size = Size.create(delta.x, delta.y)
             self._needRender()
-
-    def onMouseDoubleClick(self, point: QPointF) -> None:
-        super().onMouseDoubleClick(point)
-        self.drawing.refresh_boundingArea()
-        self._end(self.S_Success)
 
     def onKeyPress(self, key: QKeyEvent) -> None:
         super().onKeyPress(key)

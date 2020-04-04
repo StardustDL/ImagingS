@@ -3,6 +3,7 @@ from ._Line import Line
 from ._Ellipse import Ellipse
 from ._Curve import Curve
 from ._Polygon import Polygon
+from ._Rectangle import Rectangle
 
 
 __all__ = (
@@ -10,5 +11,6 @@ __all__ = (
     "Line",
     "Ellipse",
     "Curve",
-    "Polygon"
+    "Polygon",
+    "Rectangle"
 )

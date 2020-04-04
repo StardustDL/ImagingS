@@ -1,5 +1,6 @@
 from ImagingS.core.drawing import Drawing
 from typing import Optional
+from ImagingS.Gui import icons
 import ImagingS.Gui.ui as ui
 from ImagingS.document import Document
 from ImagingS.Gui.app import Application
@@ -99,12 +100,15 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actToggleProperties.setShortcut("Ctrl+Shift+P")
         self.actToggleDrawings = self.dwgDrawings.toggleViewAction()
         self.actToggleDrawings.setShortcut("Ctrl+Shift+D")
+        self.actToggleTransforms = self.dwgTransforms.toggleViewAction()
+        self.actToggleTransforms.setShortcut("Ctrl+Shift+T")
 
         self.tabifyDockWidget(self.dwgDrawings, self.dwgBrushes)
+        self.tabifyDockWidget(self.dwgBrushes, self.dwgTransforms)
         self.dwgDrawings.raise_()
 
         viewActions = [self.actToggleDrawings, self.actToggleBrushes,
-                       self.actToggleProperties]
+                       self.actToggleTransforms, self.actToggleProperties]
         self.mnuView.addActions(viewActions)
 
     def setupIcon(self):
@@ -117,17 +121,21 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actQuit.setIcon(qta.icon("mdi.exit-to-app"))
         self.actUndo.setIcon(qta.icon("mdi.undo"))
         self.actRedo.setIcon(qta.icon("mdi.redo"))
-        self.actToggleDrawings.setIcon(qta.icon("mdi.drawing"))
-        self.actToggleBrushes.setIcon(qta.icon("mdi.brush"))
-        self.actToggleProperties.setIcon(qta.icon("mdi.database"))
-        self.actBrushSolid.setIcon(qta.icon("mdi.solid"))
+        self.actBrushSolid.setIcon(icons.solidBrush)
         self.actBrushRemove.setIcon(qta.icon("mdi.close", color="red"))
         self.actDrawingRemove.setIcon(qta.icon("mdi.close", color="red"))
+        self.actTransformRemove.setIcon(qta.icon("mdi.close", color="red"))
         self.actBrushClear.setIcon(qta.icon("mdi.delete", color="red"))
         self.actDrawingClear.setIcon(qta.icon("mdi.delete", color="red"))
-        self.dwgBrushes.setWindowIcon(qta.icon("mdi.brush"))
-        self.dwgDrawings.setWindowIcon(qta.icon("mdi.drawing"))
-        self.dwgProperties.setWindowIcon(qta.icon("mdi.database"))
+        self.actTransformClear.setIcon(qta.icon("mdi.delete", color="red"))
+        self.dwgBrushes.setWindowIcon(icons.brush)
+        self.dwgDrawings.setWindowIcon(icons.drawing)
+        self.dwgProperties.setWindowIcon(icons.property)
+        self.dwgTransforms.setWindowIcon(icons.transform)
+        self.actToggleDrawings.setIcon(icons.drawing)
+        self.actToggleBrushes.setIcon(icons.brush)
+        self.actToggleProperties.setIcon(icons.property)
+        self.actToggleTransforms.setIcon(icons.transform)
         self.tbxMain.setItemIcon(0, qta.icon("mdi.image"))
         self.tbxMain.setItemIcon(1, qta.icon("mdi.code-tags"))
         self.setWindowIcon(qta.icon("mdi.pencil-box-multiple", color="purple"))

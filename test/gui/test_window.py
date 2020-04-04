@@ -1,9 +1,10 @@
-from ImagingS.Gui.widgets import MainWindow
 from ImagingS.Gui.app import Application
 
 
 def test_MainWindow(qtbot) -> None:
     Application([])
+
+    from ImagingS.Gui.widgets import MainWindow
 
     window = MainWindow()
     window.show()

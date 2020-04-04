@@ -3,16 +3,16 @@ from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem
 from typing import Optional
-from . import Interactive
-from ImagingS.core.transform import TranslateTransform
+from .. import Interactive
+from ImagingS.core.transform import ScaleTransform
 from ImagingS.Gui.graphics import converters
 
 
-class TranslateTransformInteractive(Interactive):
+class ScaleTransformInteractive(Interactive):
     def __init__(self, drawing: Drawing) -> None:
         super().__init__()
         self.drawing = drawing
-        self.transform = TranslateTransform()
+        self.transform = ScaleTransform()
         self.drawing.transform = self.transform
         self._view_item = QGraphicsLineItem()
 
@@ -35,7 +35,7 @@ class TranslateTransformInteractive(Interactive):
             self._end_point = converters.convert_qpoint(point)
             self._view_item.setLine(
                 self._begin_point.x, self._begin_point.y, self._end_point.x, self._end_point.y)
-            self.transform.delta = self._end_point - self._begin_point
+
             self._end(self.S_Success)
 
     def onMouseMove(self, point: QPointF) -> None:
@@ -44,7 +44,7 @@ class TranslateTransformInteractive(Interactive):
             self._end_point = converters.convert_qpoint(point)
             self._view_item.setLine(
                 self._begin_point.x, self._begin_point.y, self._end_point.x, self._end_point.y)
-            self.transform.delta = self._end_point - self._begin_point
+
             self.drawing.refresh_boundingArea()
             self._needRender()
 

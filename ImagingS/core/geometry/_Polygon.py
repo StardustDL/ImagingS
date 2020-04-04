@@ -6,6 +6,8 @@ from . import Geometry, Line
 
 
 class Polygon(Geometry):
+    S_Vertexes = "vertexes"
+
     def __init__(self) -> None:
         super().__init__()
         self.vertexes = []

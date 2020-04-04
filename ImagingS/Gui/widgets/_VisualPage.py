@@ -1,14 +1,16 @@
 from ImagingS.core.drawing import Drawing
 from typing import Optional
 import ImagingS.Gui.ui as ui
+from ImagingS.Gui import icons
 from ImagingS.core.brush import SolidBrush, Brush
 from ImagingS.document import Document
 from ImagingS.core.geometry import Line, Curve, Polygon, Ellipse, Geometry
 from ImagingS.Gui.graphics import Canvas, converters
-from ImagingS.Gui.interactive import LineInteractive, PolygonInteractive, CurveInteractive, EllipseInteractive, Interactive
-from ImagingS.Gui.interactive import TranslateTransformInteractive, SkewTransformInteractive, RotateTransformInteractive
+from ImagingS.core.transform import MatrixTransform, TransformGroup
+from ImagingS.Gui.interactive import Interactive
+from ImagingS.Gui.interactive.geometry import LineInteractive, PolygonInteractive, CurveInteractive, EllipseInteractive
+from ImagingS.Gui.interactive.transform import TranslateTransformInteractive, SkewTransformInteractive, RotateTransformInteractive, ScaleTransformInteractive, ClipTransformInteractive
 import uuid
-import qtawesome as qta
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal, QSizeF
@@ -38,7 +40,6 @@ class VisualPage(QWidget, ui.VisualPage):
             self.actTransformSkew,
             self.actTransformMatrix,
             self.actTransformClip,
-            self.actTransformClear,
         ]
 
         self.actDrawingCurve.triggered.connect(self.actDrawingCurve_triggered)
@@ -54,8 +55,14 @@ class VisualPage(QWidget, ui.VisualPage):
             self.actTransformSkew_triggered)
         self.actTransformRotate.triggered.connect(
             self.actTransformRotate_triggered)
-        self.actTransformClear.triggered.connect(
-            self.actTransformClear_triggered)
+        self.actTransformMatrix.triggered.connect(
+            self.actTransformMatrix_triggered)
+        self.actTransformScale.triggered.connect(
+            self.actTransformScale_triggered)
+        self.actTransformClip.triggered.connect(
+            self.actTransformClip_triggered)
+        self.actTransformGroup.triggered.connect(
+            self.actTransformGroup_triggered)
 
         self.interactive = None
         self.drawing = None
@@ -63,18 +70,17 @@ class VisualPage(QWidget, ui.VisualPage):
         self.document = None
 
     def setupIcon(self):
-        self.actDrawingLine.setIcon(qta.icon("mdi.vector-line"))
-        self.actDrawingCurve.setIcon(qta.icon("mdi.vector-curve"))
-        self.actDrawingEllipse.setIcon(qta.icon("mdi.vector-ellipse"))
-        self.actDrawingPolygon.setIcon(qta.icon("mdi.vector-polygon"))
-        self.actTransformSkew.setIcon(qta.icon("mdi.skew-more"))
-        self.actTransformScale.setIcon(qta.icon("mdi.relative-scale"))
-        self.actTransformTranslate.setIcon(qta.icon("mdi.cursor-move"))
-        self.actTransformRotate.setIcon(qta.icon("mdi.rotate-left"))
-        self.actTransformMatrix.setIcon(qta.icon("mdi.matrix"))
-        self.actTransformClip.setIcon(qta.icon("mdi.crop"))
-        self.actTransformGroup.setIcon(qta.icon("mdi.group"))
-        self.actTransformClear.setIcon(qta.icon("mdi.flash-off", color="red"))
+        self.actDrawingLine.setIcon(icons.line)
+        self.actDrawingCurve.setIcon(icons.curve)
+        self.actDrawingEllipse.setIcon(icons.ellipse)
+        self.actDrawingPolygon.setIcon(icons.polygon)
+        self.actTransformSkew.setIcon(icons.skewTransform)
+        self.actTransformScale.setIcon(icons.scaleTransform)
+        self.actTransformTranslate.setIcon(icons.translateTransform)
+        self.actTransformRotate.setIcon(icons.rotateTransform)
+        self.actTransformMatrix.setIcon(icons.matrixTransform)
+        self.actTransformClip.setIcon(icons.clipTransform)
+        self.actTransformGroup.setIcon(icons.groupTransform)
 
     def setupCanvas(self):
         self.gvwMain = Canvas(self.widMain)
@@ -271,9 +277,31 @@ class VisualPage(QWidget, ui.VisualPage):
         inter.ended.connect(self.interTransform_ended)
         self.interactive = inter
 
-    def actTransformClear_triggered(self):
+    def actTransformMatrix_triggered(self):
         drawing = self.drawing
         if drawing is None:
             return
-        drawing.transform = None
+        drawing.transform = MatrixTransform()
+
+    def actTransformScale_triggered(self):
+        drawing = self.drawing
+        if drawing is None:
+            return
+        inter = ScaleTransformInteractive(drawing)
+        inter.ended.connect(self.interTransform_ended)
+        self.interactive = inter
+
+    def actTransformClip_triggered(self):
+        drawing = self.drawing
+        if drawing is None:
+            return
+        inter = ClipTransformInteractive(drawing)
+        inter.ended.connect(self.interTransform_ended)
+        self.interactive = inter
+
+    def actTransformGroup_triggered(self):
+        drawing = self.drawing
+        if drawing is None:
+            return
+        drawing.transform = TransformGroup()
         self.gvwMain.rerender()

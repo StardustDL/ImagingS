@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QKeyEvent
-from . import Interactive
+from .. import Interactive
 from ImagingS.core.geometry import Polygon
 from ImagingS.Gui.graphics import converters
 

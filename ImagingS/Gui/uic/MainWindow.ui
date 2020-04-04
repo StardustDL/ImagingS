@@ -239,9 +239,47 @@
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
        </property>
-       <addaction name="actBrushSolid"/>
        <addaction name="actBrushRemove"/>
        <addaction name="actBrushClear"/>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dwgTransforms">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Transforms</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="wgTransforms">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QListView" name="trvTransforms">
+       <property name="contextMenuPolicy">
+        <enum>Qt::ActionsContextMenu</enum>
+       </property>
+       <addaction name="actTransformRemove"/>
+       <addaction name="actTransformClear"/>
       </widget>
      </item>
     </layout>
@@ -378,6 +416,16 @@
    </property>
   </action>
   <action name="actBrushClear">
+   <property name="text">
+    <string>Clear</string>
+   </property>
+  </action>
+  <action name="actTransformRemove">
+   <property name="text">
+    <string>Remove</string>
+   </property>
+  </action>
+  <action name="actTransformClear">
    <property name="text">
     <string>Clear</string>
    </property>

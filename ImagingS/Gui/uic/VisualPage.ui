@@ -49,7 +49,6 @@
      <addaction name="actTransformMatrix"/>
      <addaction name="actTransformClip"/>
      <addaction name="actTransformGroup"/>
-     <addaction name="actTransformClear"/>
     </widget>
    </item>
    <item>
@@ -136,11 +135,6 @@
   <action name="actTransformGroup">
    <property name="text">
     <string>Group</string>
-   </property>
-  </action>
-  <action name="actTransformClear">
-   <property name="text">
-    <string>Clear</string>
    </property>
   </action>
  </widget>
