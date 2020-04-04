@@ -6,8 +6,10 @@ from ImagingS.document import Document
 from ImagingS.Gui.app import Application
 from ImagingS.core import Color
 from ImagingS.core.brush import Brushes, SolidBrush, Brush
+from ImagingS.core.drawing import NumpyArrayDrawingContext
 from ImagingS.Gui.models import BrushModel, PropertyModel, DrawingModel
 import qtawesome as qta
+from PIL import Image
 
 from . import CodePage, VisualPage
 
@@ -43,6 +45,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actSave.triggered.connect(self.actSave_triggered)
         self.actSaveAs.triggered.connect(self.actSaveAs_triggered)
         self.actOpen.triggered.connect(self.actOpen_triggered)
+        self.actExport.triggered.connect(self.actExport_triggered)
 
         self.actBrushSolid.triggered.connect(self.actBrushSolid_triggered)
         self.actBrushRemove.triggered.connect(self.actBrushRemove_triggered)
@@ -328,3 +331,21 @@ class MainWindow(QMainWindow, ui.MainWindow):
                     doc = Document.load(f)
             Application.current().document = doc
             self.current_file = fileName
+
+    def actExport_triggered(self):
+        options = QFileDialog.Options()
+        fileName, _ = QFileDialog.getSaveFileName(
+            self, "Export To", "",
+            "PNG Image (*.png);; JPEG Image (*.jpeg);; BMP Image (*.bmp)",
+            options=options)
+        if fileName:
+            ext = os.path.splitext(fileName)[1].lstrip(".")
+            doc = Application.current().document
+            assert doc is not None
+            context = NumpyArrayDrawingContext(
+                NumpyArrayDrawingContext.create_array(doc.size))
+
+            for drawing in doc.drawings:
+                drawing.render(context)
+
+            Image.fromarray(context.array).save(fileName, ext, quality=95)

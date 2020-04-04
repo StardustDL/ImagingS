@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import List
-from ImagingS.core import Point, RectArea
+from ImagingS.core import Point
 from ImagingS.core.drawing import DrawingContext
 from . import Geometry
 
@@ -35,8 +35,4 @@ class Curve(Geometry):
         self._algorithm = value
 
     def render(self, context: DrawingContext) -> None:
-        raise NotImplementedError()
-
-    @property
-    def boundingArea(self) -> RectArea:
-        raise NotImplementedError()
+        pass

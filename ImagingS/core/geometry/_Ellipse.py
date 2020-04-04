@@ -24,8 +24,4 @@ class Ellipse(Geometry):
         self._area = value
 
     def render(self, context: DrawingContext) -> None:
-        raise NotImplementedError()
-
-    @property
-    def boundingArea(self) -> RectArea:
-        raise NotImplementedError()
+        pass

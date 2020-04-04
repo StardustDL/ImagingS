@@ -1,9 +1,10 @@
-from ImagingS.core import Color, Point, RectArea
+from ImagingS.core import Color, Point, RectArea, Size
 from abc import ABC, abstractmethod
 from ImagingS.core.serialization import PropertySerializable
 from ImagingS.core.transform import Transform
 from typing import List, Optional
 from ImagingS.core import IdObject
+import numpy as np
 
 
 class DrawingContext(ABC):
@@ -37,6 +38,39 @@ class BoundingAreaMeasurer(DrawingContext):
 
     def area(self) -> RectArea:
         return RectArea.infinite()
+
+
+class NumpyArrayDrawingContext(DrawingContext):
+    @staticmethod
+    def create_array(size: Size) -> np.ndarray:
+        result = np.zeros([size.height, size.width, 3], np.uint8)
+        result.fill(255)
+        return result
+
+    def __init__(self, array: np.ndarray):
+        self.array = array
+
+    @property
+    def array(self) -> np.ndarray:
+        return self._array
+
+    @array.setter
+    def array(self, value: np.ndarray) -> None:
+        assert value.dtype == np.uint8
+        assert len(value.shape) == 3
+        assert value.shape[2] == 3
+        self._array = value
+        self._area = RectArea.create(
+            Point(), Size.create(value.shape[1], value.shape[0]))
+
+    def point(self, position: Point, color: Color) -> None:
+        x, y = map(int, position.as_tuple())
+        self.array[y, x, 0] = color.r
+        self.array[y, x, 1] = color.g
+        self.array[y, x, 2] = color.b
+
+    def area(self) -> RectArea:
+        return self._area
 
 
 class Drawing(PropertySerializable, IdObject, ABC):
