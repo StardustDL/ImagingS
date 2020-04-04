@@ -33,7 +33,43 @@ class PropertyModel(QStandardItemModel):
         self.__add_prop_children(item, obj)
 
     def __set_icon(self, item: QStandardItem, name, value) -> None:
-        if isinstance(value, Color):
+        if name == "vertexes" or name == "control_points":
+            item.setIcon(qta.icon("mdi.vector-point"))
+        elif name == "stroke":
+            item.setIcon(qta.icon("mdi.border-color"))
+        elif name == "fill":
+            item.setIcon(qta.icon("mdi.format-color-fill"))
+        elif name == "x":
+            item.setIcon(qta.icon("mdi.axis-x-arrow"))
+        elif name == "y":
+            item.setIcon(qta.icon("mdi.axis-y-arrow"))
+        elif name == "id":
+            item.setIcon(qta.icon("mdi.identifier"))
+        elif name.startswith("angle"):
+            item.setIcon(qta.icon("mdi.angle-acute"))
+        elif name == "matrix":
+            item.setIcon(qta.icon("mdi.matrix"))
+        elif name == "r":
+            item.setIcon(qta.icon("mdi.alpha-r-circle"))
+        elif name == "g":
+            item.setIcon(qta.icon("mdi.alpha-g-circle"))
+        elif name == "b":
+            item.setIcon(qta.icon("mdi.alpha-b-circle"))
+        elif name == "width":
+            item.setIcon(qta.icon("mdi.alpha-w-circle"))
+        elif name == "height":
+            item.setIcon(qta.icon("mdi.alpha-h-circle"))
+        elif name == "brushes":
+            item.setIcon(qta.icon("mdi.brush"))
+        elif name == "drawings":
+            item.setIcon(qta.icon("mdi.drawing"))
+        elif name == "matrix":
+            item.setIcon(qta.icon("mdi.matrix"))
+        elif name == "center":
+            item.setIcon(qta.icon("mdi.image-filter-center-focus"))
+        elif name == "algorithm":
+            item.setIcon(qta.icon("mdi.lightbulb"))
+        elif isinstance(value, Color):
             item.setIcon(get_color_icon(value))
         elif isinstance(value, Document):
             item.setIcon(qta.icon("mdi.file-document"))
@@ -67,24 +103,12 @@ class PropertyModel(QStandardItemModel):
             item.setIcon(qta.icon("mdi.vector-ellipse"))
         elif isinstance(value, Polygon):
             item.setIcon(qta.icon("mdi.vector-polygon"))
-        elif isinstance(value, Brush) or name == "stroke" or name == "fill":
+        elif isinstance(value, Brush):
             item.setIcon(qta.icon("mdi.brush"))
         elif isinstance(value, Drawing):
             item.setIcon(qta.icon("mdi.drawing"))
         elif isinstance(value, Transform) or name == "transform":
             item.setIcon(qta.icon("mdi.axis"))
-        elif name == "vertexes" or name == "control_points":
-            item.setIcon(qta.icon("mdi.vector-point"))
-        elif name == "x":
-            item.setIcon(qta.icon("mdi.axis-x-arrow"))
-        elif name == "y":
-            item.setIcon(qta.icon("mdi.axis-y-arrow"))
-        elif name == "id":
-            item.setIcon(qta.icon("mdi.identifier"))
-        elif name.startswith("angle"):
-            item.setIcon(qta.icon("mdi.angle-acute"))
-        elif name == "matrix":
-            item.setIcon(qta.icon("mdi.matrix"))
         elif isinstance(value, list):
             item.setIcon(qta.icon("mdi.format-list-numbered"))
         elif isinstance(value, dict):
@@ -100,9 +124,12 @@ class PropertyModel(QStandardItemModel):
         for i, value in enumerate(li):
             self.__add_child(root, str(i), value)
 
-    def __add_prop_children(self, root: QStandardItem, obj) -> None:
+    def __add_prop_children(self, root: QStandardItem, obj) -> bool:  # return has child
+        flag = False
         for prop in get_properties(obj):
+            flag = True
             self.__add_child(root, prop.name, prop.get())
+        return flag
 
     def __add_child(self, root: QStandardItem, name: str, value) -> None:
         item = QStandardItem(name)
@@ -120,6 +147,8 @@ class PropertyModel(QStandardItemModel):
             root.setChild(index, self.VALUE, QStandardItem("Set"))
             self.__add_list_children(item, list(value))
         else:
-            root.setChild(index, self.VALUE, QStandardItem(
-                value.__class__.__name__))
-            self.__add_prop_children(item, value)
+            if self.__add_prop_children(item, value):
+                root.setChild(index, self.VALUE, QStandardItem(
+                    value.__class__.__name__))
+            else:
+                root.setChild(index, self.VALUE, QStandardItem(str(value)))

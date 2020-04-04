@@ -1,4 +1,4 @@
-from ImagingS.Gui.windows import MainWindow
+from ImagingS.Gui.widgets import MainWindow
 from ImagingS.Gui.app import Application
 
 

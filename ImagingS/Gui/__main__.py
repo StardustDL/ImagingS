@@ -1,6 +1,6 @@
 import sys
 from .app import Application
-from .windows import MainWindow
+from .widgets import MainWindow
 
 if __name__ == "__main__":
     app = Application(sys.argv)

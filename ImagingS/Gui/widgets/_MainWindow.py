@@ -12,7 +12,8 @@ from ImagingS.Gui.interactive import LineInteractive, PolygonInteractive, CurveI
 from ImagingS.Gui.interactive import TranslateTransformInteractive, SkewTransformInteractive, RotateTransformInteractive
 import uuid
 import qtawesome as qta
-from io import StringIO
+
+from . import CodePage
 
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog
 from PyQt5.QtCore import QSizeF
@@ -36,6 +37,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         super().__init__()
         self.setupUi(self)
         self.setupCanvas()
+        self.setupCode()
         self.setupDockWidget()
         self.setupIcon()
         self.set_current_file(None)
@@ -67,6 +69,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.actTransformSkew_triggered)
         self.actTransformRotate.triggered.connect(
             self.actTransformRotate_triggered)
+        self.actTransformClear.triggered.connect(
+            self.actTransformClear_triggered)
 
         self.modelBrush = BrushModel(self)
         self.trvBrushes.setModel(self.modelBrush)
@@ -79,9 +83,11 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.trvDrawings_clicked)
 
         self.modelProperties = PropertyModel(self)
-        self.modelCode = PropertyModel(self)
         self.trvProperties.setModel(self.modelProperties)
-        self.trvCode.setModel(self.modelCode)
+
+        self.widCode.uploaded.connect(self.widCode_uploaded)
+
+        self.tbxMain.setCurrentIndex(0)  # Visual
 
         self.tbxMain.currentChanged.connect(self.tbxMain_currentChanged)
 
@@ -92,10 +98,14 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self._interactive: Optional[Interactive] = None
 
         self.gvwMain = Canvas(self.centralwidget)
-        self.gvwMain.setEnabled(True)
         self.gvwMain.setObjectName("gvwMain")
         self.grdVisual.addWidget(self.gvwMain, 0, 0, 1, 1)
         self.gvwMain.resize(QSizeF(600, 600))
+
+    def setupCode(self):
+        self.widCode = CodePage()
+        self.widCode.setObjectName("widCode")
+        self.grdCode.addWidget(self.widCode, 0, 0, 1, 1)
 
     def setupDockWidget(self):
         self.actToggleBrushes = self.dwgBrushes.toggleViewAction()
@@ -141,6 +151,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actDrawingRemove.setIcon(qta.icon("mdi.delete", color="red"))
         self.actBrushClear.setIcon(qta.icon("mdi.delete-sweep", color="red"))
         self.actDrawingClear.setIcon(qta.icon("mdi.delete-sweep", color="red"))
+        self.actTransformClear.setIcon(
+            qta.icon("mdi.delete-sweep", color="red"))
         self.dwgBrushes.setWindowIcon(qta.icon("mdi.brush"))
         self.dwgDrawings.setWindowIcon(qta.icon("mdi.drawing"))
         self.dwgProperties.setWindowIcon(qta.icon("mdi.database"))
@@ -216,23 +228,6 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.set_current_drawing(None)
         self.dwgDrawings.setEnabled(hasDoc)
 
-    def fresh_code(self):
-        doc = Application.current().document
-        hasDoc = doc is not None
-
-        if not hasDoc:
-            return
-
-        io = StringIO()
-        doc.save(io, Document.FILE_RAW)
-        self.tetCode.setText(io.getvalue())
-        self.modelCode.fresh(doc)
-        width = self.trvCode.size().width() / 2
-        if width > 0:
-            self.trvCode.setColumnWidth(0, width)
-            self.trvCode.setColumnWidth(1, width)
-        self.trvCode.expandAll()
-
     def app_documentChanged(self):
         doc = Application.current().document
         hasDoc = doc is not None
@@ -248,27 +243,24 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.tbxMain.setEnabled(hasDoc)
         self.fresh_brushes()
         self.fresh_drawings()
-        self.fresh_code()
+
+        self.widCode.document = doc
+
         self.modelProperties.fresh(doc)
         self.trvProperties.expandAll()
 
+    def widCode_uploaded(self):
+        tdoc = self.widCode.load_document()
+        if tdoc is None:
+            self.stbMain.showMessage("Load document from code failed.")
+        else:
+            Application.current().document = tdoc
+
     def tbxMain_currentChanged(self, index):
         if index == 0:  # Visual
-            code = self.tetCode.toPlainText()
-            io = StringIO(code)
-            try:
-                tdoc = Document.load(io, Document.FILE_RAW)
-            except Exception:
-                self.stbMain.showMessage("Load document from code failed.")
-                self._error_code = True
-                self.tbxMain.setCurrentIndex(1)
-            else:
-                Application.current().document = tdoc
+            self.widCode.upload()
         else:  # Code
-            if hasattr(self, "_error_code"):
-                del self._error_code
-            else:
-                self.fresh_code()
+            self.widCode.fresh()
 
     def trvBrushes_clicked(self, index):
         r = index.row()
@@ -461,6 +453,13 @@ class MainWindow(QMainWindow, ui.MainWindow):
         inter = RotateTransformInteractive(drawing)
         inter.ended.connect(self.interTransform_ended)
         self._set_interactive(inter)
+
+    def actTransformClear_triggered(self):
+        drawing = self.current_drawing()
+        if drawing is None:
+            return
+        drawing.transform = None
+        self.gvwMain.rerender()
 
     def actClose_triggered(self):
         Application.current().document = None
