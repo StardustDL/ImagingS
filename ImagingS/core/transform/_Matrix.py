@@ -1,6 +1,6 @@
 from __future__ import annotations
 import numpy as np
-from typing import Optional, Dict
+from typing import Dict
 from ImagingS.core import Point
 from . import Transform
 
@@ -26,7 +26,7 @@ class MatrixTransform(Transform):
     def matrix(self, value: np.ndarray) -> None:
         self._matrix = value
 
-    def transform(self, origin: Point) -> Optional[Point]:
+    def transform(self, origin: Point) -> Point:
         result = Point.from_array(np.dot(self.matrix, origin.to_array()))
         return result
 

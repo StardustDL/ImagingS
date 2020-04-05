@@ -1,7 +1,7 @@
 from __future__ import annotations
 from ImagingS.core import Point
 import numpy as np
-from typing import Optional, Dict
+from typing import Dict
 from math import cos, sin
 from ImagingS.core.transform import MatrixTransform
 
@@ -38,7 +38,7 @@ class RotateTransform(MatrixTransform):
             [[cos(self._angle), -sin(self._angle)],
              [sin(self._angle), cos(self._angle)]])
 
-    def transform(self, origin: Point) -> Optional[Point]:
+    def transform(self, origin: Point) -> Point:
         return super().transform(origin - self.center) + self.center
 
     def serialize(self) -> Dict:

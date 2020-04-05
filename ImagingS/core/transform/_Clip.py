@@ -1,6 +1,5 @@
 from __future__ import annotations
 from ImagingS.core import RectArea, Point
-from typing import Optional
 from . import Transform
 
 
@@ -33,8 +32,5 @@ class ClipTransform(Transform):
     def algorithm(self, value: str) -> None:
         self._algorithm = value
 
-    def transform(self, origin: Point) -> Optional[Point]:
-        if origin in self.area:
-            return origin
-        else:
-            return None
+    def transform(self, origin: Point) -> Point:
+        return origin

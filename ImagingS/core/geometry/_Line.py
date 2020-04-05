@@ -54,8 +54,9 @@ class Line(Geometry):
     def algorithm(self, value: str) -> None:
         self._algorithm = value
 
-    def __gen_DDA(self) -> Iterator[Point]:
-        delta = self.end - self.start
+    @staticmethod
+    def __gen_DDA(start: Point, end: Point) -> Iterator[Point]:
+        delta = end - start
         lx, ly = abs(delta.x), abs(delta.y)
         le = min(lx, ly)
         if le < 1e-8:
@@ -65,20 +66,22 @@ class Line(Geometry):
         le = round(le)
         delta.x /= le
         delta.y /= le
-        cur = self.start
+        cur = start
         for _ in range(le + 1):
             yield cur
             cur = cur + delta
 
     def render(self, context: DrawingContext) -> None:
-        gen = self.__gen_DDA
+        start = self.start
+        end = self.end
+        if self.transform is not None:
+            start = self.transform.transform(start)
+            end = self.transform.transform(end)
+        gen = self.__gen_DDA(start, end)
         if self.algorithm == "DDA":
             pass
         elif self.algorithm == "Bresenham":
             pass
-        for p in gen():
-            rp = p
-            if self.transform is not None:
-                rp = self.transform.transform(p)
-            if rp and rp in context.area():
-                context.point(rp, self.stroke.color_at(rp, self.boundingArea))
+        for p in gen:
+            if p in context.area():
+                context.point(p, self.stroke.color_at(p, self.boundingArea))

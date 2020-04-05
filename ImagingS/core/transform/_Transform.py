@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List
 from ImagingS.core import Point
 from abc import ABC, abstractmethod
 from ImagingS.core.serialization import PropertySerializable
@@ -9,7 +9,7 @@ class Transform(PropertySerializable, ABC):
         super().__init__()
 
     @abstractmethod
-    def transform(self, origin: Point) -> Optional[Point]:
+    def transform(self, origin: Point) -> Point:
         pass
 
 
@@ -26,10 +26,8 @@ class TransformGroup(Transform):
     def children(self, value: List[Transform]) -> None:
         self._children = value
 
-    def transform(self, origin: Point) -> Optional[Point]:
-        result: Optional[Point] = origin
+    def transform(self, origin: Point) -> Point:
+        result = origin
         for tr in self.children:
             result = tr.transform(result)
-            if result is None:
-                return None
         return result

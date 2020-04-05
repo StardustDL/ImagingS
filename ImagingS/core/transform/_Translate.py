@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import Optional
 from ImagingS.core import Point
 from . import Transform
 
@@ -23,5 +22,5 @@ class TranslateTransform(Transform):
     def delta(self, value: Point) -> None:
         self._delta = value
 
-    def transform(self, origin: Point) -> Optional[Point]:
+    def transform(self, origin: Point) -> Point:
         return origin + self._delta

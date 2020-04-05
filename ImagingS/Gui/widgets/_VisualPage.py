@@ -203,6 +203,7 @@ class VisualPage(QWidget, ui.VisualPage):
             pass
         else:
             drawing.transform = None
+        self.gvwMain.rerender()
         self.interactive = None
 
     def actDrawingCurve_triggered(self):

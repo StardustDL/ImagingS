@@ -1,6 +1,6 @@
 from __future__ import annotations
 from ImagingS.core import Point
-from typing import Optional, Dict
+from typing import Dict
 import numpy as np
 from ImagingS.core.transform import MatrixTransform
 
@@ -37,7 +37,7 @@ class ScaleTransform(MatrixTransform):
             [[self._factor, 0],
              [0, self._factor]])
 
-    def transform(self, origin: Point) -> Optional[Point]:
+    def transform(self, origin: Point) -> Point:
         return super().transform(origin - self._center)
 
     def serialize(self) -> Dict:

@@ -117,7 +117,7 @@ class Point(PropertySerializable):
     @staticmethod
     def from_array(arr: np.ndarray) -> Point:
         assert len(arr) == 2 and len(arr[0]) == 1 and len(arr[1]) == 1
-        return Point.create(arr[0][0], arr[1][0])
+        return Point.create(float(arr[0][0]), float(arr[1][0]))
 
 
 def _hex_nopre(i: int) -> str:
