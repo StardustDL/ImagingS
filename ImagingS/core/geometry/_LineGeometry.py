@@ -5,7 +5,7 @@ from ImagingS.core.drawing import DrawingContext
 from . import Geometry
 
 
-class Line(Geometry):
+class LineGeometry(Geometry):
     def __init__(self) -> None:
         super().__init__()
         self._start = Point()
@@ -13,8 +13,8 @@ class Line(Geometry):
         self.algorithm = "DDA"
 
     @staticmethod
-    def create(start: Point, end: Point, algorithm: str) -> Line:
-        result = Line()
+    def create(start: Point, end: Point, algorithm: str) -> LineGeometry:
+        result = LineGeometry()
         result.start = start
         result.end = end
         result.algorithm = algorithm
@@ -27,7 +27,6 @@ class Line(Geometry):
     @start.setter
     def start(self, value: Point) -> None:
         self._start = value
-        self.refresh_boundingArea()
 
     @property
     def end(self) -> Point:
@@ -36,7 +35,6 @@ class Line(Geometry):
     @end.setter
     def end(self, value: Point) -> None:
         self._end = value
-        self.refresh_boundingArea()
 
     @property
     def algorithm(self) -> str:

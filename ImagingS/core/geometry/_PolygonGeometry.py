@@ -2,10 +2,10 @@ from __future__ import annotations
 from typing import List
 from ImagingS.core import Point
 from ImagingS.core.drawing import DrawingContext
-from . import Geometry, Line
+from . import Geometry, LineGeometry
 
 
-class Polygon(Geometry):
+class PolygonGeometry(Geometry):
     S_Vertexes = "vertexes"
 
     def __init__(self) -> None:
@@ -14,8 +14,8 @@ class Polygon(Geometry):
         self.algorithm = "DDA"
 
     @staticmethod
-    def create(vertexes: List[Point], algorithm: str) -> Polygon:
-        result = Polygon()
+    def create(vertexes: List[Point], algorithm: str) -> PolygonGeometry:
+        result = PolygonGeometry()
         result.vertexes = vertexes
         result.algorithm = algorithm
         return result

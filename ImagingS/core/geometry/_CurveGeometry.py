@@ -5,15 +5,15 @@ from ImagingS.core.drawing import DrawingContext
 from . import Geometry
 
 
-class Curve(Geometry):
+class CurveGeometry(Geometry):
     def __init__(self, ) -> None:
         super().__init__()
         self.control_points = []
         self.algorithm = "Bezier"
 
     @staticmethod
-    def create(control_points: List[Point], algorithm: str) -> Curve:
-        result = Curve()
+    def create(control_points: List[Point], algorithm: str) -> CurveGeometry:
+        result = CurveGeometry()
         result.control_points = control_points
         result.algorithm = algorithm
         return result

@@ -4,14 +4,14 @@ from ImagingS.core.drawing import DrawingContext
 from . import Geometry
 
 
-class Ellipse(Geometry):
+class EllipseGeometry(Geometry):
     def __init__(self) -> None:
         super().__init__()
         self.area = RectArea()
 
     @staticmethod
-    def create(area: RectArea) -> Ellipse:
-        result = Ellipse()
+    def create(area: RectArea) -> EllipseGeometry:
+        result = EllipseGeometry()
         result.area = area
         return result
 

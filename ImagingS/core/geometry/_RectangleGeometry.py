@@ -1,17 +1,17 @@
 from __future__ import annotations
 from typing import Dict
 from ImagingS.core import Point, RectArea
-from . import Polygon
+from . import PolygonGeometry
 
 
-class Rectangle(Polygon):
+class RectangleGeometry(PolygonGeometry):
     def __init__(self) -> None:
         super().__init__()
         self.area = RectArea()
 
     @staticmethod
-    def create(area: RectArea, algorithm: str) -> Rectangle:
-        result = Rectangle()
+    def create(area: RectArea, algorithm: str) -> RectangleGeometry:
+        result = RectangleGeometry()
         result.area = area
         result.algorithm = algorithm
         return result
@@ -33,6 +33,6 @@ class Rectangle(Polygon):
 
     def serialize(self) -> Dict:
         result = super().serialize()
-        if Polygon.S_Vertexes in result:
-            del result[Polygon.S_Vertexes]
+        if PolygonGeometry.S_Vertexes in result:
+            del result[PolygonGeometry.S_Vertexes]
         return result

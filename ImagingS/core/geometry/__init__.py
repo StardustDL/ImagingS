@@ -1,16 +1,16 @@
 from ._Geometry import Geometry
-from ._Line import Line
-from ._Ellipse import Ellipse
-from ._Curve import Curve
-from ._Polygon import Polygon
-from ._Rectangle import Rectangle
+from ._LineGeometry import LineGeometry
+from ._EllipseGeometry import EllipseGeometry
+from ._CurveGeometry import CurveGeometry
+from ._PolygonGeometry import PolygonGeometry
+from ._RectangleGeometry import RectangleGeometry
 
 
 __all__ = (
     "Geometry",
-    "Line",
-    "Ellipse",
-    "Curve",
-    "Polygon",
-    "Rectangle"
+    "LineGeometry",
+    "EllipseGeometry",
+    "CurveGeometry",
+    "PolygonGeometry",
+    "RectangleGeometry",
 )
