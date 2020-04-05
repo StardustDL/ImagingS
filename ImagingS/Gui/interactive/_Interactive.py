@@ -9,8 +9,8 @@ from PyQt5.QtGui import QKeyEvent
 class Interactive(QObject):
     S_Success, S_Failed = range(2)
 
-    started = pyqtSignal()
-    ended = pyqtSignal()
+    started = pyqtSignal(QObject)
+    ended = pyqtSignal(QObject)
 
     def __init__(self) -> None:
         super().__init__()
@@ -19,7 +19,7 @@ class Interactive(QObject):
 
     def start(self) -> None:  # will emit event, so call at the end in subclass
         self._state = self.S_Failed
-        self.started.emit()
+        self.started.emit(self)
 
     @property
     def view_item(self) -> Optional[QGraphicsItem]:
@@ -38,7 +38,7 @@ class Interactive(QObject):
 
     def _end(self, state: int) -> None:
         self._state = state
-        self.ended.emit()
+        self.ended.emit(self)
 
     def onMousePress(self, point: QPointF) -> None:
         self._isNeedRender = False

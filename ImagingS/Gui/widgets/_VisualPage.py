@@ -164,10 +164,7 @@ class VisualPage(QWidget, ui.VisualPage):
             geo.stroke = brush
         self.gvwMain.add(geo)
 
-    def interDrawing_ended(self) -> None:
-        if self.interactive is None:
-            return
-        inter = self.interactive
+    def interDrawing_ended(self, inter: Interactive) -> None:
         drawing: Optional[Drawing] = None
         if isinstance(inter, LineInteractive):
             drawing = inter.drawing
@@ -191,10 +188,7 @@ class VisualPage(QWidget, ui.VisualPage):
             self.gvwMain.remove(inter.drawing.id)
         self.interactive = None
 
-    def interTransform_ended(self) -> None:
-        if self.interactive is None:
-            return
-        inter = self.interactive
+    def interTransform_ended(self, inter: Interactive) -> None:
         drawing = self.drawing
         if drawing is None:
             return

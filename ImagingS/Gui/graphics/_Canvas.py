@@ -33,20 +33,15 @@ class Canvas(QGraphicsView):
             self._interactive.ended.connect(self._interactive_ended)
             self._interactive.start()
 
-    def _interactive_started(self):
-        if self._interactive is None:
-            return
-        if self._interactive.view_item is not None:
-            self.scene().addItem(self._interactive.view_item)
+    def _interactive_started(self, inter: Interactive):
+        if inter.view_item is not None:
+            self.scene().addItem(inter.view_item)
             self.rerender()
 
-    def _interactive_ended(self):
-        if self._interactive is not None:
-            self._after_interactive()
-            if self._interactive.view_item is not None:
-                self.scene().removeItem(self._interactive.view_item)
-                self.rerender()
-        self.interactive = None
+    def _interactive_ended(self, inter: Interactive):
+        if inter.view_item is not None:
+            self.scene().removeItem(inter.view_item)
+            self.rerender()
 
     def rerender(self) -> None:
         self.updateScene([self.sceneRect()])
@@ -97,50 +92,54 @@ class Canvas(QGraphicsView):
         self.items.clear()
         self.rerender()
 
-    def _after_interactive(self) -> None:
-        if self.interactive is None:
-            return
-        if self.interactive.isNeedRender:
+    def _after_interactive(self, inter: Interactive) -> None:
+        if inter.isNeedRender:
             self.rerender()
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         pos = self.mapToScene(event.localPos().toPoint())
         if self.interactive is not None:
-            self.interactive.onMousePress(pos)
-            self._after_interactive()
+            inter = self.interactive
+            inter.onMousePress(pos)
+            self._after_interactive(inter)
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
         pos = self.mapToScene(event.localPos().toPoint())
         if self.interactive is not None:
-            self.interactive.onMouseMove(pos)
-            self._after_interactive()
+            inter = self.interactive
+            inter.onMouseMove(pos)
+            self._after_interactive(inter)
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
         pos = self.mapToScene(event.localPos().toPoint())
         if self.interactive is not None:
-            self.interactive.onMouseRelease(pos)
-            self._after_interactive()
+            inter = self.interactive
+            inter.onMouseRelease(pos)
+            self._after_interactive(inter)
         super().mouseReleaseEvent(event)
 
     def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
         pos = self.mapToScene(event.localPos().toPoint())
         if self.interactive is not None:
-            self.interactive.onMouseDoubleClick(pos)
-            self._after_interactive()
+            inter = self.interactive
+            inter.onMouseDoubleClick(pos)
+            self._after_interactive(inter)
         super().mouseDoubleClickEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         if self.interactive is not None:
-            self.interactive.onKeyPress(event)
-            self._after_interactive()
+            inter = self.interactive
+            inter.onKeyPress(event)
+            self._after_interactive(inter)
         super().keyPressEvent(event)
 
     def keyReleaseEvent(self, event: QKeyEvent) -> None:
         if self.interactive is not None:
-            self.interactive.onKeyRelease(event)
-            self._after_interactive()
+            inter = self.interactive
+            inter.onKeyRelease(event)
+            self._after_interactive(inter)
         elif event.key() == Qt.Key_F5:
             self.rerender()
         super().keyReleaseEvent(event)
