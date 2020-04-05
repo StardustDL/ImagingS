@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import List
+from typing import List, Iterable
 from ImagingS.core import Point
-from ImagingS.core.drawing import DrawingContext
+from ImagingS.core.drawing import Pen
 from . import Geometry, LineGeometry
 
 
@@ -35,16 +35,27 @@ class PolygonGeometry(Geometry):
     @vertexes.setter
     def vertexes(self, value: List[Point]) -> None:
         self._vertexes = value
-        self.refresh_boundingArea()
 
-    def render(self, context: DrawingContext) -> None:
-        cnt = len(self.vertexes)
-        if cnt == 0:
-            return
-        for i in range(cnt):
-            j = (i+1) % cnt
-            ln = Line.create(self.vertexes[i],
-                             self.vertexes[j], self.algorithm)
-            ln.stroke = self.stroke
-            ln.transform = self.transform
-            ln.render(context)
+    # def render(self, context: DrawingContext) -> None:
+    #     cnt = len(self.vertexes)
+    #     if cnt == 0:
+    #         return
+    #     for i in range(cnt):
+    #         j = (i+1) % cnt
+    #         ln = Line.create(self.vertexes[i],
+    #                          self.vertexes[j], self.algorithm)
+    #         ln.stroke = self.stroke
+    #         ln.transform = self.transform
+    #         ln.render(context)
+
+    def stroke_points(self, pen: Pen) -> Iterable[Point]:
+        raise NotImplementedError()
+
+    def fill_points(self) -> Iterable[Point]:
+        raise NotImplementedError()
+
+    def in_stroke(self, pen: Pen, point: Point) -> bool:
+        raise NotImplementedError()
+
+    def in_fill(self, point: Point) -> bool:
+        raise NotImplementedError()

@@ -1,10 +1,11 @@
-from ImagingS.core import RectArea
+from ImagingS.core import Color, Rect, Point
 from abc import ABC, abstractmethod
 from ImagingS.core.serialization import PropertySerializable
-from typing import List
+from ImagingS.core.transform import Transform
+from typing import List, Optional
 from ImagingS.core import IdObject
 from ImagingS.core.geometry import Geometry
-from . import DrawingContext, BoundingAreaMeasurer
+from . import DrawingContext, BoundingAreaMeasurer, ProxyDrawingContext
 
 
 class Drawing(PropertySerializable, IdObject, ABC):
@@ -24,14 +25,14 @@ class Drawing(PropertySerializable, IdObject, ABC):
         pass
 
     @property
-    def boundingArea(self) -> RectArea:
+    def boundingArea(self) -> Rect:
         if not hasattr(self, "_boundingArea"):
             self._boundingArea = None
             measurer = BoundingAreaMeasurer()
             self.render(measurer)
             self._boundingArea = measurer.end_measure()
         elif self._boundingArea is None:  # boundingArea is calculating
-            return RectArea()
+            return Rect()
         return self._boundingArea
 
     def refresh_boundingArea(self) -> None:
@@ -43,6 +44,7 @@ class DrawingGroup(Drawing):
     def __init__(self):
         super().__init__()
         self.children = []
+        self.transform = None
 
     @property
     def children(self) -> List[Drawing]:
@@ -52,6 +54,24 @@ class DrawingGroup(Drawing):
     def children(self, value: List[Drawing]) -> None:
         self._children = value
 
+    @property
+    def transform(self) -> Optional[Transform]:
+        return self._transform
+
+    @transform.setter
+    def transform(self, value: Optional[Transform]) -> None:
+        self._transform = value
+
     def render(self, context: DrawingContext) -> None:
+        def fpoint(position: Point, color: Color):
+            if self.transform is not None:
+                position = self.transform.transform(position)
+            context.point(position, color)
+
+        def farea():
+            return context.area
+
+        proxy = ProxyDrawingContext(fpoint, farea)
+
         for item in self.children:
-            item.render(context)
+            item.render(proxy)

@@ -238,8 +238,8 @@ class Size(PropertySerializable):
         self._height = value
 
 
-class RectArea(PropertySerializable):
-    __infinite: Optional[RectArea] = None
+class Rect(PropertySerializable):
+    __infinite: Optional[Rect] = None
 
     def __init__(self) -> None:
         super().__init__()
@@ -247,31 +247,34 @@ class RectArea(PropertySerializable):
         self.size = Size()
 
     @staticmethod
-    def create(origin: Point, size: Size) -> RectArea:
-        result = RectArea()
+    def create(origin: Point, size: Size) -> Rect:
+        result = Rect()
         result.origin = origin
         result.size = size
         return result
 
     @classmethod
-    def infinite(cls) -> RectArea:
+    def infinite(cls) -> Rect:
         if cls.__infinite is None:
-            cls.__infinite = RectArea.from_points(Point.create(
+            cls.__infinite = Rect.from_points(Point.create(
                 float("-inf"), float("-inf")), Point.create(float("inf"), float("inf")))
         return cls.__infinite
 
     @staticmethod
-    def from_points(top_left: Point, bottom_right: Point) -> RectArea:
-        delta = bottom_right - top_left
-        return RectArea.create(top_left, Size.create(delta.x, delta.y))
+    def from_points(p1: Point, p2: Point) -> Rect:
+        x1, y1 = p1.as_tuple()
+        x2, y2 = p2.as_tuple()
+        xmin, xmax = min(x1, x2), max(x1, x2)
+        ymin, ymax = min(y1, y2), max(y1, y2)
+        return Rect.create(Point.create(xmin, ymin), Size.create(xmax - xmin, ymax - ymin))
 
     def __eq__(self, obj) -> bool:
-        if isinstance(obj, RectArea):
+        if isinstance(obj, Rect):
             return self.origin == obj.origin and self.size == obj.size
         return False
 
     def __repr__(self) -> str:
-        return f"RectArea({self.origin}, {self.size})"
+        return f"Rect({self.origin}, {self.size})"
 
     def __contains__(self, point: Point) -> bool:
         delta = point - self.origin

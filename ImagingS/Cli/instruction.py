@@ -3,7 +3,7 @@ from ImagingS.core.drawing import Drawing, NumpyArrayDrawingContext
 from ImagingS.core.geometry import Line, Polygon, Curve, Ellipse
 from ImagingS.core.transform import Transform, TranslateTransform, RotateTransform, ClipTransform, ScaleTransform, TransformGroup
 from typing import List
-from ImagingS.core import RectArea, Size, Color, Point
+from ImagingS.core import Rect, Size, Color, Point
 from ImagingS.document import Document
 import math
 import os
@@ -71,7 +71,7 @@ class BuiltinInstruction:
     def drawEllipse(self, argv: List[str]) -> None:
         lt = Point.create(int(argv[1]), int(argv[2]))
         rb = Point.create(int(argv[3]), int(argv[4]))
-        drawing = Ellipse.create(RectArea.from_points(lt, rb))
+        drawing = Ellipse.create(Rect.from_points(lt, rb))
         drawing.id = argv[0]
         drawing.stroke = self.brush
         self.doc.drawings.append(drawing)
@@ -107,7 +107,7 @@ class BuiltinInstruction:
         drawing = self.doc.drawings[argv[0]]
         lt = Point.create(int(argv[1]), int(argv[2]))
         rb = Point.create(int(argv[3]), int(argv[4]))
-        trans = ClipTransform.create(RectArea.from_points(lt, rb), argv[5])
+        trans = ClipTransform.create(Rect.from_points(lt, rb), argv[5])
         _append_transform(drawing, trans)
 
     def execute(self, ins: str) -> None:

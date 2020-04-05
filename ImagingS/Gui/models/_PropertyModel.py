@@ -1,5 +1,5 @@
 from ImagingS.document import Document
-from ImagingS.core import Color, Size, Point, RectArea
+from ImagingS.core import Color, Size, Point, Rect
 from ImagingS.core.brush import Brush, SolidBrush
 from ImagingS.core.drawing import Drawing
 from ImagingS.core.geometry import Line, Curve, Polygon, Ellipse
@@ -76,7 +76,7 @@ class PropertyModel(QStandardItemModel):
             item.setIcon(icons.document)
         elif isinstance(value, Size):
             item.setIcon(icons.size)
-        elif isinstance(value, RectArea):
+        elif isinstance(value, Rect):
             item.setIcon(icons.rect)
         elif isinstance(value, Point):
             item.setIcon(icons.point)

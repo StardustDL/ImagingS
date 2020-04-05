@@ -1,27 +1,27 @@
 from __future__ import annotations
 from typing import Dict
-from ImagingS.core import Point, RectArea
+from ImagingS.core import Point, Rect
 from . import PolygonGeometry
 
 
 class RectangleGeometry(PolygonGeometry):
     def __init__(self) -> None:
         super().__init__()
-        self.area = RectArea()
+        self.area = Rect()
 
     @staticmethod
-    def create(area: RectArea, algorithm: str) -> RectangleGeometry:
+    def create(area: Rect, algorithm: str) -> RectangleGeometry:
         result = RectangleGeometry()
         result.area = area
         result.algorithm = algorithm
         return result
 
     @property
-    def area(self) -> RectArea:
+    def area(self) -> Rect:
         return self._area
 
     @area.setter
-    def area(self, value: RectArea) -> None:
+    def area(self, value: Rect) -> None:
         self._area = value
         self.vertexes = [
             self._area.origin,

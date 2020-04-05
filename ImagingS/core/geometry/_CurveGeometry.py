@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import List
+from typing import List, Iterable
 from ImagingS.core import Point
-from ImagingS.core.drawing import DrawingContext
+from ImagingS.core.drawing import Pen
 from . import Geometry
 
 
@@ -34,5 +34,14 @@ class CurveGeometry(Geometry):
     def algorithm(self, value: str) -> None:
         self._algorithm = value
 
-    def render(self, context: DrawingContext) -> None:
-        pass
+    def stroke_points(self, pen: Pen) -> Iterable[Point]:
+        raise NotImplementedError()
+
+    def fill_points(self) -> Iterable[Point]:
+        raise NotImplementedError()
+
+    def in_stroke(self, pen: Pen, point: Point) -> bool:
+        raise NotImplementedError()
+
+    def in_fill(self, point: Point) -> bool:
+        raise NotImplementedError()

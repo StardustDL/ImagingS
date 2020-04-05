@@ -1,8 +1,8 @@
 from typing import cast
 import numpy as np
-from ImagingS.core import Point, RectArea, Size
+from ImagingS.core import Point, Rect, Size
 from ImagingS.core.brush import Brushes, SolidBrush
-from ImagingS.core.transform import TranslateTransform, SkewTransform, RotateTransform, MatrixTransform, ClipTransform, ScaleTransform, TransformGroup
+from ImagingS.core.transform import TranslateTransform, SkewTransform, RotateTransform, MatrixTransform, ScaleTransform, TransformGroup
 from ImagingS.document import Document
 from ImagingS.core.geometry import Line, Polygon, Curve, Ellipse
 import os
@@ -27,13 +27,13 @@ def test_sl() -> None:
     poly.id = "poly"
     poly.transform = RotateTransform.create(Point(), 3)
 
-    ell = Ellipse.create(RectArea.create(Point(), Size.create(10, 10)))
+    ell = Ellipse.create(Rect.create(Point(), Size.create(10, 10)))
     ell.id = "ell"
     tg = TransformGroup()
     tg.children.append(MatrixTransform.create(np.ones((2, 2))))
     tg.children.append(ScaleTransform.create(Point(), 2))
     tg.children.append(ClipTransform.create(
-        RectArea.create(Point(), Size.create(10, 10)), "cli"))
+        Rect.create(Point(), Size.create(10, 10)), "cli"))
     ell.transform = tg
 
     doc.drawings.append(line)

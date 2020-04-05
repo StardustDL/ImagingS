@@ -35,8 +35,8 @@ class GeometryDrawing(Drawing):
         self.refresh_boundingArea()
 
     def render(self, context: DrawingContext) -> None:
-        for point in self.geometry.stroke(self.stroke):
+        for point in self.geometry.stroke_points(self.stroke):
             context.point(point,
                           self.stroke.brush.color_at(point, self.boundingArea))
-        for point in self.geometry.fill():
+        for point in self.geometry.fill_points():
             context.point(point, self.fill.color_at(point, self.boundingArea))

@@ -1,4 +1,4 @@
-from ImagingS.core import Point, Size, RectArea, Color
+from ImagingS.core import Point, Size, Rect, Color
 from PyQt5.QtCore import QPointF, QSizeF, QRectF, QPoint, QSize, QRect
 from PyQt5.QtGui import QColor
 from typing import Union
@@ -12,7 +12,7 @@ def convert_size(o: Size) -> QSizeF:
     return QSizeF(o.width, o.height)
 
 
-def convert_rect_area(o: RectArea) -> QRectF:
+def convert_rect_area(o: Rect) -> QRectF:
     return QRectF(convert_point(o.origin), convert_size(o.size))
 
 
@@ -28,8 +28,8 @@ def convert_qsize(o: Union[QSizeF, QSize]) -> Size:
     return Size.create(o.width(), o.height())
 
 
-def convert_qrect_area(o: Union[QRectF, QRect]) -> RectArea:
-    return RectArea.create(convert_qpoint(o.topLeft()), convert_qsize(o.size()))
+def convert_qrect_area(o: Union[QRectF, QRect]) -> Rect:
+    return Rect.create(convert_qpoint(o.topLeft()), convert_qsize(o.size()))
 
 
 def convert_qcolor(o: QColor) -> Color:
