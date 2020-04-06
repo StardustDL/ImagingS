@@ -1,7 +1,10 @@
 from __future__ import annotations
+
 from typing import Iterable
-from ImagingS.core import Rect, Point
+
+from ImagingS.core import Point, Rect
 from ImagingS.core.drawing import Pen
+
 from . import Geometry
 
 
@@ -28,10 +31,4 @@ class EllipseGeometry(Geometry):
         raise NotImplementedError()
 
     def fill_points(self) -> Iterable[Point]:
-        raise NotImplementedError()
-
-    def in_stroke(self, pen: Pen, point: Point) -> bool:
-        raise NotImplementedError()
-
-    def in_fill(self, point: Point) -> bool:
         raise NotImplementedError()

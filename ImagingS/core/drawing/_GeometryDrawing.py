@@ -1,6 +1,7 @@
-from . import Drawing, Pen, DrawingContext
-from ImagingS.core.brush import Brushes, Brush
+from ImagingS.core.brush import Brush, Brushes
 from ImagingS.core.geometry import Geometry
+
+from . import Drawing, DrawingContext, Pen
 
 
 class GeometryDrawing(Drawing):

@@ -1,7 +1,9 @@
-from ImagingS.core import Point, Size, Rect, Color
-from PyQt5.QtCore import QPointF, QSizeF, QRectF, QPoint, QSize, QRect
-from PyQt5.QtGui import QColor
 from typing import Union
+
+from PyQt5.QtCore import QPoint, QPointF, QRect, QRectF, QSize, QSizeF
+from PyQt5.QtGui import QColor
+
+from ImagingS.core import Color, Point, Rect, Size
 
 
 def convert_point(o: Point) -> QPointF:

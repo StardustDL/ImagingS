@@ -1,11 +1,12 @@
-from ImagingS.core import Color, Rect, Point
 from abc import ABC, abstractmethod
+from typing import List, Optional
+
+from ImagingS.core import Color, IdObject, Point, Rect
+from ImagingS.core.geometry import Geometry
 from ImagingS.core.serialization import PropertySerializable
 from ImagingS.core.transform import Transform
-from typing import List, Optional
-from ImagingS.core import IdObject
-from ImagingS.core.geometry import Geometry
-from . import DrawingContext, BoundingAreaMeasurer, ProxyDrawingContext
+
+from . import BoundingAreaMeasurer, DrawingContext, ProxyDrawingContext
 
 
 class Drawing(PropertySerializable, IdObject, ABC):

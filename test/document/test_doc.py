@@ -1,12 +1,16 @@
-from typing import cast
-import numpy as np
-from ImagingS.core import Point, Rect, Size
-from ImagingS.core.brush import Brushes, SolidBrush
-from ImagingS.core.transform import TranslateTransform, SkewTransform, RotateTransform, MatrixTransform, ScaleTransform, TransformGroup
-from ImagingS.document import Document
-from ImagingS.core.geometry import Line, Polygon, Curve, Ellipse
 import os
 from test.temp import get_temp_dir
+from typing import cast
+
+import numpy as np
+
+from ImagingS.core import Point, Rect, Size
+from ImagingS.core.brush import Brushes, SolidBrush
+from ImagingS.core.geometry import Curve, Ellipse, Line, Polygon
+from ImagingS.core.transform import (MatrixTransform, RotateTransform,
+                                     ScaleTransform, SkewTransform,
+                                     TransformGroup, TranslateTransform)
+from ImagingS.document import Document
 
 
 def test_sl() -> None:

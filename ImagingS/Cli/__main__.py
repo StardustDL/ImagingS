@@ -1,6 +1,7 @@
-from ImagingS.document import Document
-import sys
 import os
+import sys
+
+from ImagingS.document import Document
 
 from .instruction import BuiltinInstruction
 

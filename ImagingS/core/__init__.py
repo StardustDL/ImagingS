@@ -1,8 +1,11 @@
 from __future__ import annotations
-from ImagingS.core.serialization import PropertySerializable
-from typing import Dict, Generic, Iterator, Optional, Tuple, TypeVar, List
+
 from math import fabs
+from typing import Dict, Generic, Iterator, List, Optional, Tuple, TypeVar
+
 import numpy as np
+
+from ImagingS.core.serialization import PropertySerializable
 
 T = TypeVar("T")
 

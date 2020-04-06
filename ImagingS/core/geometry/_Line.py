@@ -1,7 +1,10 @@
 from __future__ import annotations
-from typing import Iterator, Optional, Iterable
+
+from typing import Iterable, Iterator, Optional
+
 from ImagingS.core import Point, Rect
 from ImagingS.core.drawing import Pen
+
 from . import Geometry
 
 
@@ -87,29 +90,18 @@ class LineGeometry(Geometry):
             yield cur
             cur = cur + delta
 
-    # def render(self, context: DrawingContext) -> None:
-    #     start = self.start
-    #     end = self.end
-    #     if self.transform is not None:
-    #         start = self.transform.transform(start)
-    #         end = self.transform.transform(end)
-    #     gen = self.__gen_DDA(start, end)
-    #     if self.algorithm == "DDA":
-    #         pass
-    #     elif self.algorithm == "Bresenham":
-    #         pass
-    #     for p in gen:
-    #         if p in context.area():
-    #             context.point(p, self.stroke.color_at(p, self.boundingArea))
-
     def stroke_points(self, pen: Pen) -> Iterable[Point]:
-        raise NotImplementedError()
+        start = self.start
+        end = self.end
+        if self.transform is not None:
+            start = self.transform.transform(start)
+            end = self.transform.transform(end)
+        gen = self.__gen_DDA(start, end)
+        if self.algorithm == "DDA":
+            pass
+        elif self.algorithm == "Bresenham":
+            pass
+        return gen
 
     def fill_points(self) -> Iterable[Point]:
-        raise NotImplementedError()
-
-    def in_stroke(self, pen: Pen, point: Point) -> bool:
-        raise NotImplementedError()
-
-    def in_fill(self, point: Point) -> bool:
-        raise NotImplementedError()
+        return []

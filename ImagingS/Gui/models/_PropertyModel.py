@@ -1,16 +1,22 @@
-from ImagingS.document import Document
-from ImagingS.core import Color, Size, Point, Rect
+from typing import Dict, List
+
+import qtawesome as qta
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QStandardItem, QStandardItemModel
+
+from ImagingS.core import Color, Point, Rect, Size
 from ImagingS.core.brush import Brush, SolidBrush
 from ImagingS.core.drawing import Drawing
-from ImagingS.core.geometry import Line, Curve, Polygon, Ellipse
-from ImagingS.core.transform import Transform, TranslateTransform, SkewTransform, RotateTransform, TransformGroup, ScaleTransform, MatrixTransform, ClipTransform
-from typing import Dict, List
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from ImagingS.core.geometry import Geometry, CurveGeometry, EllipseGeometry, LineGeometry, PolygonGeometry
 from ImagingS.core.serialization import get_properties
-from ._BrushModel import get_color_icon
-import qtawesome as qta
+from ImagingS.core.transform import (MatrixTransform,
+                                     RotateTransform, ScaleTransform,
+                                     SkewTransform, Transform, TransformGroup,
+                                     TranslateTransform)
+from ImagingS.document import Document
 from ImagingS.Gui import icons
+
+from ._BrushModel import get_color_icon
 
 
 class PropertyModel(QStandardItemModel):
@@ -64,6 +70,8 @@ class PropertyModel(QStandardItemModel):
             item.setIcon(icons.brush)
         elif name == "drawings":
             item.setIcon(icons.drawing)
+        elif name == "geometry":
+            item.setIcon(icons.geometry)
         elif name == "matrix":
             item.setIcon(icons.matrix)
         elif name == "center":
@@ -96,18 +104,20 @@ class PropertyModel(QStandardItemModel):
             item.setIcon(icons.groupTransform)
         elif isinstance(value, SolidBrush):
             item.setIcon(icons.solidBrush)
-        elif isinstance(value, Line):
+        elif isinstance(value, LineGeometry):
             item.setIcon(icons.line)
-        elif isinstance(value, Curve):
+        elif isinstance(value, CurveGeometry):
             item.setIcon(icons.curve)
-        elif isinstance(value, Ellipse):
+        elif isinstance(value, EllipseGeometry):
             item.setIcon(icons.ellipse)
-        elif isinstance(value, Polygon):
+        elif isinstance(value, PolygonGeometry):
             item.setIcon(icons.polygon)
         elif isinstance(value, Brush):
             item.setIcon(icons.brush)
         elif isinstance(value, Drawing):
             item.setIcon(icons.drawing)
+        elif isinstance(value, Geometry):
+            item.setIcon(icons.geometry)
         elif isinstance(value, Transform) or name == "transform":
             item.setIcon(icons.transform)
         elif isinstance(value, list):

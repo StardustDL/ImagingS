@@ -1,21 +1,20 @@
-from ImagingS.core.drawing import Drawing
+import os
 from typing import Optional
-from ImagingS.Gui import icons
-import ImagingS.Gui.ui as ui
-from ImagingS.document import Document
-from ImagingS.Gui.app import Application
-from ImagingS.core import Color
-from ImagingS.core.brush import Brushes, SolidBrush, Brush
-from ImagingS.core.drawing import NumpyArrayDrawingContext
-from ImagingS.Gui.models import BrushModel, PropertyModel, DrawingModel
+
 import qtawesome as qta
 from PIL import Image
+from PyQt5.QtWidgets import QColorDialog, QFileDialog, QMainWindow
+
+import ImagingS.Gui.ui as ui
+from ImagingS.core import Color
+from ImagingS.core.brush import Brush, Brushes, SolidBrush
+from ImagingS.core.drawing import Drawing, NumpyArrayDrawingContext
+from ImagingS.document import Document
+from ImagingS.Gui import icons
+from ImagingS.Gui.app import Application
+from ImagingS.Gui.models import BrushModel, DrawingModel, PropertyModel
 
 from . import CodePage, VisualPage
-
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QColorDialog
-
-import os
 
 
 def _create_new_document() -> Document:

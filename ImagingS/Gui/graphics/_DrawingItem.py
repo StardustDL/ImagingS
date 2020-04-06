@@ -1,12 +1,13 @@
+from typing import Optional
+
+from PyQt5.QtCore import QRectF, QSizeF
+from PyQt5.QtGui import QColor, QPainter
+from PyQt5.QtWidgets import QGraphicsItem, QStyleOptionGraphicsItem, QWidget
+
 from ImagingS.core import Point, Rect
 from ImagingS.core.drawing import Drawing
-from . import PainterDrawingContext
-from . import converters
 
-from PyQt5.QtWidgets import QGraphicsItem, QWidget, QStyleOptionGraphicsItem
-from PyQt5.QtGui import QPainter, QColor
-from PyQt5.QtCore import QRectF, QSizeF
-from typing import Optional
+from . import PainterDrawingContext, converters
 
 
 class DrawingItem(QGraphicsItem):
@@ -38,7 +39,8 @@ class DrawingItem(QGraphicsItem):
             painter.drawRect(converters.convert_rect_area(area))
 
     def boundingRect(self) -> QRectF:  # must be efficient
-        return QRectF(0, 0, self._size.width(), self._size.height())  # to fix prepareGeometryChange bug
+        # to fix prepareGeometryChange bug
+        return QRectF(0, 0, self._size.width(), self._size.height())
         self.prepareGeometryChange()  # important!!!
         area = self.drawing.boundingArea
         return QRectF(area.origin.x - 1, area.origin.y - 1, area.size.width + 2, area.size.height + 2)

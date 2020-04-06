@@ -1,9 +1,10 @@
-from ImagingS.core import Color
+import qtawesome as qta
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QStandardItemModel, QIcon, QStandardItem
+from PyQt5.QtGui import QIcon, QStandardItem, QStandardItemModel
+
+from ImagingS.core import Color
 from ImagingS.core.brush import Brush, SolidBrush
 from ImagingS.Gui.graphics import converters
-import qtawesome as qta
 
 
 def get_color_icon(color: Color) -> QIcon:

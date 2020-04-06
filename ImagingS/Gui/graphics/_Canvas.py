@@ -1,11 +1,13 @@
 from typing import Dict, Optional
+
+from PyQt5.QtCore import QPointF, QRectF, QSizeF, Qt
+from PyQt5.QtGui import QKeyEvent, QMouseEvent
+from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsScene, QGraphicsView
+
 from ImagingS.core.drawing import Drawing
 from ImagingS.Gui.interactive import Interactive
-from . import DrawingItem
 
-from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsRectItem
-from PyQt5.QtCore import QSizeF, QPointF, QRectF, Qt
-from PyQt5.QtGui import QMouseEvent, QKeyEvent
+from . import DrawingItem
 
 
 class Canvas(QGraphicsView):

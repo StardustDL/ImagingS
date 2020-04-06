@@ -1,7 +1,11 @@
-from ImagingS.core import Point
-from ImagingS.core.transform import MatrixTransform, TranslateTransform, RotateTransform, ScaleTransform, SkewTransform
 import math
+
 import numpy as np
+
+from ImagingS.core import Point
+from ImagingS.core.transform import (MatrixTransform, RotateTransform,
+                                     ScaleTransform, SkewTransform,
+                                     TranslateTransform)
 
 
 def test_Clip() -> None:

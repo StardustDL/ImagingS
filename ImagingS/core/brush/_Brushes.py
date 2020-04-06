@@ -1,5 +1,6 @@
 from ImagingS.core import Colors
-from . import SolidBrush, Brush
+
+from . import Brush, SolidBrush
 
 
 class Brushes:

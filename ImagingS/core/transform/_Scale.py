@@ -1,7 +1,10 @@
 from __future__ import annotations
-from ImagingS.core import Point
+
 from typing import Dict
+
 import numpy as np
+
+from ImagingS.core import Point
 from ImagingS.core.transform import MatrixTransform
 
 

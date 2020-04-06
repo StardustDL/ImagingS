@@ -1,13 +1,16 @@
-from ImagingS.core.drawing import Drawing
+import math
+from typing import Optional
+
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem
-from typing import Optional
-from .. import Interactive
+
 from ImagingS.core import Point
+from ImagingS.core.drawing import Drawing
 from ImagingS.core.transform import SkewTransform
 from ImagingS.Gui.graphics import converters
-import math
+
+from .. import Interactive
 
 
 class SkewTransformInteractive(Interactive):

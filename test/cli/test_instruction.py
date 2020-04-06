@@ -1,7 +1,7 @@
-from ImagingS.document import Document
-from ImagingS.Cli.instruction import BuiltinInstruction
-
 from test.temp import get_temp_dir
+
+from ImagingS.Cli.instruction import BuiltinInstruction
+from ImagingS.document import Document
 
 
 def test_ins() -> None:

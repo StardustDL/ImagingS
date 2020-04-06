@@ -1,12 +1,13 @@
+from io import StringIO
 from typing import Optional
+
+import qtawesome as qta
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QWidget
+
 import ImagingS.Gui.ui as ui
 from ImagingS.document import Document
 from ImagingS.Gui.models import PropertyModel
-import qtawesome as qta
-from io import StringIO
-
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtCore import pyqtSignal
 
 
 class CodePage(QWidget, ui.CodePage):

@@ -1,6 +1,8 @@
 from __future__ import annotations
-from . import Brush
+
 from ImagingS.core import Color, Colors, Point, Rect
+
+from . import Brush
 
 
 class SolidBrush(Brush):

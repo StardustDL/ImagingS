@@ -1,7 +1,10 @@
 from __future__ import annotations
-from typing import List, Iterable
+
+from typing import Iterable, List
+
 from ImagingS.core import Point
 from ImagingS.core.drawing import Pen
+
 from . import Geometry
 
 
@@ -38,10 +41,4 @@ class CurveGeometry(Geometry):
         raise NotImplementedError()
 
     def fill_points(self) -> Iterable[Point]:
-        raise NotImplementedError()
-
-    def in_stroke(self, pen: Pen, point: Point) -> bool:
-        raise NotImplementedError()
-
-    def in_fill(self, point: Point) -> bool:
-        raise NotImplementedError()
+        return []

@@ -1,7 +1,8 @@
-from ImagingS.core.drawing import Pen
-from ImagingS.core import Point
 from abc import ABC, abstractmethod
 from typing import Iterable, List, Optional
+
+from ImagingS.core import Point
+from ImagingS.core.drawing import Pen
 from ImagingS.core.serialization import PropertySerializable
 from ImagingS.core.transform import Transform
 
@@ -23,13 +24,11 @@ class Geometry(PropertySerializable, ABC):
     def fill_points(self) -> Iterable[Point]:
         pass
 
-    @abstractmethod
     def in_stroke(self, pen: Pen, point: Point) -> bool:
-        pass
+        return point in self.stroke_points(pen)
 
-    @abstractmethod
     def in_fill(self, point: Point) -> bool:
-        pass
+        return point in self.fill_points
 
 
 class GeometryGroup(Geometry):

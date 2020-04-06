@@ -1,13 +1,15 @@
 from __future__ import annotations
-from ImagingS.core import IdObjectList, IdObject, Size
-from ImagingS.core.drawing import Drawing
-from typing import List
-from ImagingS.core.brush import Brush
-from ImagingS.core.serialization import PropertySerializable
-from ImagingS.core.serialization.json import Decoder, Encoder
+
 import json
 import lzma
 import uuid
+from typing import List
+
+from ImagingS.core import IdObject, IdObjectList, Size
+from ImagingS.core.brush import Brush
+from ImagingS.core.drawing import Drawing
+from ImagingS.core.serialization import PropertySerializable
+from ImagingS.core.serialization.json import Decoder, Encoder
 
 
 class Document(PropertySerializable, IdObject):

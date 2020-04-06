@@ -1,6 +1,8 @@
-from ImagingS.core import Color, Point, Rect, Size
 from abc import ABC, abstractmethod
+
 import numpy as np
+
+from ImagingS.core import Color, Point, Rect, Size
 
 
 class DrawingContext(ABC):

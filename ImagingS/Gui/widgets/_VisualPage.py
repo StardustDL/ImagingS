@@ -1,19 +1,27 @@
-from ImagingS.core.drawing import Drawing
-from typing import Optional
-import ImagingS.Gui.ui as ui
-from ImagingS.Gui import icons
-from ImagingS.core.brush import SolidBrush, Brush
-from ImagingS.document import Document
-from ImagingS.core.geometry import Line, Curve, Polygon, Ellipse, Geometry
-from ImagingS.Gui.graphics import Canvas, converters
-from ImagingS.core.transform import MatrixTransform, TransformGroup
-from ImagingS.Gui.interactive import Interactive
-from ImagingS.Gui.interactive.geometry import LineInteractive, PolygonInteractive, CurveInteractive, EllipseInteractive
-from ImagingS.Gui.interactive.transform import TranslateTransformInteractive, SkewTransformInteractive, RotateTransformInteractive, ScaleTransformInteractive, ClipTransformInteractive
 import uuid
+from typing import Optional
 
+from PyQt5.QtCore import QSizeF, pyqtSignal
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtCore import pyqtSignal, QSizeF
+
+import ImagingS.Gui.ui as ui
+from ImagingS.core.brush import Brush, SolidBrush
+from ImagingS.core.drawing import Drawing
+from ImagingS.core.geometry import Curve, Ellipse, Geometry, Line, Polygon
+from ImagingS.core.transform import MatrixTransform, TransformGroup
+from ImagingS.document import Document
+from ImagingS.Gui import icons
+from ImagingS.Gui.graphics import Canvas, converters
+from ImagingS.Gui.interactive import Interactive
+from ImagingS.Gui.interactive.geometry import (CurveInteractive,
+                                               EllipseInteractive,
+                                               LineInteractive,
+                                               PolygonInteractive)
+from ImagingS.Gui.interactive.transform import (ClipTransformInteractive,
+                                                RotateTransformInteractive,
+                                                ScaleTransformInteractive,
+                                                SkewTransformInteractive,
+                                                TranslateTransformInteractive)
 
 
 class VisualPage(QWidget, ui.VisualPage):

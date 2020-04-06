@@ -32,7 +32,9 @@ rect = qta.icon("mdi.rectangle-outline")
 
 point = qta.icon("mdi.circle-medium")
 
-drawing = qta.icon("mdi.drawing")
+drawing = qta.icon("mdi.drawing-box")
+
+geometry = qta.icon("mdi.drawing")
 
 brush = qta.icon("mdi.brush")
 

@@ -1,13 +1,17 @@
-from ImagingS.core.brush import Brushes, SolidBrush
-from ImagingS.core.drawing import Drawing, NumpyArrayDrawingContext
-from ImagingS.core.geometry import Line, Polygon, Curve, Ellipse
-from ImagingS.core.transform import Transform, TranslateTransform, RotateTransform, ClipTransform, ScaleTransform, TransformGroup
-from typing import List
-from ImagingS.core import Rect, Size, Color, Point
-from ImagingS.document import Document
 import math
 import os
+from typing import List
+
 from PIL import Image
+
+from ImagingS.core import Color, Point, Rect, Size
+from ImagingS.core.brush import Brushes, SolidBrush
+from ImagingS.core.drawing import Drawing, GeometryDrawing, NumpyArrayDrawingContext
+from ImagingS.core.geometry import CurveGeometry, EllipseGeometry, LineGeometry, PolygonGeometry
+from ImagingS.core.transform import (
+    RotateTransform, ScaleTransform, Transform, TransformGroup,
+    TranslateTransform)
+from ImagingS.document import Document
 
 
 def _append_transform(drawing: Drawing, transform: Transform) -> None:

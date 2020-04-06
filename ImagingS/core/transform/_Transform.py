@@ -1,6 +1,7 @@
-from typing import List
-from ImagingS.core import Point
 from abc import ABC, abstractmethod
+from typing import List
+
+from ImagingS.core import Point
 from ImagingS.core.serialization import PropertySerializable
 
 

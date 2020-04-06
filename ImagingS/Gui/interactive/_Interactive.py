@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 from typing import Optional
-from PyQt5.QtCore import QPointF
-from PyQt5.QtCore import pyqtSignal, QObject
-from PyQt5.QtWidgets import QGraphicsItem
+
+from PyQt5.QtCore import QObject, QPointF, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import QGraphicsItem
 
 
 class Interactive(QObject):

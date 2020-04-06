@@ -1,5 +1,5 @@
-from ImagingS.core.serialization import PropertySerializable
 from ImagingS.core.brush import Brush, Brushes
+from ImagingS.core.serialization import PropertySerializable
 
 
 class Pen(PropertySerializable):

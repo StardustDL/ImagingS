@@ -1,6 +1,7 @@
-import json
-from . import Serializable
 import importlib
+import json
+
+from . import Serializable
 
 
 class Encoder(json.JSONEncoder):
@@ -29,7 +30,8 @@ class Decoder(json.JSONDecoder):
                 data = d.pop("__data__")
                 obj.deserialize(data)
             else:
-                raise Exception(f"Type '{module_name}.{class_name}' is not serializable.")
+                raise Exception(
+                    f"Type '{module_name}.{class_name}' is not serializable.")
             inst = obj
         else:
             inst = d

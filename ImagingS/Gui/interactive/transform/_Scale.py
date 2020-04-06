@@ -1,11 +1,14 @@
-from ImagingS.core.drawing import Drawing
+from typing import Optional
+
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem
-from typing import Optional
-from .. import Interactive
+
+from ImagingS.core.drawing import Drawing
 from ImagingS.core.transform import ScaleTransform
 from ImagingS.Gui.graphics import converters
+
+from .. import Interactive
 
 
 class ScaleTransformInteractive(Interactive):

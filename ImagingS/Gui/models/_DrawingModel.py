@@ -1,11 +1,12 @@
-from ImagingS.core import Colors
-from ImagingS.Gui.graphics import converters
-from ImagingS.core.drawing import Drawing
-from ImagingS.core.brush import SolidBrush
-from ImagingS.core.geometry import Line, Polygon, Curve, Ellipse, Geometry
 import qtawesome as qta
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtGui import QStandardItem, QStandardItemModel
+
+from ImagingS.core import Colors
+from ImagingS.core.brush import SolidBrush
+from ImagingS.core.drawing import Drawing, GeometryDrawing
+from ImagingS.core.geometry import CurveGeometry, EllipseGeometry, LineGeometry, PolygonGeometry
+from ImagingS.Gui.graphics import converters
 
 
 class DrawingModel(QStandardItemModel):
@@ -17,19 +18,21 @@ class DrawingModel(QStandardItemModel):
 
     def append(self, drawing: Drawing) -> None:
         fitem = None
-        if isinstance(drawing, Geometry):
-            if isinstance(drawing.stroke, SolidBrush):
-                color = converters.convert_color(drawing.stroke.color)
+        if isinstance(drawing, GeometryDrawing):
+            if isinstance(drawing.stroke.brush, SolidBrush):
+                color = converters.convert_color(drawing.stroke.brush.color)
             else:
                 color = converters.convert_color(Colors.Black())
-            if isinstance(drawing, Line):
-                fitem = QStandardItem(qta.icon("mdi.vector-line", color=color), drawing.id)
-            elif isinstance(drawing, Curve):
-                fitem = QStandardItem(qta.icon("mdi.vector-curve", color=color), drawing.id)
-            elif isinstance(drawing, Ellipse):
+            if isinstance(drawing.geometry, LineGeometry):
+                fitem = QStandardItem(
+                    qta.icon("mdi.vector-line", color=color), drawing.id)
+            elif isinstance(drawing.geometry, CurveGeometry):
+                fitem = QStandardItem(
+                    qta.icon("mdi.vector-curve", color=color), drawing.id)
+            elif isinstance(drawing.geometry, EllipseGeometry):
                 fitem = QStandardItem(
                     qta.icon("mdi.vector-ellipse", color=color), drawing.id)
-            elif isinstance(drawing, Polygon):
+            elif isinstance(drawing.geometry, PolygonGeometry):
                 fitem = QStandardItem(
                     qta.icon("mdi.vector-polygon", color=color), drawing.id)
 
