@@ -6,10 +6,11 @@ import numpy as np
 
 from ImagingS.core import Point, Rect, Size
 from ImagingS.core.brush import Brushes, SolidBrush
-from ImagingS.core.geometry import Curve, Ellipse, Line, Polygon
+from ImagingS.core.geometry import CurveGeometry, EllipseGeometry, LineGeometry, PolygonGeometry
 from ImagingS.core.transform import (MatrixTransform, RotateTransform,
                                      ScaleTransform, SkewTransform,
                                      TransformGroup, TranslateTransform)
+from ImagingS.core.drawing import GeometryDrawing
 from ImagingS.document import Document
 
 
@@ -19,26 +20,28 @@ def test_sl() -> None:
     doc.brushes.append(Brushes.Black())
     doc.brushes.append(Brushes.White())
 
-    line = Line.create(Point.create(0, 0), Point.create(1, 1), "DDA")
+    lineG = LineGeometry.create(Point.create(0, 0), Point.create(1, 1), "DDA")
+    lineG.transform = TranslateTransform()
+    line = GeometryDrawing.create(lineG)
     line.id = "line"
-    line.transform = TranslateTransform()
 
-    curve = Curve.create([Point.create(2, 2)], "alg")
+    curveG = CurveGeometry.create([Point.create(2, 2)], "alg")
+    curveG.transform = SkewTransform.create(Point(), 1, 1)
+    curve = GeometryDrawing.create(curveG)
     curve.id = "curve"
-    curve.transform = SkewTransform.create(Point(), 1, 1)
 
-    poly = Polygon.create([Point.create(2, 2)], "DDA")
+    polyG = PolygonGeometry.create([Point.create(2, 2)], "DDA")
+    polyG.transform = RotateTransform.create(Point(), 3)
+    poly = GeometryDrawing.create(polyG)
     poly.id = "poly"
-    poly.transform = RotateTransform.create(Point(), 3)
 
-    ell = Ellipse.create(Rect.create(Point(), Size.create(10, 10)))
-    ell.id = "ell"
+    ellG = EllipseGeometry.create(Rect.create(Point(), Size.create(10, 10)))
     tg = TransformGroup()
     tg.children.append(MatrixTransform.create(np.ones((2, 2))))
     tg.children.append(ScaleTransform.create(Point(), 2))
-    tg.children.append(ClipTransform.create(
-        Rect.create(Point(), Size.create(10, 10)), "cli"))
-    ell.transform = tg
+    ellG.transform = tg
+    ell = GeometryDrawing.create(ellG)
+    ell.id = "ell"
 
     doc.drawings.append(line)
     doc.drawings.append(curve)
@@ -58,9 +61,16 @@ def test_sl() -> None:
         SolidBrush, doc.brushes[0]).color
     assert cast(SolidBrush, docl.brushes[1]).color == cast(
         SolidBrush, doc.brushes[1]).color
-    assert cast(Line, docl.drawings["line"]).start == line.start
-    assert cast(Line, docl.drawings["line"]).end == line.end
-    assert cast(Line, docl.drawings["line"]).algorithm == line.algorithm
-    assert cast(Curve, docl.drawings["curve"]).algorithm == curve.algorithm
-    assert cast(Polygon, docl.drawings["poly"]).algorithm == poly.algorithm
-    assert cast(Ellipse, docl.drawings["ell"]).area == ell.area
+    assert isinstance(docl.drawings["line"], GeometryDrawing)
+    assert cast(LineGeometry, cast(GeometryDrawing,
+                                   docl.drawings["line"]).geometry).start == lineG.start
+    assert cast(LineGeometry, cast(GeometryDrawing,
+                                   docl.drawings["line"]).geometry).end == lineG.end
+    assert cast(LineGeometry, cast(GeometryDrawing,
+                                   docl.drawings["line"]).geometry).algorithm == lineG.algorithm
+    assert cast(CurveGeometry, cast(GeometryDrawing,
+                                    docl.drawings["curve"]).geometry).algorithm == curveG.algorithm
+    assert cast(PolygonGeometry, cast(GeometryDrawing,
+                                      docl.drawings["poly"]).geometry).algorithm == polyG.algorithm
+    assert cast(EllipseGeometry, cast(GeometryDrawing,
+                                      docl.drawings["ell"]).geometry).area == ellG.area

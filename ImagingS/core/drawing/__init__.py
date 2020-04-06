@@ -1,7 +1,7 @@
-from ._Drawing import Drawing
+from ._Pen import Pen
 from ._DrawingContext import (BoundingAreaMeasurer, DrawingContext,
                               NumpyArrayDrawingContext, ProxyDrawingContext)
-from ._Pen import Pen
+from ._Drawing import Drawing
 from ._GeometryDrawing import GeometryDrawing
 
 __all__ = (

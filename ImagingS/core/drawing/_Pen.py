@@ -1,3 +1,4 @@
+from __future__ import annotations
 from ImagingS.core.brush import Brush, Brushes
 from ImagingS.core.serialization import PropertySerializable
 
@@ -7,6 +8,13 @@ class Pen(PropertySerializable):
         super().__init__()
         self.thickness = 1
         self.brush = Brushes.Black()
+
+    @staticmethod
+    def create(brush: Brush, thickness: float = 1) -> Pen:
+        result = Pen()
+        result.thickness = thickness
+        result.brush = brush
+        return result
 
     @property
     def thickness(self) -> float:

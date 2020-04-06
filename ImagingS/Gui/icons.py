@@ -1,67 +1,83 @@
 import qtawesome as qta
 
-list = qta.icon("mdi.format-list-numbered")
+from ImagingS.core import Color
+from ImagingS.core.brush import SolidBrush
+from . import converters
+from PyQt5.QtGui import QIcon
 
-set = qta.icon("mdi.code-braces")
+list: QIcon = qta.icon("mdi.format-list-numbered")
 
-dictionary = qta.icon("mdi.dictionary")
+set: QIcon = qta.icon("mdi.code-braces")
 
-vertex = qta.icon("mdi.vector-point")
+dictionary: QIcon = qta.icon("mdi.dictionary")
 
-stroke = qta.icon("mdi.border-color")
+vertex: QIcon = qta.icon("mdi.vector-point")
 
-fill = qta.icon("mdi.format-color-fill")
+stroke: QIcon = qta.icon("mdi.border-color")
 
-x = qta.icon("mdi.axis-x-arrow")
+fill: QIcon = qta.icon("mdi.format-color-fill")
 
-y = qta.icon("mdi.axis-y-arrow")
+x: QIcon = qta.icon("mdi.axis-x-arrow")
 
-id = qta.icon("mdi.identifier")
+y: QIcon = qta.icon("mdi.axis-y-arrow")
 
-angle = qta.icon("mdi.angle-acute")
+id: QIcon = qta.icon("mdi.identifier")
 
-matrix = qta.icon("mdi.matrix")
+angle: QIcon = qta.icon("mdi.angle-acute")
 
-center = qta.icon("mdi.image-filter-center-focus")
+matrix: QIcon = qta.icon("mdi.matrix")
 
-document = qta.icon("mdi.file-document")
+center: QIcon = qta.icon("mdi.image-filter-center-focus")
 
-size = qta.icon("mdi.format-size")
+document: QIcon = qta.icon("mdi.file-document")
 
-rect = qta.icon("mdi.rectangle-outline")
+size: QIcon = qta.icon("mdi.format-size")
 
-point = qta.icon("mdi.circle-medium")
+rect: QIcon = qta.icon("mdi.rectangle-outline")
 
-drawing = qta.icon("mdi.drawing-box")
+point: QIcon = qta.icon("mdi.circle-medium")
 
-geometry = qta.icon("mdi.drawing")
+drawing: QIcon = qta.icon("mdi.drawing-box")
 
-brush = qta.icon("mdi.brush")
+geometry: QIcon = qta.icon("mdi.drawing")
 
-solidBrush = qta.icon("mdi.solid")
+brush: QIcon = qta.icon("mdi.brush")
 
-property = qta.icon("mdi.database")
+solidBrush: QIcon = qta.icon("mdi.solid")
 
-transform = qta.icon("mdi.flash")
+property: QIcon = qta.icon("mdi.database")
 
-line = qta.icon("mdi.vector-line")
+transform: QIcon = qta.icon("mdi.flash")
 
-curve = qta.icon("mdi.vector-curve")
+line: QIcon = qta.icon("mdi.vector-line")
 
-ellipse = qta.icon("mdi.vector-ellipse")
+curve: QIcon = qta.icon("mdi.vector-curve")
 
-polygon = qta.icon("mdi.vector-polygon")
+ellipse: QIcon = qta.icon("mdi.vector-ellipse")
 
-skewTransform = qta.icon("mdi.skew-more")
+polygon: QIcon = qta.icon("mdi.vector-polygon")
 
-scaleTransform = qta.icon("mdi.relative-scale")
+clip: QIcon = qta.icon("mdi.crop")
 
-translateTransform = qta.icon("mdi.cursor-move")
+skewTransform: QIcon = qta.icon("mdi.skew-more")
 
-rotateTransform = qta.icon("mdi.rotate-left")
+scaleTransform: QIcon = qta.icon("mdi.relative-scale")
 
-matrixTransform = matrix
+translateTransform: QIcon = qta.icon("mdi.cursor-move")
 
-clipTransform = qta.icon("mdi.crop")
+rotateTransform: QIcon = qta.icon("mdi.rotate-left")
 
-groupTransform = qta.icon("mdi.group")
+matrixTransform: QIcon = matrix
+
+groupTransform: QIcon = qta.icon("mdi.group")
+
+
+def get_color_icon(color: Color) -> QIcon:
+    return qta.icon("mdi.invert-colors", color=converters.convert_color(color))
+
+
+def get_brush_icon(brush: SolidBrush) -> QIcon:
+    # pixmap = QPixmap(32, 32)
+    # pixmap.fill(converters.convert_color(color))
+    # return QIcon(pixmap)
+    return qta.icon("mdi.brush", color=converters.convert_color(brush.color))

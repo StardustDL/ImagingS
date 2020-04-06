@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ImagingS.core.brush import Brush, Brushes
 from ImagingS.core.geometry import Geometry
 
@@ -9,6 +11,12 @@ class GeometryDrawing(Drawing):
         super().__init__()
         self.stroke = Pen()
         self.fill = Brushes.White()
+
+    @staticmethod
+    def create(geometry: Geometry) -> GeometryDrawing:
+        result = GeometryDrawing()
+        result.geometry = geometry
+        return result
 
     @property
     def stroke(self) -> Pen:

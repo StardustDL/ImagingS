@@ -6,7 +6,7 @@ from PIL import Image
 
 from ImagingS.core import Color, Point, Rect, Size
 from ImagingS.core.brush import Brushes, SolidBrush
-from ImagingS.core.drawing import Drawing, GeometryDrawing, NumpyArrayDrawingContext
+from ImagingS.core.drawing import GeometryDrawing, NumpyArrayDrawingContext, Pen
 from ImagingS.core.geometry import CurveGeometry, EllipseGeometry, LineGeometry, PolygonGeometry
 from ImagingS.core.transform import (
     RotateTransform, ScaleTransform, Transform, TransformGroup,
@@ -14,18 +14,19 @@ from ImagingS.core.transform import (
 from ImagingS.document import Document
 
 
-def _append_transform(drawing: Drawing, transform: Transform) -> None:
+def _append_transform(drawing: GeometryDrawing, transform: Transform) -> None:
     assert not isinstance(transform, TransformGroup)
-    if drawing.transform is None:
-        drawing.transform = transform
-    elif isinstance(drawing.transform, TransformGroup):
-        drawing.transform.children.append(transform)
+    geometry = drawing.geometry
+    if geometry.transform is None:
+        geometry.transform = transform
+    elif isinstance(geometry.transform, TransformGroup):
+        geometry.transform.children.append(transform)
     else:
-        old = drawing.transform
+        old = geometry.transform
         new = TransformGroup()
         new.children.append(old)
         new.children.append(transform)
-        drawing.transform = new
+        geometry.transform = new
 
 
 class BuiltinInstruction:
@@ -54,10 +55,11 @@ class BuiltinInstruction:
             Color.create(int(argv[0]), int(argv[1]), int(argv[2])))
 
     def drawLine(self, argv: List[str]) -> None:
-        drawing = Line.create(Point.create(int(argv[1]), int(argv[2])), Point.create(
+        geometry = LineGeometry.create(Point.create(int(argv[1]), int(argv[2])), Point.create(
             int(argv[3]), int(argv[4])), argv[5])
+        drawing = GeometryDrawing.create(geometry)
         drawing.id = argv[0]
-        drawing.stroke = self.brush
+        drawing.stroke = Pen.create(self.brush)
         self.doc.drawings.append(drawing)
 
     def drawPolygon(self, argv: List[str]) -> None:
@@ -67,17 +69,19 @@ class BuiltinInstruction:
         while i < len(ps):
             vers.append(Point.create(int(ps[i]), int(ps[i+1])))
             i += 2
-        drawing = Polygon.create(vers, argv[-1])
+        geometry = PolygonGeometry.create(vers, argv[-1])
+        drawing = GeometryDrawing.create(geometry)
         drawing.id = argv[0]
-        drawing.stroke = self.brush
+        drawing.stroke = Pen.create(self.brush)
         self.doc.drawings.append(drawing)
 
     def drawEllipse(self, argv: List[str]) -> None:
         lt = Point.create(int(argv[1]), int(argv[2]))
         rb = Point.create(int(argv[3]), int(argv[4]))
-        drawing = Ellipse.create(Rect.from_points(lt, rb))
+        geometry = EllipseGeometry.create(Rect.from_points(lt, rb))
+        drawing = GeometryDrawing.create(geometry)
         drawing.id = argv[0]
-        drawing.stroke = self.brush
+        drawing.stroke = Pen.create(self.brush)
         self.doc.drawings.append(drawing)
 
     def drawCurve(self, argv: List[str]) -> None:
@@ -87,32 +91,38 @@ class BuiltinInstruction:
         while i < len(ps):
             vers.append(Point.create(int(ps[i]), int(ps[i+1])))
             i += 2
-        drawing = Curve.create(vers, argv[-1])
+        geometry = CurveGeometry.create(vers, argv[-1])
+        drawing = GeometryDrawing.create(geometry)
         drawing.id = argv[0]
-        drawing.stroke = self.brush
+        drawing.stroke = Pen.create(self.brush)
         self.doc.drawings.append(drawing)
 
     def translate(self, argv: List[str]) -> None:
         drawing = self.doc.drawings[argv[0]]
+        assert isinstance(drawing, GeometryDrawing)
         _append_transform(drawing, TranslateTransform.create(
             Point.create(int(argv[1]), int(argv[2]))))
 
     def rotate(self, argv: List[str]) -> None:
         drawing = self.doc.drawings[argv[0]]
+        assert isinstance(drawing, GeometryDrawing)
         _append_transform(drawing, RotateTransform.create(
             Point.create(int(argv[1]), int(argv[2])), int(argv[3]) / 360 * 2 * math.pi))
 
     def scale(self, argv: List[str]) -> None:
         drawing = self.doc.drawings[argv[0]]
+        assert isinstance(drawing, GeometryDrawing)
         _append_transform(drawing, ScaleTransform.create(
             Point.create(int(argv[1]), int(argv[2])), int(argv[3])))
 
     def clip(self, argv: List[str]) -> None:
         drawing = self.doc.drawings[argv[0]]
+        assert isinstance(drawing, GeometryDrawing)
+        assert isinstance(drawing.geometry, LineGeometry)
         lt = Point.create(int(argv[1]), int(argv[2]))
         rb = Point.create(int(argv[3]), int(argv[4]))
-        trans = ClipTransform.create(Rect.from_points(lt, rb), argv[5])
-        _append_transform(drawing, trans)
+        drawing.geometry.clip = Rect.from_points(lt, rb)
+        drawing.geometry.clip_algorithm = argv[5]
 
     def execute(self, ins: str) -> None:
         ins = ins.strip()

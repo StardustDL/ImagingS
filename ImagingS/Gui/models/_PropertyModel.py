@@ -16,8 +16,6 @@ from ImagingS.core.transform import (MatrixTransform,
 from ImagingS.document import Document
 from ImagingS.Gui import icons
 
-from ._BrushModel import get_color_icon
-
 
 class PropertyModel(QStandardItemModel):
     NAME, VALUE = range(2)
@@ -78,8 +76,10 @@ class PropertyModel(QStandardItemModel):
             item.setIcon(icons.center)
         elif name == "algorithm":
             item.setIcon(qta.icon("mdi.lightbulb"))
+        elif name == "clip":
+            item.setIcon(icons.clip)
         elif isinstance(value, Color):
-            item.setIcon(get_color_icon(value))
+            item.setIcon(icons.get_color_icon(value))
         elif isinstance(value, Document):
             item.setIcon(icons.document)
         elif isinstance(value, Size):
@@ -98,8 +98,6 @@ class PropertyModel(QStandardItemModel):
             item.setIcon(icons.scaleTransform)
         elif isinstance(value, MatrixTransform):
             item.setIcon(icons.matrixTransform)
-        elif isinstance(value, ClipTransform):
-            item.setIcon(icons.clipTransform)
         elif isinstance(value, TransformGroup):
             item.setIcon(icons.groupTransform)
         elif isinstance(value, SolidBrush):

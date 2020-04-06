@@ -38,7 +38,7 @@ class CurveGeometry(Geometry):
         self._algorithm = value
 
     def stroke_points(self, pen: Pen) -> Iterable[Point]:
-        raise NotImplementedError()
+        return []
 
     def fill_points(self) -> Iterable[Point]:
         return []

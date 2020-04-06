@@ -41,6 +41,6 @@ class DrawingItem(QGraphicsItem):
     def boundingRect(self) -> QRectF:  # must be efficient
         # to fix prepareGeometryChange bug
         return QRectF(0, 0, self._size.width(), self._size.height())
-        self.prepareGeometryChange()  # important!!!
-        area = self.drawing.boundingArea
-        return QRectF(area.origin.x - 1, area.origin.y - 1, area.size.width + 2, area.size.height + 2)
+        # self.prepareGeometryChange()  # important!!!
+        # area = self.drawing.boundingArea
+        # return QRectF(area.origin.x - 1, area.origin.y - 1, area.size.width + 2, area.size.height + 2)

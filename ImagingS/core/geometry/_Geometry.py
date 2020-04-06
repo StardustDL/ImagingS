@@ -8,6 +8,10 @@ from ImagingS.core.transform import Transform
 
 
 class Geometry(PropertySerializable, ABC):
+    def __init__(self) -> None:
+        super().__init__()
+        self.transform = None
+
     @property
     def transform(self) -> Optional[Transform]:
         return self._transform

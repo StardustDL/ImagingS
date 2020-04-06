@@ -1,24 +1,8 @@
-import qtawesome as qta
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QStandardItem, QStandardItemModel
+from PyQt5.QtGui import QStandardItem, QStandardItemModel
 
-from ImagingS.core import Color
 from ImagingS.core.brush import Brush, SolidBrush
-from ImagingS.Gui.graphics import converters
-
-
-def get_color_icon(color: Color) -> QIcon:
-    # pixmap = QPixmap(32, 32)
-    # pixmap.fill(converters.convert_color(color))
-    # return QIcon(pixmap)
-    return qta.icon("mdi.invert-colors", color=converters.convert_color(color))
-
-
-def get_brush_icon(color: Color) -> QIcon:
-    # pixmap = QPixmap(32, 32)
-    # pixmap.fill(converters.convert_color(color))
-    # return QIcon(pixmap)
-    return qta.icon("mdi.brush", color=converters.convert_color(color))
+from ImagingS.Gui import icons
 
 
 class BrushModel(QStandardItemModel):
@@ -31,8 +15,8 @@ class BrushModel(QStandardItemModel):
     def append(self, brush: Brush) -> None:
         fitem = None
         if isinstance(brush, SolidBrush):
-            fitem = QStandardItem(get_brush_icon(
-                brush.color), brush.color.to_hex())
+            fitem = QStandardItem(icons.get_brush_icon(
+                brush), brush.color.to_hex())
 
         if fitem:
             fitem.setEditable(False)

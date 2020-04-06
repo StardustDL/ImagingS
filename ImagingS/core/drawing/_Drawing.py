@@ -12,13 +12,14 @@ from . import BoundingAreaMeasurer, DrawingContext, ProxyDrawingContext
 class Drawing(PropertySerializable, IdObject, ABC):
     def __init__(self) -> None:
         super().__init__()
+        self.clip = None
 
     @property
-    def clip(self) -> Geometry:
+    def clip(self) -> Optional[Geometry]:
         return self._clip
 
     @clip.setter
-    def clip(self, value: Geometry) -> None:
+    def clip(self, value: Optional[Geometry]) -> None:
         self._clip = value
 
     @abstractmethod

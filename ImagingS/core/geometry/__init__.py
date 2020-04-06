@@ -1,6 +1,6 @@
+from ._Geometry import Geometry
 from ._Curve import CurveGeometry
 from ._Ellipse import EllipseGeometry
-from ._Geometry import Geometry
 from ._Line import LineGeometry
 from ._Polygon import PolygonGeometry
 from ._Rectangle import RectangleGeometry
