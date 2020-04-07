@@ -5,7 +5,7 @@ from typing import Iterable, List
 from ImagingS import Point
 from ImagingS.drawing import Pen
 
-from . import Geometry, LineGeometry
+from . import Geometry, LineGeometry, LineAlgorithm
 
 
 class PolygonGeometry(Geometry):
@@ -14,21 +14,21 @@ class PolygonGeometry(Geometry):
     def __init__(self) -> None:
         super().__init__()
         self.vertexes = []
-        self.algorithm = "DDA"
+        self.algorithm = LineAlgorithm.Dda
 
     @staticmethod
-    def create(vertexes: List[Point], algorithm: str) -> PolygonGeometry:
+    def create(vertexes: List[Point], algorithm: LineAlgorithm) -> PolygonGeometry:
         result = PolygonGeometry()
         result.vertexes = vertexes
         result.algorithm = algorithm
         return result
 
     @property
-    def algorithm(self) -> str:
+    def algorithm(self) -> LineAlgorithm:
         return self._algorithm
 
     @algorithm.setter
-    def algorithm(self, value: str) -> None:
+    def algorithm(self, value: LineAlgorithm) -> None:
         self._algorithm = value
 
     @property

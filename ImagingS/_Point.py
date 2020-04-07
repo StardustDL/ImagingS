@@ -49,16 +49,18 @@ class Point(PropertySerializable):
     def y(self, value: float) -> None:
         self._y = value
 
-    def to_array(self) -> np.ndarray:
-        return np.array([[self.x], [self.y]])
+    def to_homogeneous(self) -> np.ndarray:
+        return np.array([[self.x], [self.y], [1]])
 
     def as_tuple(self) -> Tuple[float, float]:
         return self.x, self.y
 
     @staticmethod
-    def from_array(arr: np.ndarray) -> Point:
-        assert len(arr) == 2 and len(arr[0]) == 1 and len(arr[1]) == 1
-        return Point.create(float(arr[0][0]), float(arr[1][0]))
+    def from_homogeneous(arr: np.ndarray) -> Point:
+        assert arr.shape == (3, 1)
+        w = float(arr[2][0])
+        assert w != 0
+        return Point.create(float(arr[0][0]) / w, float(arr[1][0]) / w)
 
 
 class Size(PropertySerializable):

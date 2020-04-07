@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict
+from typing import Dict, Tuple
 
 import numpy as np
 
@@ -12,10 +12,10 @@ class ScaleTransform(MatrixTransform):
     def __init__(self) -> None:
         super().__init__()
         self.center = Point()
-        self.factor = 1
+        self.factor = (1, 1)
 
     @staticmethod
-    def create(center: Point, factor: float) -> ScaleTransform:
+    def create(center: Point, factor: Tuple[float, float]) -> ScaleTransform:
         result = ScaleTransform()
         result.center = center
         result.factor = factor
@@ -30,15 +30,16 @@ class ScaleTransform(MatrixTransform):
         self._center = value
 
     @property
-    def factor(self) -> float:
+    def factor(self) -> Tuple[float, float]:
         return self._factor
 
     @factor.setter
-    def factor(self, value: float) -> None:
+    def factor(self, value: Tuple[float, float]) -> None:
         self._factor = value
         self.matrix = np.array(
-            [[self._factor, 0],
-             [0, self._factor]])
+            [[self._factor[0], 0, 0],
+             [0, self._factor[1], 0],
+             [0, 0, 1]])
 
     def transform(self, origin: Point) -> Point:
         return super().transform(origin - self._center) + self.center

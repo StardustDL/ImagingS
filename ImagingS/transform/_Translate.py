@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import Dict
+
+import numpy as np
+
 from ImagingS import Point
 
-from . import Transform
+from . import MatrixTransform
 
 
-class TranslateTransform(Transform):
+class TranslateTransform(MatrixTransform):
     def __init__(self) -> None:
         super().__init__()
         self.delta = Point()
@@ -23,6 +27,16 @@ class TranslateTransform(Transform):
     @delta.setter
     def delta(self, value: Point) -> None:
         self._delta = value
+        self.matrix = np.array(
+            [[1, 0, 0],
+             [0, 1, 0],
+             [self._delta.x, self._delta.y, 1]])
 
     def transform(self, origin: Point) -> Point:
         return origin + self._delta
+
+    def serialize(self) -> Dict:
+        result = super().serialize()
+        if MatrixTransform.S_Matrix in result:
+            del result[MatrixTransform.S_Matrix]
+        return result

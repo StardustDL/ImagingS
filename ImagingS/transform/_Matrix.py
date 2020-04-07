@@ -14,7 +14,7 @@ class MatrixTransform(Transform):
 
     def __init__(self) -> None:
         super().__init__()
-        self.matrix = np.eye(2)
+        self.matrix = np.eye(3)
 
     @staticmethod
     def create(matrix: np.ndarray) -> MatrixTransform:
@@ -28,10 +28,12 @@ class MatrixTransform(Transform):
 
     @matrix.setter
     def matrix(self, value: np.ndarray) -> None:
+        assert value.shape == (3, 3)
         self._matrix = value
 
     def transform(self, origin: Point) -> Point:
-        result = Point.from_array(np.dot(self.matrix, origin.to_array()))
+        result = Point.from_homogeneous(
+            np.dot(self.matrix, origin.to_homogeneous()))
         return result
 
     def serialize(self) -> Dict:
@@ -40,13 +42,12 @@ class MatrixTransform(Transform):
         if "matrix" in result:
             del result["matrix"]
 
-        result[self.S_Matrix] = [self.matrix[0][0], self.matrix[0][1],
-                                 self.matrix[1][0], self.matrix[1][1]]
+        result[self.S_Matrix] = [*self.matrix[0],
+                                 *self.matrix[1], *self.matrix[2]]
         return result
 
     def deserialize(self, data: Dict) -> None:
         if self.S_Matrix in data:
-            mat = data[self.S_Matrix]
-            del data[self.S_Matrix]
-            self.matrix = np.array([[mat[0], mat[1]], [mat[2], mat[3]]])
+            mat = data.pop(self.S_Matrix)
+            self.matrix = np.array([mat[0:3], mat[3:6], mat[6:9]])
         super().deserialize(data)

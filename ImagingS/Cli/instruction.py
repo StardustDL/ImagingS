@@ -9,7 +9,7 @@ from ImagingS.brush import Brushes, SolidBrush
 from ImagingS.document import Document
 from ImagingS.drawing import GeometryDrawing, NumpyArrayDrawingContext, Pen
 from ImagingS.geometry import (CurveGeometry, EllipseGeometry, LineGeometry,
-                               PolygonGeometry)
+                               PolygonGeometry, LineAlgorithm, LineClipAlgorithm, CurveAlgorithm)
 from ImagingS.transform import (RotateTransform, ScaleTransform, Transform,
                                 TransformGroup, TranslateTransform)
 
@@ -55,7 +55,7 @@ class BuiltinInstruction:
 
     def drawLine(self, argv: List[str]) -> None:
         geometry = LineGeometry.create(Point.create(int(argv[1]), int(argv[2])), Point.create(
-            int(argv[3]), int(argv[4])), argv[5])
+            int(argv[3]), int(argv[4])), LineAlgorithm.Dda if argv[5] == "DDA" else LineAlgorithm.Bresenham)
         drawing = GeometryDrawing.create(geometry)
         drawing.id = argv[0]
         drawing.stroke = Pen.create(self.brush)
@@ -68,7 +68,8 @@ class BuiltinInstruction:
         while i < len(ps):
             vers.append(Point.create(int(ps[i]), int(ps[i+1])))
             i += 2
-        geometry = PolygonGeometry.create(vers, argv[-1])
+        geometry = PolygonGeometry.create(
+            vers, LineAlgorithm.Dda if argv[-1] == "DDA" else LineAlgorithm.Bresenham)
         drawing = GeometryDrawing.create(geometry)
         drawing.id = argv[0]
         drawing.stroke = Pen.create(self.brush)
@@ -90,7 +91,8 @@ class BuiltinInstruction:
         while i < len(ps):
             vers.append(Point.create(int(ps[i]), int(ps[i+1])))
             i += 2
-        geometry = CurveGeometry.create(vers, argv[-1])
+        geometry = CurveGeometry.create(
+            vers, CurveAlgorithm.Bezier if argv[-1] == "Bezier" else CurveAlgorithm.BSpline)
         drawing = GeometryDrawing.create(geometry)
         drawing.id = argv[0]
         drawing.stroke = Pen.create(self.brush)
@@ -112,7 +114,7 @@ class BuiltinInstruction:
         drawing = self.doc.drawings.children[argv[0]]
         assert isinstance(drawing, GeometryDrawing)
         _append_transform(drawing, ScaleTransform.create(
-            Point.create(int(argv[1]), int(argv[2])), int(argv[3])))
+            Point.create(int(argv[1]), int(argv[2])), (int(argv[3]), int(argv[3]))))
 
     def clip(self, argv: List[str]) -> None:
         drawing = self.doc.drawings.children[argv[0]]
@@ -121,7 +123,8 @@ class BuiltinInstruction:
         lt = Point.create(int(argv[1]), int(argv[2]))
         rb = Point.create(int(argv[3]), int(argv[4]))
         drawing.geometry.clip = Rect.from_points(lt, rb)
-        drawing.geometry.clip_algorithm = argv[5]
+        drawing.geometry.clip_algorithm = LineClipAlgorithm.CohenSutherland if argv[
+            5] == "Cohen-Sutherland" else LineClipAlgorithm.LiangBarsky
 
     def execute(self, ins: str) -> None:
         ins = ins.strip()

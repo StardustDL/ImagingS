@@ -38,8 +38,9 @@ class RotateTransform(MatrixTransform):
     def angle(self, value: float) -> None:
         self._angle = value
         self.matrix = np.array(
-            [[cos(self._angle), -sin(self._angle)],
-             [sin(self._angle), cos(self._angle)]])
+            [[cos(self._angle), -sin(self._angle), 0],
+             [sin(self._angle), cos(self._angle), 0],
+             [0, 0, 1]])
 
     def transform(self, origin: Point) -> Point:
         return super().transform(origin - self.center) + self.center

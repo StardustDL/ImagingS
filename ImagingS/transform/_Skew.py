@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from math import tan
-from typing import Dict
+from typing import Dict, Tuple
 
 import numpy as np
 
@@ -13,21 +13,14 @@ class SkewTransform(MatrixTransform):
     def __init__(self) -> None:
         super().__init__()
         self.center = Point()
-        self._angle_x = 0
-        self.angle_y = 0
+        self.angle = (0, 0)
 
     @staticmethod
-    def create(center: Point, angle_x: float, angle_y: float) -> SkewTransform:
+    def create(center: Point, angle: Tuple[float, float]) -> SkewTransform:
         result = SkewTransform()
         result.center = center
-        result.angle_x = angle_x
-        result.angle_y = angle_y
+        result.angle = angle
         return result
-
-    def __update_matrix(self) -> None:
-        self.matrix = np.array(
-            [[1, tan(self._angle_x)],
-             [tan(self._angle_y), 1]])
 
     @property
     def center(self) -> Point:
@@ -38,22 +31,16 @@ class SkewTransform(MatrixTransform):
         self._center = value
 
     @property
-    def angle_x(self) -> float:
-        return self._angle_x
+    def angle(self) -> Tuple[float, float]:
+        return self._angle
 
-    @angle_x.setter
-    def angle_x(self, value: float) -> None:
-        self._angle_x = value
-        self.__update_matrix()
-
-    @property
-    def angle_y(self) -> float:
-        return self._angle_y
-
-    @angle_y.setter
-    def angle_y(self, value: float) -> None:
-        self._angle_y = value
-        self.__update_matrix()
+    @angle.setter
+    def angle(self, value: Tuple[float, float]) -> None:
+        self._angle = value
+        self.matrix = np.array(
+            [[1, tan(self._angle[0]), 0],
+             [tan(self._angle[1]), 1, 0],
+             [0, 0, 1]])
 
     def transform(self, origin: Point) -> Point:
         return super().transform(origin - self.center) + self.center

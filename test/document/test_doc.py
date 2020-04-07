@@ -9,7 +9,7 @@ from ImagingS.brush import Brushes, SolidBrush
 from ImagingS.document import Document
 from ImagingS.drawing import GeometryDrawing
 from ImagingS.geometry import (CurveGeometry, EllipseGeometry, LineGeometry,
-                               PolygonGeometry)
+                               PolygonGeometry, LineAlgorithm, CurveAlgorithm)
 from ImagingS.transform import (MatrixTransform, RotateTransform,
                                 ScaleTransform, SkewTransform, TransformGroup,
                                 TranslateTransform)
@@ -21,25 +21,26 @@ def test_sl() -> None:
     doc.brushes.append(Brushes.Black)
     doc.brushes.append(Brushes.White)
 
-    lineG = LineGeometry.create(Point.create(0, 0), Point.create(1, 1), "DDA")
+    lineG = LineGeometry.create(Point.create(
+        0, 0), Point.create(1, 1), LineAlgorithm.Dda)
     lineG.transform = TranslateTransform()
     line = GeometryDrawing.create(lineG)
     line.id = "line"
 
-    curveG = CurveGeometry.create([Point.create(2, 2)], "alg")
-    curveG.transform = SkewTransform.create(Point(), 1, 1)
+    curveG = CurveGeometry.create([Point.create(2, 2)], CurveAlgorithm.Bezier)
+    curveG.transform = SkewTransform.create(Point(), (1, 1))
     curve = GeometryDrawing.create(curveG)
     curve.id = "curve"
 
-    polyG = PolygonGeometry.create([Point.create(2, 2)], "DDA")
+    polyG = PolygonGeometry.create([Point.create(2, 2)], LineAlgorithm.Dda)
     polyG.transform = RotateTransform.create(Point(), 3)
     poly = GeometryDrawing.create(polyG)
     poly.id = "poly"
 
     ellG = EllipseGeometry.create(Rect.create(Point(), Size.create(10, 10)))
     tg = TransformGroup()
-    tg.children.append(MatrixTransform.create(np.ones((2, 2))))
-    tg.children.append(ScaleTransform.create(Point(), 2))
+    tg.children.append(MatrixTransform.create(np.ones((3, 3))))
+    tg.children.append(ScaleTransform.create(Point(), (2, 2)))
     ellG.transform = tg
     ell = GeometryDrawing.create(ellG)
     ell.id = "ell"

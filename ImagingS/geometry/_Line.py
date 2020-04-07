@@ -1,4 +1,5 @@
 from __future__ import annotations
+from enum import IntEnum, unique
 
 from typing import Iterable, Iterator, Optional
 
@@ -8,17 +9,29 @@ from ImagingS.drawing import Pen
 from . import Geometry
 
 
+@unique
+class LineAlgorithm(IntEnum):
+    Dda = 0
+    Bresenham = 1
+
+
+@unique
+class LineClipAlgorithm(IntEnum):
+    CohenSutherland = 0
+    LiangBarsky = 1
+
+
 class LineGeometry(Geometry):
     def __init__(self) -> None:
         super().__init__()
         self._start = Point()
         self.end = Point()
-        self.algorithm = "DDA"
+        self.algorithm = LineAlgorithm.Dda
         self.clip = None
-        self.clip_algorithm = "Cohen-Sutherland"
+        self.clip_algorithm = LineClipAlgorithm.CohenSutherland
 
     @staticmethod
-    def create(start: Point, end: Point, algorithm: str) -> LineGeometry:
+    def create(start: Point, end: Point, algorithm: LineAlgorithm) -> LineGeometry:
         result = LineGeometry()
         result.start = start
         result.end = end
@@ -42,19 +55,11 @@ class LineGeometry(Geometry):
         self._end = value
 
     @property
-    def algorithm(self) -> str:
+    def algorithm(self) -> LineAlgorithm:
         return self._algorithm
 
     @algorithm.setter
-    def algorithm(self, value: str) -> None:
-        self._algorithm = value
-
-    @property
-    def algorithm(self) -> str:
-        return self._algorithm
-
-    @algorithm.setter
-    def algorithm(self, value: str) -> None:
+    def algorithm(self, value: LineAlgorithm) -> None:
         self._algorithm = value
 
     @property
@@ -66,11 +71,11 @@ class LineGeometry(Geometry):
         self._clip = value
 
     @property
-    def clip_algorithm(self) -> str:
+    def clip_algorithm(self) -> LineClipAlgorithm:
         return self._clip_algorithm
 
     @clip_algorithm.setter
-    def clip_algorithm(self, value: str) -> None:
+    def clip_algorithm(self, value: LineClipAlgorithm) -> None:
         self._clip_algorithm = value
 
     @staticmethod
@@ -97,9 +102,9 @@ class LineGeometry(Geometry):
             start = self.transform.transform(start)
             end = self.transform.transform(end)
         gen = self.__gen_DDA(start, end)
-        if self.algorithm == "DDA":
+        if self.algorithm is LineAlgorithm.Dda:
             pass
-        elif self.algorithm == "Bresenham":
+        elif self.algorithm is LineAlgorithm.Bresenham:
             pass
         return gen
 
