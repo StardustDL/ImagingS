@@ -3,7 +3,7 @@ from __future__ import annotations
 from ImagingS.serialization import PropertySerializable
 
 
-def __hex_nopre(i: int) -> str:
+def _hex_nopre(i: int) -> str:
     return format(i, 'X')
 
 
@@ -22,16 +22,14 @@ class Color(PropertySerializable):
         result.b = b
         return result
 
-    def __eq__(self, obj) -> bool:
-        if isinstance(obj, Color):
-            return self.r == obj.r and self.g == obj.g and self.b == obj.b
-        return False
+    def __eq__(self, obj: Color) -> bool:
+        return self.r == obj.r and self.g == obj.g and self.b == obj.b
 
     def __repr__(self) -> str:
         return f"Color({self.r}, {self.g}, {self.b})"
 
     def to_hex(self) -> str:
-        return f"#{__hex_nopre(self.r).zfill(2)}{__hex_nopre(self.g).zfill(2)}{__hex_nopre(self.b).zfill(2)}"
+        return f"#{_hex_nopre(self.r).zfill(2)}{_hex_nopre(self.g).zfill(2)}{_hex_nopre(self.b).zfill(2)}"
 
     @property
     def r(self) -> int:

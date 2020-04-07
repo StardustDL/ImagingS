@@ -15,6 +15,8 @@ setColor 0 0 255
 drawPolygon poly1 80 80 80 160 160 160 160 80 Bresenham
 saveCanvas doc2
 translate line1 100 100
+translate line1 50 50
+translate line1 25 25
 rotate poly1 0 0 45
 saveCanvas doc3
 drawEllipse ell1 10 10 20 20

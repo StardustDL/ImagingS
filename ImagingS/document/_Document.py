@@ -52,7 +52,7 @@ class Document(PropertySerializable, IdObject):
         self._size = value
 
     def save(self, file, format: DocumentFormat = DocumentFormat.ISD) -> None:
-        if type is DocumentFormat.RAW:
+        if format is DocumentFormat.RAW:
             json.dump(self, file, ensure_ascii=False, indent=4, cls=Encoder)
         else:
             s = json.dumps(self, ensure_ascii=False, cls=Encoder)
@@ -62,7 +62,7 @@ class Document(PropertySerializable, IdObject):
 
     @staticmethod
     def load(file, format: DocumentFormat = DocumentFormat.ISD) -> Document:
-        if type is DocumentFormat.RAW:
+        if format is DocumentFormat.RAW:
             return json.load(file, cls=Decoder)
         else:
             data = file.read()

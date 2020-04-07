@@ -1,6 +1,6 @@
 from __future__ import annotations
-from enum import IntEnum, unique
 
+from enum import IntEnum, unique
 from typing import Iterable, Iterator, Optional
 
 from ImagingS import Point, Rect

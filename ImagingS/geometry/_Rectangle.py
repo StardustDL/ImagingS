@@ -4,7 +4,7 @@ from typing import Dict
 
 from ImagingS import Point, Rect
 
-from . import PolygonGeometry
+from . import LineAlgorithm, PolygonGeometry
 
 
 class RectangleGeometry(PolygonGeometry):
@@ -13,7 +13,7 @@ class RectangleGeometry(PolygonGeometry):
         self.area = Rect()
 
     @staticmethod
-    def create(area: Rect, algorithm: str) -> RectangleGeometry:
+    def create(area: Rect, algorithm: LineAlgorithm) -> RectangleGeometry:
         result = RectangleGeometry()
         result.area = area
         result.algorithm = algorithm

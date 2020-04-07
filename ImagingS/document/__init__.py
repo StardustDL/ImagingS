@@ -1,5 +1,6 @@
-from ._Document import Document
+from ._Document import Document, DocumentFormat
 
 __all__ = (
     "Document",
+    "DocumentFormat",
 )

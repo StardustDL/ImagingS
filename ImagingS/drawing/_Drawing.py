@@ -23,8 +23,7 @@ class Drawing(PropertySerializable, IdObject, ABC):
         self._clip = value
 
     @abstractmethod
-    def render(self, context: DrawingContext) -> None:
-        pass
+    def render(self, context: DrawingContext) -> None: pass
 
     @property
     def boundingArea(self) -> Rect:

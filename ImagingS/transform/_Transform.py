@@ -10,8 +10,7 @@ class Transform(PropertySerializable, ABC):
         super().__init__()
 
     @abstractmethod
-    def transform(self, origin: Point) -> Point:
-        pass
+    def transform(self, origin: Point) -> Point: pass
 
 
 class TransformGroup(Transform):

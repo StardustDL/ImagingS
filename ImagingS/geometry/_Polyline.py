@@ -5,10 +5,10 @@ from typing import Iterable, List
 from ImagingS import Point
 from ImagingS.drawing import Pen
 
-from . import Geometry, LineGeometry, LineAlgorithm
+from . import Geometry, LineAlgorithm, LineGeometry
 
 
-class PolygonGeometry(Geometry):
+class PolylineGeometry(Geometry):
     S_Vertexes = "vertexes"
 
     def __init__(self) -> None:
@@ -17,8 +17,8 @@ class PolygonGeometry(Geometry):
         self.algorithm = LineAlgorithm.Dda
 
     @staticmethod
-    def create(vertexes: List[Point], algorithm: LineAlgorithm) -> PolygonGeometry:
-        result = PolygonGeometry()
+    def create(vertexes: List[Point], algorithm: LineAlgorithm) -> PolylineGeometry:
+        result = PolylineGeometry()
         result.vertexes = vertexes
         result.algorithm = algorithm
         return result
@@ -43,13 +43,35 @@ class PolygonGeometry(Geometry):
         cnt = len(self.vertexes)
         if cnt == 0:
             return
-        for i in range(cnt):
-            j = (i+1) % cnt
+        for i in range(cnt - 1):
             ln = LineGeometry.create(self.vertexes[i],
-                                     self.vertexes[j], self.algorithm)
+                                     self.vertexes[i+1], self.algorithm)
             ln.transform = self.transform
             for point in ln.stroke_points(pen):
                 yield point
 
     def fill_points(self) -> Iterable[Point]:
         return []
+
+
+class PolygonGeometry(PolylineGeometry):
+    def __init__(self) -> None:
+        super().__init__()
+
+    @staticmethod
+    def create(vertexes: List[Point], algorithm: LineAlgorithm) -> PolygonGeometry:
+        result = PolygonGeometry()
+        result.vertexes = vertexes
+        result.algorithm = algorithm
+        return result
+
+    def stroke_points(self, pen: Pen) -> Iterable[Point]:
+        cnt = len(self.vertexes)
+        if cnt > 0:
+            for point in super().stroke_points(pen):
+                yield point
+            ln = LineGeometry.create(self.vertexes[-1],
+                                     self.vertexes[0], self.algorithm)
+            ln.transform = self.transform
+            for point in ln.stroke_points(pen):
+                yield point

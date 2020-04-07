@@ -1,6 +1,6 @@
-from enum import Enum
 import importlib
 import json
+from enum import Enum
 from typing import Any, Dict
 
 from . import Serializable

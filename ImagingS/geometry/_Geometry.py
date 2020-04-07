@@ -21,12 +21,10 @@ class Geometry(PropertySerializable, ABC):
         self._transform = value
 
     @abstractmethod
-    def stroke_points(self, pen: Pen) -> Iterable[Point]:
-        pass
+    def stroke_points(self, pen: Pen) -> Iterable[Point]: pass
 
     @abstractmethod
-    def fill_points(self) -> Iterable[Point]:
-        pass
+    def fill_points(self) -> Iterable[Point]: pass
 
     def in_stroke(self, pen: Pen, point: Point) -> bool:
         return point in self.stroke_points(pen)

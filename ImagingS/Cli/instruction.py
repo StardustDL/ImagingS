@@ -8,8 +8,9 @@ from ImagingS import Color, Point, Rect, Size
 from ImagingS.brush import Brushes, SolidBrush
 from ImagingS.document import Document
 from ImagingS.drawing import GeometryDrawing, NumpyArrayDrawingContext, Pen
-from ImagingS.geometry import (CurveGeometry, EllipseGeometry, LineGeometry,
-                               PolygonGeometry, LineAlgorithm, LineClipAlgorithm, CurveAlgorithm)
+from ImagingS.geometry import (CurveAlgorithm, CurveGeometry, EllipseGeometry,
+                               LineAlgorithm, LineClipAlgorithm, LineGeometry,
+                               PolygonGeometry)
 from ImagingS.transform import (RotateTransform, ScaleTransform, Transform,
                                 TransformGroup, TranslateTransform)
 

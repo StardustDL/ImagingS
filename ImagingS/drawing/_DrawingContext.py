@@ -8,12 +8,10 @@ from ImagingS import Color, Point, Rect, Size
 
 class DrawingContext(ABC):
     @abstractmethod
-    def point(self, position: Point, color: Color) -> None:
-        pass
+    def point(self, position: Point, color: Color) -> None: pass
 
     @abstractmethod
-    def area(self) -> Rect:
-        pass
+    def area(self) -> Rect: pass
 
 
 class BoundingAreaMeasurer(DrawingContext):

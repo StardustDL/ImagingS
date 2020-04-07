@@ -76,10 +76,8 @@ class Size(PropertySerializable):
         result.height = height
         return result
 
-    def __eq__(self, obj) -> bool:
-        if isinstance(obj, Size):
-            return self.width == obj.width and self.height == obj.height
-        return False
+    def __eq__(self, obj: Size) -> bool:
+        return self.width == obj.width and self.height == obj.height
 
     def __repr__(self) -> str:
         return f"Size({self.width}, {self.height})"
@@ -134,10 +132,8 @@ class Rect(PropertySerializable):
         ymin, ymax = min(y1, y2), max(y1, y2)
         return Rect.create(Point.create(xmin, ymin), Size.create(xmax - xmin, ymax - ymin))
 
-    def __eq__(self, obj) -> bool:
-        if isinstance(obj, Rect):
-            return self.origin == obj.origin and self.size == obj.size
-        return False
+    def __eq__(self, obj: Rect) -> bool:
+        return self.origin == obj.origin and self.size == obj.size
 
     def __repr__(self) -> str:
         return f"Rect({self.origin}, {self.size})"
