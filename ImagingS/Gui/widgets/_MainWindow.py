@@ -6,10 +6,10 @@ from PIL import Image
 from PyQt5.QtWidgets import QColorDialog, QFileDialog, QMainWindow
 
 import ImagingS.Gui.ui as ui
-from ImagingS.core import Color
-from ImagingS.core.brush import Brush, Brushes, SolidBrush
-from ImagingS.core.drawing import Drawing, NumpyArrayDrawingContext
+from ImagingS import Color
+from ImagingS.brush import Brush, Brushes, SolidBrush
 from ImagingS.document import Document
+from ImagingS.drawing import Drawing, NumpyArrayDrawingContext
 from ImagingS.Gui import icons
 from ImagingS.Gui.app import Application
 from ImagingS.Gui.models import BrushModel, DrawingModel, PropertyModel
@@ -54,6 +54,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.actDrawingRemove_triggered)
         self.actDrawingClear.triggered.connect(self.actDrawingClear_triggered)
 
+        self.actViewVisual.triggered.connect(self.actViewVisual_triggered)
+        self.actViewCode.triggered.connect(self.actViewCode_triggered)
+
         self.modelBrush = BrushModel(self)
         self.trvBrushes.setModel(self.modelBrush)
         self.trvBrushes.clicked.connect(
@@ -68,12 +71,11 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.trvProperties.setModel(self.modelProperties)
 
         self.widCode.uploaded.connect(self.widCode_uploaded)
-
-        self.tbxMain.setCurrentIndex(0)  # Visual
-
         self.tbxMain.currentChanged.connect(self.tbxMain_currentChanged)
 
         Application.current().documentChanged.connect(self.app_documentChanged)
+
+        self.actViewVisual.trigger()
         self.actNew.trigger()
 
     def setupCode(self):
@@ -140,8 +142,10 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actToggleBrushes.setIcon(icons.brush)
         self.actToggleProperties.setIcon(icons.property)
         self.actToggleTransforms.setIcon(icons.transform)
-        self.tbxMain.setItemIcon(0, qta.icon("mdi.image"))
-        self.tbxMain.setItemIcon(1, qta.icon("mdi.code-tags"))
+        self.tbxMain.setItemIcon(0, icons.visual)
+        self.tbxMain.setItemIcon(1, icons.code)
+        self.actViewCode.setIcon(icons.code)
+        self.actViewVisual.setIcon(icons.visual)
         self.setWindowIcon(qta.icon("mdi.pencil-box-multiple", color="purple"))
 
     @property
@@ -249,6 +253,16 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.modelProperties.fresh(doc)
             self.trvProperties.expandAll()
             self.trvDrawings.clearSelection()
+
+    def actViewVisual_triggered(self):
+        self.actViewCode.setChecked(False)
+        self.actViewVisual.setChecked(True)
+        self.tbxMain.setCurrentIndex(0)
+
+    def actViewCode_triggered(self):
+        self.actViewCode.setChecked(True)
+        self.actViewVisual.setChecked(False)
+        self.tbxMain.setCurrentIndex(1)
 
     def actDrawingRemove_triggered(self):
         indexs = self.trvDrawings.selectedIndexes()

@@ -4,8 +4,8 @@ from typing import Dict
 
 import numpy as np
 
-from ImagingS.core import Point
-from ImagingS.core.transform import MatrixTransform
+from ImagingS import Point
+from ImagingS.transform import MatrixTransform
 
 
 class ScaleTransform(MatrixTransform):
@@ -41,7 +41,7 @@ class ScaleTransform(MatrixTransform):
              [0, self._factor]])
 
     def transform(self, origin: Point) -> Point:
-        return super().transform(origin - self._center)
+        return super().transform(origin - self._center) + self.center
 
     def serialize(self) -> Dict:
         result = super().serialize()

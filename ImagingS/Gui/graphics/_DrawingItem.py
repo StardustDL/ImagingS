@@ -4,8 +4,8 @@ from PyQt5.QtCore import QRectF, QSizeF
 from PyQt5.QtGui import QColor, QPainter
 from PyQt5.QtWidgets import QGraphicsItem, QStyleOptionGraphicsItem, QWidget
 
-from ImagingS.core import Point, Rect
-from ImagingS.core.drawing import Drawing
+from ImagingS import Point, Rect
+from ImagingS.drawing import Drawing
 from ImagingS.Gui import converters
 
 from . import PainterDrawingContext
@@ -16,28 +16,26 @@ class DrawingItem(QGraphicsItem):
         super().__init__(parent)
         self._drawing = drawing
         self._size = size
-        self.is_active = False
+        self._is_active = False
 
     @property
     def drawing(self) -> Drawing:
         return self._drawing
 
-    @property
-    def is_active(self) -> bool:
-        return self._is_active
+    def activate(self) -> None:
+        self._is_active = True
 
-    @is_active.setter
-    def is_active(self, value: bool) -> None:
-        self._is_active = value
+    def deactivate(self) -> None:
+        self._is_active = False
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: Optional[QWidget] = ...) -> None:
         context = PainterDrawingContext(
-            painter, Rect.create(Point(), converters.convert_qsize(self._size)))
+            painter, Rect.create(Point(), converters.size(self._size)))
         self.drawing.render(context)
-        if self.is_active:
+        if self._is_active:
             painter.setPen(QColor(255, 0, 0))
             area = self.drawing.boundingArea
-            painter.drawRect(converters.convert_rect_area(area))
+            painter.drawRect(converters.qrect(area))
 
     def boundingRect(self) -> QRectF:  # must be efficient
         # to fix prepareGeometryChange bug

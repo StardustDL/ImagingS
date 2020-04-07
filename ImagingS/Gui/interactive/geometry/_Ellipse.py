@@ -1,8 +1,8 @@
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QKeyEvent
 
-from ImagingS.core import Size
-from ImagingS.core.geometry import Ellipse
+from ImagingS import Size
+from ImagingS.geometry import Ellipse
 from ImagingS.Gui.graphics import converters
 
 from .. import Interactive

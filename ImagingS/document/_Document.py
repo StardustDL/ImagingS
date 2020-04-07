@@ -3,18 +3,23 @@ from __future__ import annotations
 import json
 import lzma
 import uuid
+from enum import IntEnum, unique
 from typing import List
 
-from ImagingS.core import IdObject, Size
-from ImagingS.core.brush import Brush
-from ImagingS.core.drawing import DrawingGroup
-from ImagingS.core.serialization import PropertySerializable
-from ImagingS.core.serialization.json import Decoder, Encoder
+from ImagingS import IdObject, Size
+from ImagingS.brush import Brush
+from ImagingS.drawing import DrawingGroup
+from ImagingS.serialization import PropertySerializable
+from ImagingS.serialization.json import Decoder, Encoder
+
+
+@unique
+class DocumentFormat(IntEnum):
+    ISD = 1
+    RAW = 2
 
 
 class Document(PropertySerializable, IdObject):
-    FILE_ISD, FILE_RAW = range(2)
-
     def __init__(self) -> None:
         super().__init__()
         self.id = str(uuid.uuid1())
@@ -46,8 +51,8 @@ class Document(PropertySerializable, IdObject):
     def size(self, value: Size) -> None:
         self._size = value
 
-    def save(self, file, type=0) -> None:
-        if type == self.FILE_RAW:
+    def save(self, file, format: DocumentFormat = DocumentFormat.ISD) -> None:
+        if type is DocumentFormat.RAW:
             json.dump(self, file, ensure_ascii=False, indent=4, cls=Encoder)
         else:
             s = json.dumps(self, ensure_ascii=False, cls=Encoder)
@@ -55,9 +60,9 @@ class Document(PropertySerializable, IdObject):
             data = lzma.compress(data)
             file.write(data)
 
-    @classmethod
-    def load(cls, file, type=0) -> Document:
-        if type == cls.FILE_RAW:
+    @staticmethod
+    def load(file, format: DocumentFormat = DocumentFormat.ISD) -> Document:
+        if type is DocumentFormat.RAW:
             return json.load(file, cls=Decoder)
         else:
             data = file.read()

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Iterable, List
 
-from ImagingS.core import Point
-from ImagingS.core.drawing import Pen
+from ImagingS import Point
+from ImagingS.drawing import Pen
 
 from . import Geometry, LineGeometry
 

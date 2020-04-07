@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ImagingS.core import Color, Colors, Point, Rect
+from ImagingS import Color, Colors, Point, Rect
 
 from . import Brush
 
@@ -8,7 +8,7 @@ from . import Brush
 class SolidBrush(Brush):
     def __init__(self) -> None:
         super().__init__()
-        self.color = Colors.Black()
+        self.color = Colors.Black
 
     @staticmethod
     def create(color: Color) -> SolidBrush:
@@ -25,7 +25,7 @@ class SolidBrush(Brush):
         self._color = value
 
     def color_at(self, position: Point, area: Rect) -> Color:
-        return self._color
+        return self.color
 
     def __repr__(self) -> str:
         return f"SolidBrush({self.color})"

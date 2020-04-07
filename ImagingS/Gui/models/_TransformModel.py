@@ -1,8 +1,10 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 
-from ImagingS.core.transform import Transform, TransformGroup, TranslateTransform, ScaleTransform, RotateTransform, MatrixTransform, SkewTransform
 from ImagingS.Gui import icons
+from ImagingS.transform import (MatrixTransform, RotateTransform,
+                                ScaleTransform, SkewTransform, Transform,
+                                TransformGroup, TranslateTransform)
 
 
 class TransformModel(QStandardItemModel):

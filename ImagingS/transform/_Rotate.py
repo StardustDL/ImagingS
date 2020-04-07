@@ -5,8 +5,8 @@ from typing import Dict
 
 import numpy as np
 
-from ImagingS.core import Point
-from ImagingS.core.transform import MatrixTransform
+from ImagingS import Point
+from ImagingS.transform import MatrixTransform
 
 
 class RotateTransform(MatrixTransform):

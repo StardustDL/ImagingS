@@ -4,7 +4,7 @@ from PyQt5.QtCore import QPointF, QRectF, QSizeF, Qt
 from PyQt5.QtGui import QKeyEvent, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsScene, QGraphicsView
 
-from ImagingS.core.drawing import Drawing
+from ImagingS.drawing import Drawing
 from ImagingS.Gui.interactive import Interactive
 
 from . import DrawingItem
@@ -29,11 +29,16 @@ class Canvas(QGraphicsView):
 
     @interactive.setter
     def interactive(self, value: Optional[Interactive]) -> None:
+        if value is not None:
+            value.started.connect(self._interactive_started)
+            value.ended.connect(self._interactive_ended)
+            value.start()
         self._interactive = value
-        if self._interactive is not None:
-            self._interactive.started.connect(self._interactive_started)
-            self._interactive.ended.connect(self._interactive_ended)
-            self._interactive.start()
+
+    def _interactive_force_end(self):
+        if self._interactive is None:
+            return
+        self._interactive_ended(self._interactive)
 
     def _interactive_started(self, inter: Interactive):
         if inter.view_item is not None:
@@ -72,7 +77,7 @@ class Canvas(QGraphicsView):
         self.scene().removeItem(item)
         self.rerender()
 
-    def select(self, name: Optional[str]) -> None:
+    def select(self, name: Optional[str] = None) -> None:
         if name is None:
             if self._active_item is not None:
                 self._active_item.is_active = False

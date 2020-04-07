@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Iterable, List, Optional
 
-from ImagingS.core import Point
-from ImagingS.core.drawing import Pen
-from ImagingS.core.serialization import PropertySerializable
-from ImagingS.core.transform import Transform
+from ImagingS import Point
+from ImagingS.drawing import Pen
+from ImagingS.serialization import PropertySerializable
+from ImagingS.transform import Transform
 
 
 class Geometry(PropertySerializable, ABC):

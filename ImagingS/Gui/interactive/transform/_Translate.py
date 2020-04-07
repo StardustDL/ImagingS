@@ -4,9 +4,9 @@ from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem
 
-from ImagingS.core.drawing import Drawing
-from ImagingS.core.transform import TranslateTransform
+from ImagingS.drawing import Drawing
 from ImagingS.Gui.graphics import converters
+from ImagingS.transform import TranslateTransform
 
 from .. import Interactive
 

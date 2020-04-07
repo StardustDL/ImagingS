@@ -4,17 +4,17 @@ import qtawesome as qta
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 
-from ImagingS.core import Color, Point, Rect, Size
-from ImagingS.core.brush import Brush, SolidBrush
-from ImagingS.core.drawing import Drawing
-from ImagingS.core.geometry import (CurveGeometry, EllipseGeometry, Geometry,
-                                    LineGeometry, PolygonGeometry)
-from ImagingS.core.serialization import get_properties
-from ImagingS.core.transform import (MatrixTransform, RotateTransform,
-                                     ScaleTransform, SkewTransform, Transform,
-                                     TransformGroup, TranslateTransform)
+from ImagingS import Color, Point, Rect, Size
+from ImagingS.brush import Brush, SolidBrush
 from ImagingS.document import Document
+from ImagingS.drawing import Drawing
+from ImagingS.geometry import (CurveGeometry, EllipseGeometry, Geometry,
+                               LineGeometry, PolygonGeometry)
 from ImagingS.Gui import icons
+from ImagingS.serialization import get_properties
+from ImagingS.transform import (MatrixTransform, RotateTransform,
+                                ScaleTransform, SkewTransform, Transform,
+                                TransformGroup, TranslateTransform)
 
 
 class PropertyModel(QStandardItemModel):

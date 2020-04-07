@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ImagingS.core import Point
+from ImagingS import Point
 
 from . import Transform
 

@@ -1,73 +1,11 @@
 from __future__ import annotations
 
 from math import fabs
-from typing import Dict, Generic, Iterator, List, Optional, Tuple, TypeVar
+from typing import Optional, Tuple
 
 import numpy as np
 
-from ImagingS.core.serialization import PropertySerializable
-
-T = TypeVar("T")
-
-
-class IdObject:
-    def __init__(self) -> None:
-        super().__init__()
-        self.id = ""
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @id.setter
-    def id(self, value: str) -> None:
-        self._id = value
-
-
-class IdObjectList(PropertySerializable, Generic[T]):
-    def __init__(self) -> None:
-        super().__init__()
-        self.items = []
-
-    @property
-    def items(self) -> List[T]:
-        return self._items
-
-    @items.setter
-    def items(self, value: List[T]) -> None:
-        if hasattr(self, "_items") and self._items is value:
-            return
-        self._items: List[T] = []
-        self._ids: Dict[str, T] = {}
-        for item in value:
-            self.append(item)
-
-    def contains(self, key: str) -> bool:
-        return key in self._ids
-
-    def append(self, item: T) -> None:
-        if self.contains(item.id):
-            raise Exception(f"The id '{item.id}' has been added.")
-        self._items.append(item)
-        self._ids[item.id] = item
-
-    def at(self, index: int) -> T:
-        return self._items[index]
-
-    def clear(self) -> None:
-        self.items = []
-
-    def __delitem__(self, key: str) -> None:
-        if not self.contains(key):
-            raise KeyError(key)
-        self._items.remove(self._ids[key])
-        del self._ids[key]
-
-    def __getitem__(self, key: str) -> T:
-        return self._ids[key]
-
-    def __iter__(self) -> Iterator[T]:
-        return iter(self._items)
+from ImagingS.serialization import PropertySerializable
 
 
 class Point(PropertySerializable):
@@ -123,83 +61,6 @@ class Point(PropertySerializable):
         return Point.create(float(arr[0][0]), float(arr[1][0]))
 
 
-def _hex_nopre(i: int) -> str:
-    return format(i, 'X')
-
-
-class Color(PropertySerializable):
-    def __init__(self) -> None:
-        super().__init__()
-        self.r = 0
-        self.g = 0
-        self.b = 0
-
-    @staticmethod
-    def create(r: int, g: int, b: int) -> Color:
-        result = Color()
-        result.r = r
-        result.g = g
-        result.b = b
-        return result
-
-    def __eq__(self, obj) -> bool:
-        if isinstance(obj, Color):
-            return self.r == obj.r and self.g == obj.g and self.b == obj.b
-        return False
-
-    def __repr__(self) -> str:
-        return f"Color({self.r}, {self.g}, {self.b})"
-
-    def to_hex(self) -> str:
-        return f"#{_hex_nopre(self.r).zfill(2)}{_hex_nopre(self.g).zfill(2)}{_hex_nopre(self.b).zfill(2)}"
-
-    @property
-    def r(self) -> int:
-        return self._r
-
-    @r.setter
-    def r(self, value: int) -> None:
-        self._r = value
-
-    @property
-    def g(self) -> int:
-        return self._g
-
-    @g.setter
-    def g(self, value: int) -> None:
-        self._g = value
-
-    @property
-    def b(self) -> int:
-        return self._b
-
-    @b.setter
-    def b(self, value: int) -> None:
-        self._b = value
-
-
-class Colors:
-    @staticmethod
-    def Black() -> Color:
-        return Color.create(0, 0, 0)
-
-    @staticmethod
-    def White() -> Color:
-        return Color.create(255, 255, 255)
-
-    @staticmethod
-    def Red() -> Color:
-        return Color.create(255, 0, 0)
-
-    @staticmethod
-    def Blue() -> Color:
-        return Color.create(0, 0, 255)
-
-    @staticmethod
-    def Green() -> Color:
-        return Color.create(0, 255, 0)
-
-
 class Size(PropertySerializable):
     def __init__(self) -> None:
         super().__init__()
@@ -242,7 +103,7 @@ class Size(PropertySerializable):
 
 
 class Rect(PropertySerializable):
-    __infinite: Optional[Rect] = None
+    _infinite: Optional[Rect] = None
 
     def __init__(self) -> None:
         super().__init__()
@@ -258,10 +119,10 @@ class Rect(PropertySerializable):
 
     @classmethod
     def infinite(cls) -> Rect:
-        if cls.__infinite is None:
-            cls.__infinite = Rect.from_points(Point.create(
+        if cls._infinite is None:
+            cls._infinite = Rect.from_points(Point.create(
                 float("-inf"), float("-inf")), Point.create(float("inf"), float("inf")))
-        return cls.__infinite
+        return cls._infinite
 
     @staticmethod
     def from_points(p1: Point, p2: Point) -> Rect:

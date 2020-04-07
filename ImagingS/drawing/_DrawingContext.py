@@ -3,7 +3,7 @@ from typing import Callable
 
 import numpy as np
 
-from ImagingS.core import Color, Point, Rect, Size
+from ImagingS import Color, Point, Rect, Size
 
 
 class DrawingContext(ABC):
@@ -17,7 +17,7 @@ class DrawingContext(ABC):
 
 
 class BoundingAreaMeasurer(DrawingContext):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._lx = float("inf")
         self._ly = float("inf")
@@ -47,7 +47,7 @@ class NumpyArrayDrawingContext(DrawingContext):
         result.fill(255)
         return result
 
-    def __init__(self, array: np.ndarray):
+    def __init__(self, array: np.ndarray) -> None:
         self.array = array
 
     @property
@@ -75,7 +75,7 @@ class NumpyArrayDrawingContext(DrawingContext):
 
 
 class ProxyDrawingContext(DrawingContext):
-    def __init__(self, fpoint: Callable[[Point, Color], None], farea: Callable[[], Rect]):
+    def __init__(self, fpoint: Callable[[Point, Color], None], farea: Callable[[], Rect]) -> None:
         super().__init__()
         self._fpoint = fpoint
         self._farea = farea

@@ -4,22 +4,22 @@ from typing import cast
 
 import numpy as np
 
-from ImagingS.core import Point, Rect, Size
-from ImagingS.core.brush import Brushes, SolidBrush
-from ImagingS.core.drawing import GeometryDrawing
-from ImagingS.core.geometry import (CurveGeometry, EllipseGeometry,
-                                    LineGeometry, PolygonGeometry)
-from ImagingS.core.transform import (MatrixTransform, RotateTransform,
-                                     ScaleTransform, SkewTransform,
-                                     TransformGroup, TranslateTransform)
+from ImagingS import Point, Rect, Size
+from ImagingS.brush import Brushes, SolidBrush
 from ImagingS.document import Document
+from ImagingS.drawing import GeometryDrawing
+from ImagingS.geometry import (CurveGeometry, EllipseGeometry, LineGeometry,
+                               PolygonGeometry)
+from ImagingS.transform import (MatrixTransform, RotateTransform,
+                                ScaleTransform, SkewTransform, TransformGroup,
+                                TranslateTransform)
 
 
 def test_sl() -> None:
     curdir = get_temp_dir()
     doc = Document()
-    doc.brushes.append(Brushes.Black())
-    doc.brushes.append(Brushes.White())
+    doc.brushes.append(Brushes.Black)
+    doc.brushes.append(Brushes.White)
 
     lineG = LineGeometry.create(Point.create(0, 0), Point.create(1, 1), "DDA")
     lineG.transform = TranslateTransform()

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from ImagingS.core import Color, Point, Rect
-from ImagingS.core.serialization import PropertySerializable
+from ImagingS import Color, Point, Rect
+from ImagingS.serialization import PropertySerializable
 
 
 class Brush(PropertySerializable, ABC):

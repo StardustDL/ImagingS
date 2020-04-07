@@ -4,16 +4,14 @@ from typing import List
 
 from PIL import Image
 
-from ImagingS.core import Color, Point, Rect, Size
-from ImagingS.core.brush import Brushes, SolidBrush
-from ImagingS.core.drawing import (GeometryDrawing, NumpyArrayDrawingContext,
-                                   Pen)
-from ImagingS.core.geometry import (CurveGeometry, EllipseGeometry,
-                                    LineGeometry, PolygonGeometry)
-from ImagingS.core.transform import (RotateTransform, ScaleTransform,
-                                     Transform, TransformGroup,
-                                     TranslateTransform)
+from ImagingS import Color, Point, Rect, Size
+from ImagingS.brush import Brushes, SolidBrush
 from ImagingS.document import Document
+from ImagingS.drawing import GeometryDrawing, NumpyArrayDrawingContext, Pen
+from ImagingS.geometry import (CurveGeometry, EllipseGeometry, LineGeometry,
+                               PolygonGeometry)
+from ImagingS.transform import (RotateTransform, ScaleTransform, Transform,
+                                TransformGroup, TranslateTransform)
 
 
 def _append_transform(drawing: GeometryDrawing, transform: Transform) -> None:
@@ -34,7 +32,7 @@ def _append_transform(drawing: GeometryDrawing, transform: Transform) -> None:
 class BuiltinInstruction:
     def __init__(self, doc: Document, output_dir: str) -> None:
         self.doc = doc
-        self.brush = Brushes.Black()
+        self.brush = Brushes.Black
         self.output_dir = output_dir
 
     def resetCanvas(self, argv: List[str]) -> None:

@@ -135,6 +135,9 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
+    <addaction name="actViewVisual"/>
+    <addaction name="actViewCode"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="mnuDrawing">
     <property name="title">
@@ -439,6 +442,22 @@
   <action name="actView">
    <property name="text">
     <string>Visual</string>
+   </property>
+  </action>
+  <action name="actViewVisual">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Visual</string>
+   </property>
+  </action>
+  <action name="actViewCode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Code</string>
    </property>
   </action>
  </widget>

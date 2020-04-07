@@ -1,14 +1,18 @@
 import qtawesome as qta
 from PyQt5.QtGui import QIcon
 
-from ImagingS.core import Color
-from ImagingS.core.brush import SolidBrush
+from ImagingS import Color
+from ImagingS.brush import SolidBrush
 
 from . import converters
 
 list: QIcon = qta.icon("mdi.format-list-numbered")
 
 set: QIcon = qta.icon("mdi.code-braces")
+
+code: QIcon = qta.icon("mdi.code-tags")
+
+visual: QIcon = qta.icon("mdi.image")
 
 dictionary: QIcon = qta.icon("mdi.dictionary")
 
@@ -74,11 +78,11 @@ groupTransform: QIcon = qta.icon("mdi.group")
 
 
 def get_color_icon(color: Color) -> QIcon:
-    return qta.icon("mdi.invert-colors", color=converters.convert_color(color))
+    return qta.icon("mdi.invert-colors", color=converters.qcolor(color))
 
 
 def get_brush_icon(brush: SolidBrush) -> QIcon:
     # pixmap = QPixmap(32, 32)
     # pixmap.fill(converters.convert_color(color))
     # return QIcon(pixmap)
-    return qta.icon("mdi.brush", color=converters.convert_color(brush.color))
+    return qta.icon("mdi.brush", color=converters.qcolor(brush.color))

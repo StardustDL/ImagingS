@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QKeyEvent
 
-from ImagingS.core.geometry import Line
+from ImagingS.geometry import Line
 from ImagingS.Gui.graphics import converters
 
 from .. import Interactive

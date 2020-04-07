@@ -5,12 +5,11 @@ from PyQt5.QtCore import QSizeF, pyqtSignal
 from PyQt5.QtWidgets import QWidget
 
 import ImagingS.Gui.ui as ui
-from ImagingS.core.brush import Brush, SolidBrush
-from ImagingS.core.drawing import Drawing, GeometryDrawing
-from ImagingS.core.geometry import (CurveGeometry, EllipseGeometry, Geometry,
-                                    LineGeometry, PolygonGeometry)
-from ImagingS.core.transform import MatrixTransform, TransformGroup
+from ImagingS.brush import Brush, SolidBrush
 from ImagingS.document import Document
+from ImagingS.drawing import Drawing, GeometryDrawing
+from ImagingS.geometry import (CurveGeometry, EllipseGeometry, Geometry,
+                               LineGeometry, PolygonGeometry)
 from ImagingS.Gui import converters, icons
 from ImagingS.Gui.graphics import Canvas
 from ImagingS.Gui.interactive import Interactive
@@ -23,6 +22,7 @@ from ImagingS.Gui.interactive.transform import (ClipTransformInteractive,
                                                 ScaleTransformInteractive,
                                                 SkewTransformInteractive,
                                                 TranslateTransformInteractive)
+from ImagingS.transform import MatrixTransform, TransformGroup
 
 
 class VisualPage(QWidget, ui.VisualPage):

@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from ImagingS.core.brush import Brush, Brushes
-from ImagingS.core.serialization import PropertySerializable
+from ImagingS.brush import Brush, Brushes
+from ImagingS.serialization import PropertySerializable
 
 
 class Pen(PropertySerializable):
     def __init__(self):
         super().__init__()
         self.thickness = 1
-        self.brush = Brushes.Black()
+        self.brush = Brushes.Black
 
     @staticmethod
     def create(brush: Brush, thickness: float = 1) -> Pen:

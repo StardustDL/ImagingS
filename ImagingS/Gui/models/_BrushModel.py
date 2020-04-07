@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 
-from ImagingS.core.brush import Brush, SolidBrush
+from ImagingS.brush import Brush, SolidBrush
 from ImagingS.Gui import icons
 
 

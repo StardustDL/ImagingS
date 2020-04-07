@@ -4,7 +4,7 @@ from typing import Dict
 
 import numpy as np
 
-from ImagingS.core import Point
+from ImagingS import Point
 
 from . import Transform
 

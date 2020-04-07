@@ -34,7 +34,6 @@ if ($args.Count -gt 0) {
             Get-ChildItem -Include htmlcov -Recurse | Remove-item -Recurse
             Get-ChildItem -Include .pytest_cache -Recurse | Remove-item -Recurse
             Get-ChildItem -Include __pycache__ -Recurse | Remove-item -Recurse
-            Get-ChildItem ./ImagingS/Gui/ui -Exclude .gitignore | Remove-item -Recurse
         }
         "clean-ui" {
             Write-Output "Clean generated UI files.."

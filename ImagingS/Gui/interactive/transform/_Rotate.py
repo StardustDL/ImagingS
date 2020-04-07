@@ -5,10 +5,10 @@ from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem
 
-from ImagingS.core import Point
-from ImagingS.core.drawing import Drawing
-from ImagingS.core.transform import RotateTransform
+from ImagingS import Point
+from ImagingS.drawing import Drawing
 from ImagingS.Gui.graphics import converters
+from ImagingS.transform import RotateTransform
 
 from .. import Interactive
 

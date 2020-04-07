@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from ImagingS.core import Point
-from ImagingS.core.serialization import PropertySerializable
+from ImagingS import Point
+from ImagingS.serialization import PropertySerializable
 
 
 class Transform(PropertySerializable, ABC):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
     @abstractmethod
@@ -15,7 +15,7 @@ class Transform(PropertySerializable, ABC):
 
 
 class TransformGroup(Transform):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.children = []
 

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Iterable, Iterator, Optional
 
-from ImagingS.core import Point, Rect
-from ImagingS.core.drawing import Pen
+from ImagingS import Point, Rect
+from ImagingS.drawing import Pen
 
 from . import Geometry
 

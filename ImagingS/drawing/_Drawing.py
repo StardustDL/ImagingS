@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import Optional
 
-from ImagingS.core import Color, IdObject, Point, Rect, IdObjectList
-from ImagingS.core.geometry import Geometry
-from ImagingS.core.serialization import PropertySerializable
-from ImagingS.core.transform import Transform
+from ImagingS import Color, IdObject, IdObjectList, Point, Rect
+from ImagingS.geometry import Geometry
+from ImagingS.serialization import PropertySerializable
+from ImagingS.transform import Transform
 
 from . import BoundingAreaMeasurer, DrawingContext, ProxyDrawingContext
 
@@ -43,7 +43,7 @@ class Drawing(PropertySerializable, IdObject, ABC):
 
 
 class DrawingGroup(Drawing):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.children = IdObjectList()
         self.transform = None
