@@ -12,7 +12,7 @@ from ImagingS.document import Document
 from ImagingS.drawing import Drawing, NumpyArrayDrawingContext
 from ImagingS.Gui import icons
 from ImagingS.Gui.app import Application
-from ImagingS.Gui.models import BrushModel, DrawingModel, PropertyModel
+from ImagingS.Gui.models import BrushModel, DrawingModel, PropertyModel, TransformModel
 
 from . import CodePage, VisualPage
 
@@ -47,12 +47,6 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actExport.triggered.connect(self.actExport_triggered)
 
         self.actBrushSolid.triggered.connect(self.actBrushSolid_triggered)
-        self.actBrushRemove.triggered.connect(self.actBrushRemove_triggered)
-        self.actBrushClear.triggered.connect(self.actBrushClear_triggered)
-
-        self.actDrawingRemove.triggered.connect(
-            self.actDrawingRemove_triggered)
-        self.actDrawingClear.triggered.connect(self.actDrawingClear_triggered)
 
         self.actViewVisual.triggered.connect(self.actViewVisual_triggered)
         self.actViewCode.triggered.connect(self.actViewCode_triggered)
@@ -61,11 +55,21 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.trvBrushes.setModel(self.modelBrush)
         self.trvBrushes.clicked.connect(
             self.trvBrushes_clicked)
+        self.actBrushRemove.triggered.connect(self.actBrushRemove_triggered)
+        self.actBrushClear.triggered.connect(self.actBrushClear_triggered)
 
         self.modelDrawing = DrawingModel(self)
         self.trvDrawings.setModel(self.modelDrawing)
         self.trvDrawings.clicked.connect(
             self.trvDrawings_clicked)
+        self.actDrawingRemove.triggered.connect(
+            self.actDrawingRemove_triggered)
+        self.actDrawingClear.triggered.connect(self.actDrawingClear_triggered)
+
+        self.modelTransform = TransformModel(self)
+        self.trvTransforms.setModel(self.modelTransform)
+        self.trvTransforms.clicked.connect(
+            self.trvTransforms_clicked)
 
         self.modelProperties = PropertyModel(self)
         self.trvProperties.setModel(self.modelProperties)
@@ -177,12 +181,12 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.dwgBrushes.setEnabled(hasDoc)
 
     def fresh_drawings(self):
-        self.modelDrawing.clear_items()
         doc = Application.current().document
         hasDoc = doc is not None
         if hasDoc:
-            for br in doc.drawings:
-                self.modelDrawing.append(br)
+            self.modelDrawing.fresh(doc.drawings)
+        else:
+            self.modelDrawing.fresh()
         self.widVisual.document = doc
         self.dwgDrawings.setEnabled(hasDoc)
 
@@ -204,7 +208,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.widCode.document = doc
         self.widVisual.document = doc
 
-        self.modelProperties.fresh(doc)
+        self.modelProperties.fresh()
         self.trvProperties.expandAll()
 
     def widVisualCode_messaged(self, message: str) -> None:
@@ -227,32 +231,38 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.widCode.fresh()
 
     def trvBrushes_clicked(self, index):
-        r = index.row()
-        doc = Application.current().document
-        item = doc.brushes[r]
+        item = self.modelBrush.get_data(index)
         if self.modelProperties.obj is not item:
             self.widVisual.brush = item
             self.modelProperties.fresh(item)
             self.trvProperties.expandAll()
         else:
             self.widVisual.brush = None
-            self.modelProperties.fresh(doc)
+            self.modelProperties.fresh()
             self.trvProperties.expandAll()
             self.trvBrushes.clearSelection()
 
     def trvDrawings_clicked(self, index):
-        r = index.row()
-        doc = Application.current().document
-        item = doc.drawings.at(r)
+        item = self.modelDrawing.get_data(index)
         if self.modelProperties.obj is not item:
             self.widVisual.drawing = item
             self.modelProperties.fresh(item)
             self.trvProperties.expandAll()
         else:
             self.widVisual.drawing = None
-            self.modelProperties.fresh(doc)
+            self.modelProperties.fresh()
             self.trvProperties.expandAll()
             self.trvDrawings.clearSelection()
+    
+    def trvTransforms_clicked(self, index):
+        item = self.modelTransform.get_data(index)
+        if self.modelProperties.obj is not item:
+            self.modelProperties.fresh(item)
+            self.trvProperties.expandAll()
+        else:
+            self.modelProperties.fresh()
+            self.trvProperties.expandAll()
+            self.trvTransforms.clearSelection()
 
     def actViewVisual_triggered(self):
         self.actViewCode.setChecked(False)
@@ -269,12 +279,11 @@ class MainWindow(QMainWindow, ui.MainWindow):
         if len(indexs) == 0:
             return
         r = indexs[0].row()
-        dr = Application.current().document.drawings.at(r)
-        del Application.current().document.drawings[dr.id]
+        del Application.current().document.drawings.children[r]
         self.fresh_drawings()
 
     def actDrawingClear_triggered(self):
-        Application.current().document.drawings.clear()
+        Application.current().document.drawings.children.clear()
         self.fresh_drawings()
 
     def actBrushSolid_triggered(self):

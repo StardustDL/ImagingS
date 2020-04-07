@@ -205,7 +205,10 @@
       </widget>
      </item>
      <item>
-      <widget class="QListView" name="trvDrawings">
+      <widget class="QTreeView" name="trvDrawings">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
        </property>
@@ -245,6 +248,9 @@
      </property>
      <item>
       <widget class="QListView" name="trvBrushes">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
        </property>
@@ -283,7 +289,10 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QListView" name="trvTransforms">
+      <widget class="QTreeView" name="trvTransforms">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
        </property>

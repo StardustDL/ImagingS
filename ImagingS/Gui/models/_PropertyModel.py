@@ -1,7 +1,7 @@
-from typing import Dict, List
+from typing import Any, Dict, List
 
 import qtawesome as qta
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QModelIndex
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 
 from ImagingS import Color, Point, Rect, Size
@@ -26,7 +26,7 @@ class PropertyModel(QStandardItemModel):
         self.setHeaderData(PropertyModel.VALUE, Qt.Horizontal, "Value")
         self.obj = None
 
-    def fresh(self, obj=None) -> None:
+    def fresh(self, obj: Any = None) -> None:
         self.removeRows(0, self.rowCount())
         self.obj = obj
         if obj is None:
@@ -34,10 +34,18 @@ class PropertyModel(QStandardItemModel):
         name = obj.__class__.__name__
         item = QStandardItem(name)
         self.__set_icon(item, name, obj)
+        self.__set_data(item, obj)
         self.appendRow(item)
         self.__add_prop_children(item, obj)
 
-    def __set_icon(self, item: QStandardItem, name, value) -> None:
+    def get_data(self, index: QModelIndex) -> Any:
+        item = self.itemFromIndex(index)
+        return item.data(Qt.UserRole)
+
+    def __set_data(self, item: QStandardItem, value: Any) -> None:
+        item.setData(value, Qt.UserRole)
+
+    def __set_icon(self, item: QStandardItem, name: str, value: Any) -> None:
         if name == "vertexes" or name == "control_points":
             item.setIcon(icons.vertex)
         elif name == "stroke":
@@ -133,16 +141,17 @@ class PropertyModel(QStandardItemModel):
         for i, value in enumerate(li):
             self.__add_child(root, str(i), value)
 
-    def __add_prop_children(self, root: QStandardItem, obj) -> bool:  # return has child
+    def __add_prop_children(self, root: QStandardItem, obj: Any) -> bool:  # return has child
         flag = False
         for prop in get_properties(obj):
             flag = True
             self.__add_child(root, prop.name, prop.get())
         return flag
 
-    def __add_child(self, root: QStandardItem, name: str, value) -> None:
+    def __add_child(self, root: QStandardItem, name: str, value: Any) -> None:
         item = QStandardItem(name)
         self.__set_icon(item, name, value)
+        self.__set_data(item, value)
         root.appendRow(item)
         index = self.indexFromItem(item).row()
         if value is None or isinstance(value, str) or isinstance(value, int) or isinstance(value, float):

@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget
 
 import ImagingS.Gui.ui as ui
-from ImagingS.document import Document
+from ImagingS.document import Document, DocumentFormat
 from ImagingS.Gui.models import PropertyModel
 
 
@@ -40,7 +40,7 @@ class CodePage(QWidget, ui.CodePage):
             self.modelCode.fresh()
         else:
             io = StringIO()
-            self.document.save(io, Document.FILE_RAW)
+            self.document.save(io, DocumentFormat.RAW)
             self.tetCode.setText(io.getvalue())
             self.modelCode.fresh(self.document)
             width = self.trvCode.size().width() / 2
@@ -72,7 +72,7 @@ class CodePage(QWidget, ui.CodePage):
     def load_document(self) -> Optional[Document]:
         io = StringIO(self.code)
         try:
-            tdoc = Document.load(io, Document.FILE_RAW)
+            tdoc = Document.load(io, DocumentFormat.RAW)
             return tdoc
         except Exception:
             return None

@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Any, Iterator
 
 
 class Property:
@@ -30,17 +30,17 @@ class Property:
     def can_del(self) -> bool:
         return self._del is not None
 
-    def get(self):
+    def get(self) -> Any:
         return self._get.__call__(self._onwer)
 
-    def set(self, val):
+    def set(self, val) -> None:
         return self._set.__call__(self._onwer, val)
 
-    def delete(self):
+    def delete(self) -> None:
         return self._del.__call__(self._onwer)
 
 
-def get_properties(obj) -> Iterator[Property]:
+def get_properties(obj: Any) -> Iterator[Property]:
     cls = obj.__class__
     for name in dir(cls):
         item = getattr(cls, name)
