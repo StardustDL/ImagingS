@@ -1,9 +1,10 @@
 import qtawesome as qta
+from PyQt5.QtGui import QIcon
 
 from ImagingS.core import Color
 from ImagingS.core.brush import SolidBrush
+
 from . import converters
-from PyQt5.QtGui import QIcon
 
 list: QIcon = qta.icon("mdi.format-list-numbered")
 

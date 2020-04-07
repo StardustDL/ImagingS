@@ -2,7 +2,7 @@ from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QKeyEvent
 
 from ImagingS.core.geometry import CurveGeometry
-from ImagingS.Gui.graphics import converters
+from ImagingS.Gui import converters
 
 from .. import Interactive
 

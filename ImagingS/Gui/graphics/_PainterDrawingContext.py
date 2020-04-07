@@ -2,8 +2,7 @@ from PyQt5.QtGui import QPainter
 
 from ImagingS.core import Color, Point, Rect
 from ImagingS.core.drawing import DrawingContext
-
-from . import converters
+from ImagingS.Gui import converters
 
 
 class PainterDrawingContext(DrawingContext):

@@ -11,7 +11,7 @@ if ($args.Count -gt 0) {
             Write-Output "Install dependencies for development..."
             pip install pytest flake8
             pip install pytest-qt pytest-cov
-            pip install autopep8
+            pip install autopep8 isort
             npm install -g pyright
             if (!$?) {
                 exit 1
@@ -19,7 +19,10 @@ if ($args.Count -gt 0) {
         }
         "format" {
             Write-Output "Formatting..."
-            # isort -rc -ac -y
+            isort -rc -ac -s __init__.py -y
+            if (!$?) {
+                exit 1
+            }
             autopep8 -ir .
             if (!$?) {
                 exit 1

@@ -6,8 +6,9 @@ from PyQt5.QtWidgets import QGraphicsItem, QStyleOptionGraphicsItem, QWidget
 
 from ImagingS.core import Point, Rect
 from ImagingS.core.drawing import Drawing
+from ImagingS.Gui import converters
 
-from . import PainterDrawingContext, converters
+from . import PainterDrawingContext
 
 
 class DrawingItem(QGraphicsItem):

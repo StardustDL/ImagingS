@@ -6,11 +6,12 @@ import numpy as np
 
 from ImagingS.core import Point, Rect, Size
 from ImagingS.core.brush import Brushes, SolidBrush
-from ImagingS.core.geometry import CurveGeometry, EllipseGeometry, LineGeometry, PolygonGeometry
+from ImagingS.core.drawing import GeometryDrawing
+from ImagingS.core.geometry import (CurveGeometry, EllipseGeometry,
+                                    LineGeometry, PolygonGeometry)
 from ImagingS.core.transform import (MatrixTransform, RotateTransform,
                                      ScaleTransform, SkewTransform,
                                      TransformGroup, TranslateTransform)
-from ImagingS.core.drawing import GeometryDrawing
 from ImagingS.document import Document
 
 
@@ -43,10 +44,10 @@ def test_sl() -> None:
     ell = GeometryDrawing.create(ellG)
     ell.id = "ell"
 
-    doc.drawings.append(line)
-    doc.drawings.append(curve)
-    doc.drawings.append(poly)
-    doc.drawings.append(ell)
+    doc.drawings.children.append(line)
+    doc.drawings.children.append(curve)
+    doc.drawings.children.append(poly)
+    doc.drawings.children.append(ell)
 
     file = os.path.join(curdir, "doc.json")
     with open(file, mode="wb") as f:
@@ -61,16 +62,16 @@ def test_sl() -> None:
         SolidBrush, doc.brushes[0]).color
     assert cast(SolidBrush, docl.brushes[1]).color == cast(
         SolidBrush, doc.brushes[1]).color
-    assert isinstance(docl.drawings["line"], GeometryDrawing)
+    assert isinstance(docl.drawings.children["line"], GeometryDrawing)
     assert cast(LineGeometry, cast(GeometryDrawing,
-                                   docl.drawings["line"]).geometry).start == lineG.start
+                                   docl.drawings.children["line"]).geometry).start == lineG.start
     assert cast(LineGeometry, cast(GeometryDrawing,
-                                   docl.drawings["line"]).geometry).end == lineG.end
+                                   docl.drawings.children["line"]).geometry).end == lineG.end
     assert cast(LineGeometry, cast(GeometryDrawing,
-                                   docl.drawings["line"]).geometry).algorithm == lineG.algorithm
+                                   docl.drawings.children["line"]).geometry).algorithm == lineG.algorithm
     assert cast(CurveGeometry, cast(GeometryDrawing,
-                                    docl.drawings["curve"]).geometry).algorithm == curveG.algorithm
+                                    docl.drawings.children["curve"]).geometry).algorithm == curveG.algorithm
     assert cast(PolygonGeometry, cast(GeometryDrawing,
-                                      docl.drawings["poly"]).geometry).algorithm == polyG.algorithm
+                                      docl.drawings.children["poly"]).geometry).algorithm == polyG.algorithm
     assert cast(EllipseGeometry, cast(GeometryDrawing,
-                                      docl.drawings["ell"]).geometry).area == ellG.area
+                                      docl.drawings.children["ell"]).geometry).area == ellG.area

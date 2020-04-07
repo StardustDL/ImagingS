@@ -6,12 +6,13 @@ from PyQt5.QtWidgets import QWidget
 
 import ImagingS.Gui.ui as ui
 from ImagingS.core.brush import Brush, SolidBrush
-from ImagingS.core.drawing import Drawing
-from ImagingS.core.geometry import Curve, Ellipse, Geometry, Line, Polygon
+from ImagingS.core.drawing import Drawing, GeometryDrawing
+from ImagingS.core.geometry import (CurveGeometry, EllipseGeometry, Geometry,
+                                    LineGeometry, PolygonGeometry)
 from ImagingS.core.transform import MatrixTransform, TransformGroup
 from ImagingS.document import Document
-from ImagingS.Gui import icons
-from ImagingS.Gui.graphics import Canvas, converters
+from ImagingS.Gui import converters, icons
+from ImagingS.Gui.graphics import Canvas
 from ImagingS.Gui.interactive import Interactive
 from ImagingS.Gui.interactive.geometry import (CurveInteractive,
                                                EllipseInteractive,
@@ -47,7 +48,6 @@ class VisualPage(QWidget, ui.VisualPage):
             self.actTransformRotate,
             self.actTransformSkew,
             self.actTransformMatrix,
-            self.actTransformClip,
         ]
 
         self.actDrawingCurve.triggered.connect(self.actDrawingCurve_triggered)
@@ -67,10 +67,11 @@ class VisualPage(QWidget, ui.VisualPage):
             self.actTransformMatrix_triggered)
         self.actTransformScale.triggered.connect(
             self.actTransformScale_triggered)
-        self.actTransformClip.triggered.connect(
-            self.actTransformClip_triggered)
         self.actTransformGroup.triggered.connect(
             self.actTransformGroup_triggered)
+
+        self.actClip.triggered.connect(
+            self.actClip_triggered)
 
         self.interactive = None
         self.drawing = None
@@ -87,8 +88,8 @@ class VisualPage(QWidget, ui.VisualPage):
         self.actTransformTranslate.setIcon(icons.translateTransform)
         self.actTransformRotate.setIcon(icons.rotateTransform)
         self.actTransformMatrix.setIcon(icons.matrixTransform)
-        self.actTransformClip.setIcon(icons.clipTransform)
         self.actTransformGroup.setIcon(icons.groupTransform)
+        self.actClip.setIcon(icons.clip)
 
     def setupCanvas(self):
         self.gvwMain = Canvas(self.widMain)
@@ -204,7 +205,8 @@ class VisualPage(QWidget, ui.VisualPage):
         if inter.state == Interactive.S_Success:
             pass
         else:
-            drawing.transform = None
+            if isinstance(drawing, GeometryDrawing):
+                drawing.geometry.transform = None
         self.gvwMain.rerender()
         self.interactive = None
 
@@ -260,41 +262,46 @@ class VisualPage(QWidget, ui.VisualPage):
         drawing = self.drawing
         if drawing is None:
             return
-        inter = TranslateTransformInteractive(drawing)
-        inter.ended.connect(self.interTransform_ended)
-        self.interactive = inter
+        if isinstance(drawing, GeometryDrawing):
+            inter = TranslateTransformInteractive(drawing)
+            inter.ended.connect(self.interTransform_ended)
+            self.interactive = inter
 
     def actTransformSkew_triggered(self):
         drawing = self.drawing
         if drawing is None:
             return
-        inter = SkewTransformInteractive(drawing)
-        inter.ended.connect(self.interTransform_ended)
-        self.interactive = inter
+        if isinstance(drawing, GeometryDrawing):
+            inter = SkewTransformInteractive(drawing)
+            inter.ended.connect(self.interTransform_ended)
+            self.interactive = inter
 
     def actTransformRotate_triggered(self):
         drawing = self.drawing
         if drawing is None:
             return
-        inter = RotateTransformInteractive(drawing)
-        inter.ended.connect(self.interTransform_ended)
-        self.interactive = inter
+        if isinstance(drawing, GeometryDrawing):
+            inter = RotateTransformInteractive(drawing)
+            inter.ended.connect(self.interTransform_ended)
+            self.interactive = inter
 
     def actTransformMatrix_triggered(self):
         drawing = self.drawing
         if drawing is None:
             return
-        drawing.transform = MatrixTransform()
+        if isinstance(drawing, GeometryDrawing):
+            drawing.geometry.transform = MatrixTransform()
 
     def actTransformScale_triggered(self):
         drawing = self.drawing
         if drawing is None:
             return
-        inter = ScaleTransformInteractive(drawing)
-        inter.ended.connect(self.interTransform_ended)
-        self.interactive = inter
+        if isinstance(drawing, GeometryDrawing):
+            inter = ScaleTransformInteractive(drawing)
+            inter.ended.connect(self.interTransform_ended)
+            self.interactive = inter
 
-    def actTransformClip_triggered(self):
+    def actClip_triggered(self):
         drawing = self.drawing
         if drawing is None:
             return
@@ -306,5 +313,6 @@ class VisualPage(QWidget, ui.VisualPage):
         drawing = self.drawing
         if drawing is None:
             return
-        drawing.transform = TransformGroup()
+        if isinstance(drawing, GeometryDrawing):
+            drawing.geometry.transform = TransformGroup()
         self.gvwMain.rerender()

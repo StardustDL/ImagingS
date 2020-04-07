@@ -153,12 +153,18 @@
     </property>
     <addaction name="actBrushSolid"/>
    </widget>
+   <widget class="QMenu" name="mnuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+   </widget>
    <addaction name="mnuFile"/>
    <addaction name="mnuEdit"/>
    <addaction name="mnuView"/>
    <addaction name="mnuDrawing"/>
    <addaction name="mnuTransform"/>
    <addaction name="mnuBrush"/>
+   <addaction name="mnuTools"/>
   </widget>
   <widget class="QStatusBar" name="stbMain"/>
   <widget class="QDockWidget" name="dwgDrawings">
@@ -428,6 +434,11 @@
   <action name="actTransformClear">
    <property name="text">
     <string>Clear</string>
+   </property>
+  </action>
+  <action name="actView">
+   <property name="text">
+    <string>Visual</string>
    </property>
   </action>
  </widget>

@@ -5,9 +5,9 @@ import lzma
 import uuid
 from typing import List
 
-from ImagingS.core import IdObject, IdObjectList, Size
+from ImagingS.core import IdObject, Size
 from ImagingS.core.brush import Brush
-from ImagingS.core.drawing import Drawing
+from ImagingS.core.drawing import DrawingGroup
 from ImagingS.core.serialization import PropertySerializable
 from ImagingS.core.serialization.json import Decoder, Encoder
 
@@ -19,7 +19,7 @@ class Document(PropertySerializable, IdObject):
         super().__init__()
         self.id = str(uuid.uuid1())
         self.brushes = []
-        self.drawings = IdObjectList()
+        self.drawings = DrawingGroup()
         self.size = Size.create(600, 600)
 
     @property
@@ -31,11 +31,11 @@ class Document(PropertySerializable, IdObject):
         self._brushes = value
 
     @property
-    def drawings(self) -> IdObjectList[Drawing]:
+    def drawings(self) -> DrawingGroup:
         return self._drawings
 
     @drawings.setter
-    def drawings(self, value: IdObjectList[Drawing]) -> None:
+    def drawings(self, value: DrawingGroup) -> None:
         self._drawings = value
 
     @property

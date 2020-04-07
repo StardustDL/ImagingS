@@ -6,11 +6,13 @@ from PIL import Image
 
 from ImagingS.core import Color, Point, Rect, Size
 from ImagingS.core.brush import Brushes, SolidBrush
-from ImagingS.core.drawing import GeometryDrawing, NumpyArrayDrawingContext, Pen
-from ImagingS.core.geometry import CurveGeometry, EllipseGeometry, LineGeometry, PolygonGeometry
-from ImagingS.core.transform import (
-    RotateTransform, ScaleTransform, Transform, TransformGroup,
-    TranslateTransform)
+from ImagingS.core.drawing import (GeometryDrawing, NumpyArrayDrawingContext,
+                                   Pen)
+from ImagingS.core.geometry import (CurveGeometry, EllipseGeometry,
+                                    LineGeometry, PolygonGeometry)
+from ImagingS.core.transform import (RotateTransform, ScaleTransform,
+                                     Transform, TransformGroup,
+                                     TranslateTransform)
 from ImagingS.document import Document
 
 
@@ -37,7 +39,7 @@ class BuiltinInstruction:
 
     def resetCanvas(self, argv: List[str]) -> None:
         self.doc.size = Size.create(int(argv[0]), int(argv[1]))
-        self.doc.drawings.clear()
+        self.doc.drawings.children.clear()
 
     def saveCanvas(self, argv: List[str]) -> None:
         fileName = os.path.join(self.output_dir, f"{argv[0]}.bmp")
@@ -45,8 +47,7 @@ class BuiltinInstruction:
         context = NumpyArrayDrawingContext(
             NumpyArrayDrawingContext.create_array(self.doc.size))
 
-        for drawing in self.doc.drawings:
-            drawing.render(context)
+        self.doc.drawings.render(context)
 
         Image.fromarray(context.array).save(fileName, "bmp")
 
@@ -60,7 +61,7 @@ class BuiltinInstruction:
         drawing = GeometryDrawing.create(geometry)
         drawing.id = argv[0]
         drawing.stroke = Pen.create(self.brush)
-        self.doc.drawings.append(drawing)
+        self.doc.drawings.children.append(drawing)
 
     def drawPolygon(self, argv: List[str]) -> None:
         vers: List[Point] = []
@@ -73,7 +74,7 @@ class BuiltinInstruction:
         drawing = GeometryDrawing.create(geometry)
         drawing.id = argv[0]
         drawing.stroke = Pen.create(self.brush)
-        self.doc.drawings.append(drawing)
+        self.doc.drawings.children.append(drawing)
 
     def drawEllipse(self, argv: List[str]) -> None:
         lt = Point.create(int(argv[1]), int(argv[2]))
@@ -82,7 +83,7 @@ class BuiltinInstruction:
         drawing = GeometryDrawing.create(geometry)
         drawing.id = argv[0]
         drawing.stroke = Pen.create(self.brush)
-        self.doc.drawings.append(drawing)
+        self.doc.drawings.children.append(drawing)
 
     def drawCurve(self, argv: List[str]) -> None:
         vers: List[Point] = []
@@ -95,28 +96,28 @@ class BuiltinInstruction:
         drawing = GeometryDrawing.create(geometry)
         drawing.id = argv[0]
         drawing.stroke = Pen.create(self.brush)
-        self.doc.drawings.append(drawing)
+        self.doc.drawings.children.append(drawing)
 
     def translate(self, argv: List[str]) -> None:
-        drawing = self.doc.drawings[argv[0]]
+        drawing = self.doc.drawings.children[argv[0]]
         assert isinstance(drawing, GeometryDrawing)
         _append_transform(drawing, TranslateTransform.create(
             Point.create(int(argv[1]), int(argv[2]))))
 
     def rotate(self, argv: List[str]) -> None:
-        drawing = self.doc.drawings[argv[0]]
+        drawing = self.doc.drawings.children[argv[0]]
         assert isinstance(drawing, GeometryDrawing)
         _append_transform(drawing, RotateTransform.create(
             Point.create(int(argv[1]), int(argv[2])), int(argv[3]) / 360 * 2 * math.pi))
 
     def scale(self, argv: List[str]) -> None:
-        drawing = self.doc.drawings[argv[0]]
+        drawing = self.doc.drawings.children[argv[0]]
         assert isinstance(drawing, GeometryDrawing)
         _append_transform(drawing, ScaleTransform.create(
             Point.create(int(argv[1]), int(argv[2])), int(argv[3])))
 
     def clip(self, argv: List[str]) -> None:
-        drawing = self.doc.drawings[argv[0]]
+        drawing = self.doc.drawings.children[argv[0]]
         assert isinstance(drawing, GeometryDrawing)
         assert isinstance(drawing.geometry, LineGeometry)
         lt = Point.create(int(argv[1]), int(argv[2]))

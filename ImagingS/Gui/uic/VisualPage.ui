@@ -47,8 +47,9 @@
      <addaction name="actTransformRotate"/>
      <addaction name="actTransformSkew"/>
      <addaction name="actTransformMatrix"/>
-     <addaction name="actTransformClip"/>
      <addaction name="actTransformGroup"/>
+     <addaction name="separator"/>
+     <addaction name="actClip"/>
     </widget>
    </item>
    <item>
@@ -135,6 +136,11 @@
   <action name="actTransformGroup">
    <property name="text">
     <string>Group</string>
+   </property>
+  </action>
+  <action name="actClip">
+   <property name="text">
+    <string>Clip</string>
    </property>
   </action>
  </widget>

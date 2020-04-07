@@ -95,6 +95,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
         for act in self.widVisual.actionTransforms:
             self.mnuTransform.addAction(act)
 
+        self.mnuTools.addAction(self.widVisual.actClip)
+
     def setupDockWidget(self):
         self.actToggleBrushes = self.dwgBrushes.toggleViewAction()
         self.actToggleBrushes.setShortcut("Ctrl+Shift+B")

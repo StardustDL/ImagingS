@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Callable
 
 import numpy as np
 
@@ -74,7 +75,7 @@ class NumpyArrayDrawingContext(DrawingContext):
 
 
 class ProxyDrawingContext(DrawingContext):
-    def __init__(self, fpoint, farea):
+    def __init__(self, fpoint: Callable[[Point, Color], None], farea: Callable[[], Rect]):
         super().__init__()
         self._fpoint = fpoint
         self._farea = farea
@@ -83,4 +84,4 @@ class ProxyDrawingContext(DrawingContext):
         self._fpoint(position, color)
 
     def area(self) -> Rect:
-        return self._farea
+        return self._farea()

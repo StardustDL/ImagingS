@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from ImagingS.core.brush import Brush, Brushes
 from ImagingS.core.serialization import PropertySerializable
 

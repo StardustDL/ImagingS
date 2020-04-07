@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from ImagingS.core import Color, IdObject, Point, Rect
+from ImagingS.core import Color, IdObject, Point, Rect, IdObjectList
 from ImagingS.core.geometry import Geometry
 from ImagingS.core.serialization import PropertySerializable
 from ImagingS.core.transform import Transform
@@ -45,15 +45,15 @@ class Drawing(PropertySerializable, IdObject, ABC):
 class DrawingGroup(Drawing):
     def __init__(self):
         super().__init__()
-        self.children = []
+        self.children = IdObjectList()
         self.transform = None
 
     @property
-    def children(self) -> List[Drawing]:
+    def children(self) -> IdObjectList[Drawing]:
         return self._children
 
     @children.setter
-    def children(self, value: List[Drawing]) -> None:
+    def children(self, value: IdObjectList[Drawing]) -> None:
         self._children = value
 
     @property
@@ -65,15 +65,16 @@ class DrawingGroup(Drawing):
         self._transform = value
 
     def render(self, context: DrawingContext) -> None:
-        def fpoint(position: Point, color: Color):
-            if self.transform is not None:
+        renderContext = context
+        if self.transform is not None:
+            def fpoint(position: Point, color: Color) -> None:
                 position = self.transform.transform(position)
-            context.point(position, color)
+                context.point(position, color)
 
-        def farea():
-            return context.area
+            def farea() -> Rect:
+                return context.area()
 
-        proxy = ProxyDrawingContext(fpoint, farea)
+            renderContext = ProxyDrawingContext(fpoint, farea)
 
         for item in self.children:
-            item.render(proxy)
+            item.render(renderContext)

@@ -7,12 +7,12 @@ from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from ImagingS.core import Color, Point, Rect, Size
 from ImagingS.core.brush import Brush, SolidBrush
 from ImagingS.core.drawing import Drawing
-from ImagingS.core.geometry import Geometry, CurveGeometry, EllipseGeometry, LineGeometry, PolygonGeometry
+from ImagingS.core.geometry import (CurveGeometry, EllipseGeometry, Geometry,
+                                    LineGeometry, PolygonGeometry)
 from ImagingS.core.serialization import get_properties
-from ImagingS.core.transform import (MatrixTransform,
-                                     RotateTransform, ScaleTransform,
-                                     SkewTransform, Transform, TransformGroup,
-                                     TranslateTransform)
+from ImagingS.core.transform import (MatrixTransform, RotateTransform,
+                                     ScaleTransform, SkewTransform, Transform,
+                                     TransformGroup, TranslateTransform)
 from ImagingS.document import Document
 from ImagingS.Gui import icons
 

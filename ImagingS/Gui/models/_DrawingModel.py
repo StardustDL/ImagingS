@@ -5,7 +5,8 @@ from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from ImagingS.core import Colors
 from ImagingS.core.brush import SolidBrush
 from ImagingS.core.drawing import Drawing, GeometryDrawing
-from ImagingS.core.geometry import CurveGeometry, EllipseGeometry, LineGeometry, PolygonGeometry
+from ImagingS.core.geometry import (CurveGeometry, EllipseGeometry,
+                                    LineGeometry, PolygonGeometry)
 from ImagingS.Gui import converters
 
 
