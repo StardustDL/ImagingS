@@ -11,6 +11,7 @@ def test_color() -> None:
 def test_point() -> None:
     c = Point.create(1, 1)
     assert c == Point.create(1, 1)
+    assert c + c == c * 2
     assert c.as_tuple() == (1, 1)
     assert str(c).startswith("Point")
     assert c.to_homogeneous().shape == (3, 1)

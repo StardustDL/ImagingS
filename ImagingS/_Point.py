@@ -8,6 +8,16 @@ import numpy as np
 from ImagingS.serialization import PropertySerializable
 
 
+def feq(a: float, b: float) -> bool:
+    return fabs(a-b) < 1e-8
+
+
+def fsign(a: float) -> int:
+    if feq(a, 0):
+        return 0
+    return 1 if a > 0 else -1
+
+
 class Point(PropertySerializable):
     def __init__(self) -> None:
         super().__init__()
@@ -22,7 +32,7 @@ class Point(PropertySerializable):
         return result
 
     def __eq__(self, other: Point) -> bool:
-        return fabs(self.x - other.x) < 1e-8 and fabs(self.y - other.y) < 1e-8
+        return feq(self.x, other.x) and feq(self.y, other.y)
 
     def __add__(self, other: Point) -> Point:
         return Point.create(self.x + other.x, self.y + other.y)
@@ -30,8 +40,26 @@ class Point(PropertySerializable):
     def __sub__(self, other: Point) -> Point:
         return Point.create(self.x - other.x, self.y - other.y)
 
+    def __neg__(self) -> Point:
+        return Point.create(-self.x, -self.y)
+
+    def __pos__(self) -> Point:
+        return self.clone()
+
+    def __mul__(self, other: float) -> Point:
+        return Point.create(self.x * other, self.y * other)
+
+    def __rmul__(self, other: float) -> Point:
+        return self * other
+
+    def __abs__(self) -> float:
+        return (self.x**2 + self.y**2)**0.5
+
     def __repr__(self) -> str:
         return f"Point({self.x}, {self.y})"
+
+    def clone(self) -> Point:
+        return Point.create(self.x, self.y)
 
     @property
     def x(self) -> float:
@@ -157,3 +185,6 @@ class Rect(PropertySerializable):
     @size.setter
     def size(self, value: Size) -> None:
         self._size = value
+
+    def vertex(self) -> Point:
+        return Point.create(self.origin.x+self.size.width, self.origin.y+self.size.height)

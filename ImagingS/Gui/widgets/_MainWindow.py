@@ -209,7 +209,6 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.widVisual.document = doc
 
         self.modelProperties.fresh()
-        self.trvProperties.expandAll()
 
     def widVisualCode_messaged(self, message: str) -> None:
         self.stbMain.showMessage(message)

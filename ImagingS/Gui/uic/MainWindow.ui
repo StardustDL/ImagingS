@@ -73,8 +73,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>767</width>
-         <height>620</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -206,11 +206,11 @@
      </item>
      <item>
       <widget class="QTreeView" name="trvDrawings">
-       <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
-       </property>
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
        </property>
        <addaction name="actDrawingRemove"/>
        <addaction name="actDrawingClear"/>
@@ -248,11 +248,11 @@
      </property>
      <item>
       <widget class="QListView" name="trvBrushes">
-       <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
-       </property>
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
        </property>
        <addaction name="actBrushRemove"/>
        <addaction name="actBrushClear"/>
@@ -290,11 +290,11 @@
      </property>
      <item>
       <widget class="QTreeView" name="trvTransforms">
-       <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
-       </property>
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
        </property>
        <addaction name="actTransformRemove"/>
        <addaction name="actTransformClear"/>
@@ -467,6 +467,11 @@
    </property>
    <property name="text">
     <string>Code</string>
+   </property>
+  </action>
+  <action name="actionaa">
+   <property name="text">
+    <string>aa</string>
    </property>
   </action>
  </widget>

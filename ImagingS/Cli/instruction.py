@@ -79,7 +79,7 @@ class BuiltinInstruction:
     def drawEllipse(self, argv: List[str]) -> None:
         lt = Point.create(int(argv[1]), int(argv[2]))
         rb = Point.create(int(argv[3]), int(argv[4]))
-        geometry = EllipseGeometry.create(Rect.from_points(lt, rb))
+        geometry = EllipseGeometry.from_rect(Rect.from_points(lt, rb))
         drawing = GeometryDrawing.create(geometry)
         drawing.id = argv[0]
         drawing.stroke = Pen.create(self.brush)

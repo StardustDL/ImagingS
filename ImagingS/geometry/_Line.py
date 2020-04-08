@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import IntEnum, unique
 from typing import Iterable, Iterator, Optional
 
-from ImagingS import Point, Rect
+from ImagingS import Point, Rect, fsign
 from ImagingS.drawing import Pen
 
 from . import Geometry
@@ -13,6 +13,60 @@ from . import Geometry
 class LineAlgorithm(IntEnum):
     Dda = 0
     Bresenham = 1
+
+
+def _gen_DDA(start: Point, end: Point) -> Iterator[Point]:
+    if start == end:
+        yield start
+        return
+    xs, ys = map(round, start.as_tuple())
+    xe, ye = map(round, end.as_tuple())
+    dx, dy = xe-xs, ye-ys
+    sx, sy = fsign(dx), fsign(dy)
+    flag = False
+    if abs(dy) > abs(dx):
+        dx, dy = dy, dx
+        flag = True
+    k = dy / dx
+    xc, yc = xs, ys
+    for _ in range(round(abs(dx))+1):
+        yield Point.create(xc, yc)
+        if flag:
+            yc += sy
+            xc += k
+        else:
+            xc += sx
+            yc += k
+
+
+def _gen_Bresenham(start: Point, end: Point) -> Iterator[Point]:
+    if start == end:
+        yield start
+        return
+    xs, ys = map(round, start.as_tuple())
+    xe, ye = map(round, end.as_tuple())
+    dx, dy = xe-xs, ye-ys
+    sx, sy = fsign(dx), fsign(dy)
+    dx, dy = abs(dx), abs(dy)
+    flag = False
+    if dy > dx:
+        dx, dy = dy, dx
+        flag = True
+    xc, yc = xs, ys
+    ne = 2*dy-dx
+    for _ in range(round(dx)+1):
+        yield Point.create(xc, yc)
+        if ne >= 0:
+            if flag:
+                xc += sx
+            else:
+                yc += sy
+            ne -= 2*dx
+        if flag:
+            yc += sy
+        else:
+            xc += sx
+        ne += 2*dy
 
 
 @unique
@@ -78,35 +132,18 @@ class LineGeometry(Geometry):
     def clip_algorithm(self, value: LineClipAlgorithm) -> None:
         self._clip_algorithm = value
 
-    @staticmethod
-    def __gen_DDA(start: Point, end: Point) -> Iterator[Point]:
-        delta = end - start
-        lx, ly = abs(delta.x), abs(delta.y)
-        le = min(lx, ly)
-        if le < 1e-8:
-            le = max(lx, ly)
-        if le < 1:
-            le = 1
-        le = round(le)
-        delta.x /= le
-        delta.y /= le
-        cur = start
-        for _ in range(le + 1):
-            yield cur
-            cur = cur + delta
-
     def stroke_points(self, pen: Pen) -> Iterable[Point]:
         start = self.start
         end = self.end
         if self.transform is not None:
             start = self.transform.transform(start)
             end = self.transform.transform(end)
-        gen = self.__gen_DDA(start, end)
+        gen = None
         if self.algorithm is LineAlgorithm.Dda:
-            pass
+            gen = _gen_DDA
         elif self.algorithm is LineAlgorithm.Bresenham:
-            pass
-        return gen
+            gen = _gen_Bresenham
+        return gen(start, end)
 
     def fill_points(self) -> Iterable[Point]:
         return []

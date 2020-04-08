@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 
-from ImagingS import Point
+from ImagingS import Point, feq
 from ImagingS.transform import (MatrixTransform, RotateTransform,
                                 ScaleTransform, SkewTransform,
                                 TranslateTransform)
@@ -22,7 +22,7 @@ def test_Matrix() -> None:
 def test_Rotate() -> None:
     tr = RotateTransform.create(Point.create(0, 0), math.pi / 2)
     assert Point.create(0, 0) == tr.center
-    assert math.fabs(tr.angle - math.pi / 2) < 1e-8
+    assert feq(tr.angle, math.pi / 2)
     assert Point.create(0, 1) == tr.transform(Point.create(1, 0))
     assert Point.create(-1, 0) == tr.transform(Point.create(0, 1))
 
@@ -38,8 +38,8 @@ def test_Scale() -> None:
 def test_Skew() -> None:
     tr = SkewTransform.create(Point.create(0, 0), (math.pi / 4, 0))
     assert Point.create(0, 0) == tr.center
-    assert math.fabs(tr.angle[0] - math.pi / 4) < 1e-8
-    assert math.fabs(tr.angle[1] - 0) < 1e-8
+    assert feq(tr.angle[0], math.pi / 4)
+    assert feq(tr.angle[1], 0)
     assert Point.create(1, 0) == tr.transform(Point.create(1, 0))
     assert Point.create(1, 1) == tr.transform(Point.create(0, 1))
 

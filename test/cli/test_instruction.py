@@ -19,8 +19,8 @@ translate line1 50 50
 translate line1 25 25
 rotate poly1 0 0 45
 saveCanvas doc3
-drawEllipse ell1 10 10 20 20
-drawCurve curv1 0 0 1 0 1 1 Bezier
+drawEllipse ell1 400 420 520 520
+drawCurve curv1 80 80 80 160 160 160 240 320 B-spline
 saveCanvas doc4
 scale curv1 0 0 2
 clip line1 12 12 18 18 Cohen-Sutherland

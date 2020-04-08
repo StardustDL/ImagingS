@@ -37,7 +37,7 @@ def test_sl() -> None:
     poly = GeometryDrawing.create(polyG)
     poly.id = "poly"
 
-    ellG = EllipseGeometry.create(Rect.create(Point(), Size.create(10, 10)))
+    ellG = EllipseGeometry.from_rect(Rect.create(Point(), Size.create(10, 10)))
     tg = TransformGroup()
     tg.children.append(MatrixTransform.create(np.ones((3, 3))))
     tg.children.append(ScaleTransform.create(Point(), (2, 2)))
@@ -70,7 +70,7 @@ def test_sl() -> None:
         assert cast(PolygonGeometry, cast(GeometryDrawing,
                                           docl.drawings.children["poly"]).geometry).algorithm == polyG.algorithm
         assert cast(EllipseGeometry, cast(GeometryDrawing,
-                                          docl.drawings.children["ell"]).geometry).area == ellG.area
+                                          docl.drawings.children["ell"]).geometry).center == ellG.center
 
     file = os.path.join(curdir, "doc.isd")
     with open(file, mode="wb") as f:
