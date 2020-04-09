@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from . import get_properties
+from . import getProperties
 
 
 class Serializable(ABC):
@@ -17,14 +17,14 @@ class Serializable(ABC):
 class PropertySerializable(Serializable):
     def serialize(self) -> Dict:
         result = {}
-        for prop in get_properties(self):
-            if prop.can_set:
+        for prop in getProperties(self):
+            if prop.canSet:
                 result[prop.name] = prop.get()
         return result
 
     def deserialize(self, data: Dict) -> None:
-        for prop in get_properties(self):
-            if prop.can_set and prop.name in data:
+        for prop in getProperties(self):
+            if prop.canSet and prop.name in data:
                 value = data[prop.name]
                 prop.set(value)
                 # if isinstance(value, prop.data_type):

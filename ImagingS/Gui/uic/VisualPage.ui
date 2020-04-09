@@ -48,8 +48,6 @@
      <addaction name="actTransformSkew"/>
      <addaction name="actTransformMatrix"/>
      <addaction name="actTransformGroup"/>
-     <addaction name="separator"/>
-     <addaction name="actClip"/>
     </widget>
    </item>
    <item>

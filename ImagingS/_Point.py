@@ -77,14 +77,14 @@ class Point(PropertySerializable):
     def y(self, value: float) -> None:
         self._y = value
 
-    def to_homogeneous(self) -> np.ndarray:
+    def toHomogeneous(self) -> np.ndarray:
         return np.array([[self.x], [self.y], [1]])
 
-    def as_tuple(self) -> Tuple[float, float]:
+    def asTuple(self) -> Tuple[float, float]:
         return self.x, self.y
 
     @staticmethod
-    def from_homogeneous(arr: np.ndarray) -> Point:
+    def fromHomogeneous(arr: np.ndarray) -> Point:
         assert arr.shape == (3, 1)
         w = float(arr[2][0])
         assert w != 0
@@ -110,7 +110,7 @@ class Size(PropertySerializable):
     def __repr__(self) -> str:
         return f"Size({self.width}, {self.height})"
 
-    def as_tuple(self) -> Tuple[float, float]:
+    def asTuple(self) -> Tuple[float, float]:
         return self.width, self.height
 
     @property
@@ -154,8 +154,8 @@ class Rect(PropertySerializable):
 
     @staticmethod
     def from_points(p1: Point, p2: Point) -> Rect:
-        x1, y1 = p1.as_tuple()
-        x2, y2 = p2.as_tuple()
+        x1, y1 = p1.asTuple()
+        x2, y2 = p2.asTuple()
         xmin, xmax = min(x1, x2), max(x1, x2)
         ymin, ymax = min(y1, y2), max(y1, y2)
         return Rect.create(Point.create(xmin, ymin), Size.create(xmax - xmin, ymax - ymin))

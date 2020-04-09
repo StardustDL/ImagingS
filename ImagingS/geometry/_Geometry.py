@@ -21,16 +21,16 @@ class Geometry(PropertySerializable, ABC):
         self._transform = value
 
     @abstractmethod
-    def stroke_points(self, pen: Pen) -> Iterable[Point]: pass
+    def strokePoints(self, pen: Pen) -> Iterable[Point]: pass
 
     @abstractmethod
-    def fill_points(self) -> Iterable[Point]: pass
+    def fillPoints(self) -> Iterable[Point]: pass
 
-    def in_stroke(self, pen: Pen, point: Point) -> bool:
-        return point in self.stroke_points(pen)
+    def inStroke(self, pen: Pen, point: Point) -> bool:
+        return point in self.strokePoints(pen)
 
-    def in_fill(self, point: Point) -> bool:
-        return point in self.fill_points
+    def inFill(self, point: Point) -> bool:
+        return point in self.fillPoints
 
 
 class GeometryGroup(Geometry):
@@ -46,30 +46,30 @@ class GeometryGroup(Geometry):
     def children(self, value: List[Geometry]) -> None:
         self._children = value
 
-    def stroke_points(self, pen: Pen) -> Iterable[Point]:
+    def strokePoints(self, pen: Pen) -> Iterable[Point]:
         for child in self.children:
-            for point in child.stroke_points(pen):
+            for point in child.strokePoints(pen):
                 if self.transform is None:
                     yield point
                 else:
                     yield self.transform.transform(point)
 
-    def fill_points(self) -> Iterable[Point]:
+    def fillPoints(self) -> Iterable[Point]:
         for child in self.children:
-            for point in child.fill_points():
+            for point in child.fillPoints():
                 if self.transform is None:
                     yield point
                 else:
                     yield self.transform.transform(point)
 
-    def in_stroke(self, pen: Pen, point: Point) -> bool:
+    def inStroke(self, pen: Pen, point: Point) -> bool:
         for child in self.children:
-            if child.in_stroke(pen, point):
+            if child.inStroke(pen, point):
                 return True
         return False
 
-    def in_fill(self, point: Point) -> bool:
+    def inFill(self, point: Point) -> bool:
         for child in self.children:
-            if child.in_fill(point):
+            if child.inFill(point):
                 return True
         return False

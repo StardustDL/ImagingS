@@ -39,7 +39,7 @@ class PolylineGeometry(Geometry):
     def vertexes(self, value: List[Point]) -> None:
         self._vertexes = value
 
-    def stroke_points(self, pen: Pen) -> Iterable[Point]:
+    def strokePoints(self, pen: Pen) -> Iterable[Point]:
         cnt = len(self.vertexes)
         if cnt == 0:
             return
@@ -47,10 +47,10 @@ class PolylineGeometry(Geometry):
             ln = LineGeometry.create(self.vertexes[i],
                                      self.vertexes[i+1], self.algorithm)
             ln.transform = self.transform
-            for point in ln.stroke_points(pen):
+            for point in ln.strokePoints(pen):
                 yield point
 
-    def fill_points(self) -> Iterable[Point]:
+    def fillPoints(self) -> Iterable[Point]:
         return []
 
 
@@ -65,13 +65,13 @@ class PolygonGeometry(PolylineGeometry):
         result.algorithm = algorithm
         return result
 
-    def stroke_points(self, pen: Pen) -> Iterable[Point]:
+    def strokePoints(self, pen: Pen) -> Iterable[Point]:
         cnt = len(self.vertexes)
         if cnt > 0:
-            for point in super().stroke_points(pen):
+            for point in super().strokePoints(pen):
                 yield point
             ln = LineGeometry.create(self.vertexes[-1],
                                      self.vertexes[0], self.algorithm)
             ln.transform = self.transform
-            for point in ln.stroke_points(pen):
+            for point in ln.strokePoints(pen):
                 yield point

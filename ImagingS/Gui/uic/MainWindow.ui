@@ -33,70 +33,6 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
-    <item row="0" column="0">
-     <widget class="QToolBox" name="tbxMain">
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <property name="tabSpacing">
-       <number>0</number>
-      </property>
-      <widget class="QWidget" name="pagVisual">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>767</width>
-         <height>620</height>
-        </rect>
-       </property>
-       <attribute name="label">
-        <string>Visual</string>
-       </attribute>
-       <layout class="QGridLayout" name="grdVisual">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="pagCode">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>98</width>
-         <height>28</height>
-        </rect>
-       </property>
-       <attribute name="label">
-        <string>Code</string>
-       </attribute>
-       <layout class="QGridLayout" name="grdCode">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-       </layout>
-      </widget>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="mnbWindow">
@@ -139,17 +75,6 @@
     <addaction name="actViewCode"/>
     <addaction name="separator"/>
    </widget>
-   <widget class="QMenu" name="mnuDrawing">
-    <property name="title">
-     <string>&amp;Drawing</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="mnuTransform">
-    <property name="title">
-     <string>&amp;Transform</string>
-    </property>
-    <addaction name="separator"/>
-   </widget>
    <widget class="QMenu" name="mnuBrush">
     <property name="title">
      <string>&amp;Brush</string>
@@ -159,6 +84,17 @@
    <widget class="QMenu" name="mnuTools">
     <property name="title">
      <string>Tools</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="mnuTransform">
+    <property name="title">
+     <string>&amp;Transform</string>
+    </property>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="mnuDrawing">
+    <property name="title">
+     <string>&amp;Drawing</string>
     </property>
    </widget>
    <addaction name="mnuFile"/>
@@ -448,30 +384,14 @@
     <string>Clear</string>
    </property>
   </action>
-  <action name="actView">
-   <property name="text">
-    <string>Visual</string>
-   </property>
-  </action>
   <action name="actViewVisual">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="text">
     <string>Visual</string>
    </property>
   </action>
   <action name="actViewCode">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="text">
     <string>Code</string>
-   </property>
-  </action>
-  <action name="actionaa">
-   <property name="text">
-    <string>aa</string>
    </property>
   </action>
  </widget>

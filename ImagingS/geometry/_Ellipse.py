@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, Tuple, Iterator
+from typing import Iterable, Iterator, Tuple
 
 from ImagingS import Point, Rect
 from ImagingS.drawing import Pen
@@ -9,7 +9,7 @@ from . import Geometry
 
 
 def _gen(center: Point, radius: Tuple[float, float]) -> Iterator[Point]:
-    def gen_first(a: int, b: int) -> Iterator[Point]:
+    def genFirst(a: int, b: int) -> Iterator[Point]:
         x, y = 0, b
         a2, b2 = a**2, b**2
         d = b2 - a2*(b-0.25)
@@ -32,7 +32,7 @@ def _gen(center: Point, radius: Tuple[float, float]) -> Iterator[Point]:
                 d += a2*(-2*y+3)
             y -= 1
             yield Point.create(x, y)
-    for p in gen_first(round(radius[0]), round(radius[1])):
+    for p in genFirst(round(radius[0]), round(radius[1])):
         yield center + p
         yield center - p
         yield center + Point.create(p.x, -p.y)
@@ -76,8 +76,24 @@ class EllipseGeometry(Geometry):
     def radius(self, value: Tuple[float, float]) -> None:
         self._radius = value
 
-    def stroke_points(self, pen: Pen) -> Iterable[Point]:
-        return _gen(self.center, self.radius)
+    def strokePoints(self, pen: Pen) -> Iterable[Point]:
+        center, radius = self.center, self.radius
+        if self.transform is not None:
+            lt = Point.create(center.x - radius[0], center.y - radius[1])
+            rt = Point.create(center.x + radius[0], center.y - radius[1])
+            lb = Point.create(center.x - radius[0], center.y + radius[1])
+            rb = Point.create(center.x + radius[0], center.y + radius[1])
+            lt, rt, lb, rb = self.transform.transform(lt), self.transform.transform(
+                rt), self.transform.transform(lb), self.transform.transform(rb)
+            minX, maxX = min(lt.x, rt.x, lb.x, rb.x), max(
+                lt.x, rt.x, lb.x, rb.x)
+            minY, maxY = min(lt.y, rt.y, lb.y, rb.y), max(
+                lt.y, rt.y, lb.y, rb.y)
+            nell = self.from_rect(Rect.from_points(
+                Point.create(minX, minY), Point.create(maxX, maxY)))
+            center, radius = nell.center, nell.radius
 
-    def fill_points(self) -> Iterable[Point]:
+        return _gen(center, radius)
+
+    def fillPoints(self) -> Iterable[Point]:
         return []

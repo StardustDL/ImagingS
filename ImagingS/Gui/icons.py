@@ -54,13 +54,13 @@ property: QIcon = qta.icon("mdi.database")
 
 transform: QIcon = qta.icon("mdi.flash")
 
-line: QIcon = qta.icon("mdi.vector-line")
+lineGeometry: QIcon = qta.icon("mdi.vector-line")
 
-curve: QIcon = qta.icon("mdi.vector-curve")
+curveGeometry: QIcon = qta.icon("mdi.vector-curve")
 
-ellipse: QIcon = qta.icon("mdi.vector-ellipse")
+ellipseGeometry: QIcon = qta.icon("mdi.vector-ellipse")
 
-polygon: QIcon = qta.icon("mdi.vector-polygon")
+polygonGeometry: QIcon = qta.icon("mdi.vector-polygon")
 
 clip: QIcon = qta.icon("mdi.crop")
 
@@ -74,14 +74,14 @@ rotateTransform: QIcon = qta.icon("mdi.rotate-left")
 
 matrixTransform: QIcon = matrix
 
-groupTransform: QIcon = qta.icon("mdi.group")
+transformGroup: QIcon = qta.icon("mdi.group")
 
 
-def get_color_icon(color: Color) -> QIcon:
+def getColorIcon(color: Color) -> QIcon:
     return qta.icon("mdi.invert-colors", color=converters.qcolor(color))
 
 
-def get_brush_icon(brush: SolidBrush) -> QIcon:
+def getBrushIcon(brush: SolidBrush) -> QIcon:
     # pixmap = QPixmap(32, 32)
     # pixmap.fill(converters.convert_color(color))
     # return QIcon(pixmap)

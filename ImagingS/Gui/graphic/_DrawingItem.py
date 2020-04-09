@@ -2,10 +2,10 @@ from typing import Optional
 
 from PyQt5.QtCore import QRectF, QSizeF
 from PyQt5.QtGui import QColor, QPainter
-from PyQt5.QtWidgets import QGraphicsItem, QStyleOptionGraphicsItem, QWidget, QGraphicsItemGroup
+from PyQt5.QtWidgets import QGraphicsItem, QStyleOptionGraphicsItem, QWidget
 
 from ImagingS import Point, Rect
-from ImagingS.drawing import Drawing, DrawingGroup
+from ImagingS.drawing import Drawing
 from ImagingS.Gui import converters
 
 from . import PainterDrawingContext
@@ -45,37 +45,37 @@ class DrawingItem(QGraphicsItem):
         # return QRectF(area.origin.x - 1, area.origin.y - 1, area.size.width + 2, area.size.height + 2)
 
 
-class DrawingGroupItem(QGraphicsItemGroup):
-    def __init__(self, drawing: DrawingGroup, size: QSizeF, parent: QGraphicsItem = None):
-        super().__init__(parent)
-        self._drawing = drawing
-        self._size = size
-        self._is_active = False
+# class DrawingGroupItem(QGraphicsItemGroup):
+#     def __init__(self, drawing: DrawingGroup, size: QSizeF, parent: QGraphicsItem = None):
+#         super().__init__(parent)
+#         self._drawing = drawing
+#         self._size = size
+#         self._is_active = False
 
-    @property
-    def drawing(self) -> DrawingGroup:
-        return self._drawing
+#     @property
+#     def drawing(self) -> DrawingGroup:
+#         return self._drawing
 
-    def activate(self) -> None:
-        self._is_active = True
+#     def activate(self) -> None:
+#         self._is_active = True
 
-    def deactivate(self) -> None:
-        self._is_active = False
+#     def deactivate(self) -> None:
+#         self._is_active = False
 
-    def fresh(self) -> None:
-        for item in self.childItems:
-            self.removeFromGroup(item)
-        for di in self.drawing.children:
-            item = None
-            if isinstance(di, DrawingGroup):
-                item = DrawingGroupItem(di, self._size)
-            else:
-                item = DrawingItem(di, self._size)
-            self.addToGroup(item)
+#     def fresh(self) -> None:
+#         for item in self.childItems:
+#             self.removeFromGroup(item)
+#         for di in self.drawing.children:
+#             item = None
+#             if isinstance(di, DrawingGroup):
+#                 item = DrawingGroupItem(di, self._size)
+#             else:
+#                 item = DrawingItem(di, self._size)
+#             self.addToGroup(item)
 
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: Optional[QWidget] = None) -> None:
-        super().paint(painter, option, widget)
-        if self._is_active:
-            painter.setPen(QColor(255, 0, 0))
-            area = self.drawing.boundingArea
-            painter.drawRect(converters.qrect(area))
+#     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: Optional[QWidget] = None) -> None:
+#         super().paint(painter, option, widget)
+#         if self._is_active:
+#             painter.setPen(QColor(255, 0, 0))
+#             area = self.drawing.boundingArea
+#             painter.drawRect(converters.qrect(area))

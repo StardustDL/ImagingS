@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from enum import IntEnum, unique
-from typing import Iterable, List, Iterator
+from enum import Enum, unique
+from typing import Iterable, Iterator, List
 
 from ImagingS import Point
 from ImagingS.drawing import Pen
@@ -10,12 +10,12 @@ from . import Geometry
 
 
 @unique
-class CurveAlgorithm(IntEnum):
+class CurveAlgorithm(Enum):
     Bezier = 0
     BSpline = 1
 
 
-def _calc_point_count(points: List[Point]) -> int:
+def _calcPointCount(points: List[Point]) -> int:
     cnt = 0
     for i in range(len(points)-1):
         cnt += abs(points[i+1]-points[i])
@@ -23,7 +23,7 @@ def _calc_point_count(points: List[Point]) -> int:
     return cnt
 
 
-def _gen_Bezier(points: List[Point]) -> Iterator[Point]:
+def _genBezier(points: List[Point]) -> Iterator[Point]:
     def casteljau(ps: List[Point], t: float) -> Point:
         cps = [p.clone() for p in ps]
         n = len(cps) - 1
@@ -31,16 +31,16 @@ def _gen_Bezier(points: List[Point]) -> Iterator[Point]:
             for j in range(n-i+1):
                 cps[j] = cps[j] + t * (cps[j+1] - cps[j])
         return cps[0]
-    cnt = _calc_point_count(points)
+    cnt = _calcPointCount(points)
     for t in range(cnt+1):
         p = casteljau(points, t / cnt)
         yield p
 
 
-def _gen_BSpline3(points: List[Point]) -> Iterator[Point]:
+def _genBSpline3(points: List[Point]) -> Iterator[Point]:
     def subline(ps: List[Point]) -> Iterator[Point]:
         assert len(ps) == 4
-        cnt = _calc_point_count(ps)
+        cnt = _calcPointCount(ps)
         for tc in range(cnt+1):
             t = tc / cnt
             t2 = t * t
@@ -58,23 +58,23 @@ def _gen_BSpline3(points: List[Point]) -> Iterator[Point]:
 class CurveGeometry(Geometry):
     def __init__(self, ) -> None:
         super().__init__()
-        self.control_points = []
+        self.controlPoints = []
         self.algorithm = CurveAlgorithm.Bezier
 
     @staticmethod
-    def create(control_points: List[Point], algorithm: CurveAlgorithm) -> CurveGeometry:
+    def create(controlPoints: List[Point], algorithm: CurveAlgorithm) -> CurveGeometry:
         result = CurveGeometry()
-        result.control_points = control_points
+        result.controlPoints = controlPoints
         result.algorithm = algorithm
         return result
 
     @property
-    def control_points(self) -> List[Point]:
-        return self._control_points
+    def controlPoints(self) -> List[Point]:
+        return self._controlPoints
 
-    @control_points.setter
-    def control_points(self, value: List[Point]) -> None:
-        self._control_points = value
+    @controlPoints.setter
+    def controlPoints(self, value: List[Point]) -> None:
+        self._controlPoints = value
 
     @property
     def algorithm(self) -> CurveAlgorithm:
@@ -84,16 +84,16 @@ class CurveGeometry(Geometry):
     def algorithm(self, value: CurveAlgorithm) -> None:
         self._algorithm = value
 
-    def stroke_points(self, pen: Pen) -> Iterable[Point]:
-        lp = self.control_points
+    def strokePoints(self, pen: Pen) -> Iterable[Point]:
+        lp = self.controlPoints
         if self.transform is not None:
             lp = list(map(self.transform.transform, lp))
         gen = None
         if self.algorithm is CurveAlgorithm.Bezier:
-            gen = _gen_Bezier
+            gen = _genBezier
         elif self.algorithm is CurveAlgorithm.BSpline:
-            gen = _gen_BSpline3
+            gen = _genBSpline3
         return gen(lp)
 
-    def fill_points(self) -> Iterable[Point]:
+    def fillPoints(self) -> Iterable[Point]:
         return []

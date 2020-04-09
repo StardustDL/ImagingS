@@ -1,3 +1,4 @@
+from enum import Enum, unique
 import os
 from typing import Optional
 
@@ -8,13 +9,21 @@ from PyQt5.QtWidgets import QColorDialog, QFileDialog, QMainWindow
 import ImagingS.Gui.ui as ui
 from ImagingS import Color
 from ImagingS.brush import Brush, Brushes, SolidBrush
-from ImagingS.document import Document
-from ImagingS.drawing import Drawing, NumpyArrayDrawingContext
+from ImagingS.document import Document, DocumentFormat
+from ImagingS.drawing import NumpyArrayDrawingContext
 from ImagingS.Gui import icons
 from ImagingS.Gui.app import Application
-from ImagingS.Gui.models import BrushModel, DrawingModel, PropertyModel, TransformModel
+from ImagingS.Gui.models import (BrushModel, DrawingModel, PropertyModel,
+                                 TransformModel)
 
-from . import CodePage, VisualPage
+from . import DocumentEditor, DocumentEditorState
+
+
+@unique
+class MainWindowState(Enum):
+    Disable = 0,
+    Visual = 1,
+    Code = 2
 
 
 def _create_new_document() -> Document:
@@ -22,9 +31,8 @@ def _create_new_document() -> Document:
     for name, item in Brushes.__dict__.items():
         if name.startswith("__") and name.endswith("__"):
             continue
-        br = item.__func__()  # static method . __func__
-        if isinstance(br, Brush):
-            result.brushes.append(br)
+        if isinstance(item, Brush):
+            result.brushes.append(item)
     return result
 
 
@@ -32,9 +40,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setupVisual()
-        self.setupCode()
         self.setupDockWidget()
+        self.setupEditor()
         self.setupIcon()
         self.current_file = None
 
@@ -74,34 +81,10 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.modelProperties = PropertyModel(self)
         self.trvProperties.setModel(self.modelProperties)
 
-        self.widCode.uploaded.connect(self.widCode_uploaded)
-        self.tbxMain.currentChanged.connect(self.tbxMain_currentChanged)
-
         Application.current().documentChanged.connect(self.app_documentChanged)
 
         self.actViewVisual.trigger()
         self.actNew.trigger()
-
-    def setupCode(self):
-        self.widCode = CodePage()
-        self.widCode.setObjectName("widCode")
-        self.grdCode.addWidget(self.widCode, 0, 0, 1, 1)
-        self.widCode.messaged.connect(self.widVisualCode_messaged)
-
-    def setupVisual(self):
-        self.widVisual = VisualPage()
-        self.widVisual.setObjectName("widVisual")
-        self.grdVisual.addWidget(self.widVisual, 0, 0, 1, 1)
-        self.widVisual.messaged.connect(self.widVisualCode_messaged)
-        self.widVisual.drawingCreated.connect(self.widVisual_drawingCreated)
-
-        for act in self.widVisual.actionDrawings:
-            self.mnuDrawing.addAction(act)
-
-        for act in self.widVisual.actionTransforms:
-            self.mnuTransform.addAction(act)
-
-        self.mnuTools.addAction(self.widVisual.actClip)
 
     def setupDockWidget(self):
         self.actToggleBrushes = self.dwgBrushes.toggleViewAction()
@@ -120,6 +103,12 @@ class MainWindow(QMainWindow, ui.MainWindow):
         viewActions = [self.actToggleDrawings, self.actToggleBrushes,
                        self.actToggleTransforms, self.actToggleProperties]
         self.mnuView.addActions(viewActions)
+
+    def setupEditor(self) -> None:
+        self.editor = DocumentEditor()
+        self.editor.setObjectName("editor")
+        self.gridLayout.addWidget(self.editor, 0, 0, 1, 1)
+        self.editor.messaged.connect(self.editor_messaged)
 
     def setupIcon(self):
         self.actNew.setIcon(qta.icon("mdi.file"))
@@ -146,8 +135,6 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actToggleBrushes.setIcon(icons.brush)
         self.actToggleProperties.setIcon(icons.property)
         self.actToggleTransforms.setIcon(icons.transform)
-        self.tbxMain.setItemIcon(0, icons.visual)
-        self.tbxMain.setItemIcon(1, icons.code)
         self.actViewCode.setIcon(icons.code)
         self.actViewVisual.setIcon(icons.visual)
         self.setWindowIcon(qta.icon("mdi.pencil-box-multiple", color="purple"))
@@ -183,12 +170,12 @@ class MainWindow(QMainWindow, ui.MainWindow):
     def fresh_drawings(self):
         doc = Application.current().document
         hasDoc = doc is not None
+        self.dwgDrawings.setEnabled(hasDoc)
         if hasDoc:
             self.modelDrawing.fresh(doc.drawings)
+            self.trvDrawings.expandAll()
         else:
             self.modelDrawing.fresh()
-        self.widVisual.document = doc
-        self.dwgDrawings.setEnabled(hasDoc)
 
     def app_documentChanged(self):
         doc = Application.current().document
@@ -201,60 +188,38 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.mnuTransform.setEnabled(hasDoc)
         self.mnuBrush.setEnabled(hasDoc)
         self.dwgProperties.setEnabled(hasDoc)
-        self.tbxMain.setEnabled(hasDoc)
         self.fresh_brushes()
         self.fresh_drawings()
-
-        self.widCode.document = doc
-        self.widVisual.document = doc
-
         self.modelProperties.fresh()
 
-    def widVisualCode_messaged(self, message: str) -> None:
-        self.stbMain.showMessage(message)
+        if self.editor.state is not DocumentEditorState.Disable:
+            self.editor.disable()
 
-    def widVisual_drawingCreated(self, drawing: Drawing) -> None:
-        self.modelDrawing.append(drawing)
-
-    def widCode_uploaded(self):
-        tdoc = self.widCode.load_document()
-        if tdoc is None:
-            self.stbMain.showMessage("Load document from code failed.")
-        else:
-            Application.current().document = tdoc
-
-    def tbxMain_currentChanged(self, index):
-        if index == 0:  # Visual
-            self.widCode.upload()
-        else:  # Code
-            self.widCode.fresh()
+        if doc is not None:
+            self.editor.enable(doc)
 
     def trvBrushes_clicked(self, index):
-        item = self.modelBrush.get_data(index)
+        item = self.modelBrush.getData(index)
         if self.modelProperties.obj is not item:
-            self.widVisual.brush = item
             self.modelProperties.fresh(item)
             self.trvProperties.expandAll()
         else:
-            self.widVisual.brush = None
             self.modelProperties.fresh()
             self.trvProperties.expandAll()
             self.trvBrushes.clearSelection()
 
     def trvDrawings_clicked(self, index):
-        item = self.modelDrawing.get_data(index)
+        item = self.modelDrawing.getData(index)
         if self.modelProperties.obj is not item:
-            self.widVisual.drawing = item
             self.modelProperties.fresh(item)
             self.trvProperties.expandAll()
         else:
-            self.widVisual.drawing = None
             self.modelProperties.fresh()
             self.trvProperties.expandAll()
             self.trvDrawings.clearSelection()
-    
+
     def trvTransforms_clicked(self, index):
-        item = self.modelTransform.get_data(index)
+        item = self.modelTransform.getData(index)
         if self.modelProperties.obj is not item:
             self.modelProperties.fresh(item)
             self.trvProperties.expandAll()
@@ -264,14 +229,10 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.trvTransforms.clearSelection()
 
     def actViewVisual_triggered(self):
-        self.actViewCode.setChecked(False)
-        self.actViewVisual.setChecked(True)
-        self.tbxMain.setCurrentIndex(0)
+        self.editor.switchVisual()
 
     def actViewCode_triggered(self):
-        self.actViewCode.setChecked(True)
-        self.actViewVisual.setChecked(False)
-        self.tbxMain.setCurrentIndex(1)
+        self.editor.switchCode()
 
     def actDrawingRemove_triggered(self):
         indexs = self.trvDrawings.selectedIndexes()
@@ -321,7 +282,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
             return
         if file.endswith(".isd.json"):
             with open(file, mode="w+") as f:
-                Application.current().document.save(f, Document.FILE_RAW)
+                Application.current().document.save(f, DocumentFormat.RAW)
         else:
             with open(file, mode="wb") as f:
                 Application.current().document.save(f)
@@ -335,7 +296,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
         if fileName.endswith(".isd.json"):
             with open(fileName, mode="w+") as f:
-                Application.current().document.save(f, Document.FILE_RAW)
+                Application.current().document.save(f, DocumentFormat.RAW)
         else:
             with open(fileName, mode="wb") as f:
                 Application.current().document.save(f)
@@ -348,7 +309,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         if fileName:
             if fileName.endswith(".isd.json"):
                 with open(fileName, mode="r") as f:
-                    doc = Document.load(f, Document.FILE_RAW)
+                    doc = Document.load(f, DocumentFormat.RAW)
             else:
                 with open(fileName, mode="rb") as f:
                     doc = Document.load(f)
@@ -368,7 +329,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
             context = NumpyArrayDrawingContext(
                 NumpyArrayDrawingContext.create_array(doc.size))
 
-            for drawing in doc.drawings:
-                drawing.render(context)
+            doc.drawings.render(context)
 
             Image.fromarray(context.array).save(fileName, ext, quality=95)
+
+    def editor_messaged(self, message: str) -> None:
+        self.stbMain.showMessage(message)

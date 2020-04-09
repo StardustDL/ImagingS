@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from enum import IntEnum, unique
+from enum import Enum, unique
 from typing import Iterable, Iterator, Optional
 
 from ImagingS import Point, Rect, fsign
@@ -10,17 +10,17 @@ from . import Geometry
 
 
 @unique
-class LineAlgorithm(IntEnum):
+class LineAlgorithm(Enum):
     Dda = 0
     Bresenham = 1
 
 
-def _gen_DDA(start: Point, end: Point) -> Iterator[Point]:
+def _genDDA(start: Point, end: Point) -> Iterator[Point]:
     if start == end:
         yield start
         return
-    xs, ys = map(round, start.as_tuple())
-    xe, ye = map(round, end.as_tuple())
+    xs, ys = map(round, start.asTuple())
+    xe, ye = map(round, end.asTuple())
     dx, dy = xe-xs, ye-ys
     sx, sy = fsign(dx), fsign(dy)
     flag = False
@@ -39,12 +39,12 @@ def _gen_DDA(start: Point, end: Point) -> Iterator[Point]:
             yc += k
 
 
-def _gen_Bresenham(start: Point, end: Point) -> Iterator[Point]:
+def _genBresenham(start: Point, end: Point) -> Iterator[Point]:
     if start == end:
         yield start
         return
-    xs, ys = map(round, start.as_tuple())
-    xe, ye = map(round, end.as_tuple())
+    xs, ys = map(round, start.asTuple())
+    xe, ye = map(round, end.asTuple())
     dx, dy = xe-xs, ye-ys
     sx, sy = fsign(dx), fsign(dy)
     dx, dy = abs(dx), abs(dy)
@@ -70,7 +70,7 @@ def _gen_Bresenham(start: Point, end: Point) -> Iterator[Point]:
 
 
 @unique
-class LineClipAlgorithm(IntEnum):
+class LineClipAlgorithm(Enum):
     CohenSutherland = 0
     LiangBarsky = 1
 
@@ -82,7 +82,7 @@ class LineGeometry(Geometry):
         self.end = Point()
         self.algorithm = LineAlgorithm.Dda
         self.clip = None
-        self.clip_algorithm = LineClipAlgorithm.CohenSutherland
+        self.clipAlgorithm = LineClipAlgorithm.CohenSutherland
 
     @staticmethod
     def create(start: Point, end: Point, algorithm: LineAlgorithm) -> LineGeometry:
@@ -125,14 +125,14 @@ class LineGeometry(Geometry):
         self._clip = value
 
     @property
-    def clip_algorithm(self) -> LineClipAlgorithm:
-        return self._clip_algorithm
+    def clipAlgorithm(self) -> LineClipAlgorithm:
+        return self._clipAlgorithm
 
-    @clip_algorithm.setter
-    def clip_algorithm(self, value: LineClipAlgorithm) -> None:
-        self._clip_algorithm = value
+    @clipAlgorithm.setter
+    def clipAlgorithm(self, value: LineClipAlgorithm) -> None:
+        self._clipAlgorithm = value
 
-    def stroke_points(self, pen: Pen) -> Iterable[Point]:
+    def strokePoints(self, pen: Pen) -> Iterable[Point]:
         start = self.start
         end = self.end
         if self.transform is not None:
@@ -140,10 +140,10 @@ class LineGeometry(Geometry):
             end = self.transform.transform(end)
         gen = None
         if self.algorithm is LineAlgorithm.Dda:
-            gen = _gen_DDA
+            gen = _genDDA
         elif self.algorithm is LineAlgorithm.Bresenham:
-            gen = _gen_Bresenham
+            gen = _genBresenham
         return gen(start, end)
 
-    def fill_points(self) -> Iterable[Point]:
+    def fillPoints(self) -> Iterable[Point]:
         return []

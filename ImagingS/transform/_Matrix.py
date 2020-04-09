@@ -32,8 +32,8 @@ class MatrixTransform(Transform):
         self._matrix = value
 
     def transform(self, origin: Point) -> Point:
-        result = Point.from_homogeneous(
-            np.dot(self.matrix, origin.to_homogeneous()))
+        result = Point.fromHomogeneous(
+            np.dot(self.matrix, origin.toHomogeneous()))
         return result
 
     def serialize(self) -> Dict:

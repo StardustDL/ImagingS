@@ -6,7 +6,7 @@ from PIL import Image
 
 from ImagingS import Color, Point, Rect, Size
 from ImagingS.brush import Brushes, SolidBrush
-from ImagingS.document import Document
+from ImagingS.document import Document, DocumentFormat
 from ImagingS.drawing import GeometryDrawing, NumpyArrayDrawingContext, Pen
 from ImagingS.geometry import (CurveAlgorithm, CurveGeometry, EllipseGeometry,
                                LineAlgorithm, LineClipAlgorithm, LineGeometry,
@@ -39,6 +39,17 @@ class BuiltinInstruction:
     def resetCanvas(self, argv: List[str]) -> None:
         self.doc.size = Size.create(int(argv[0]), int(argv[1]))
         self.doc.drawings.children.clear()
+
+    def saveDoc(self, argv: List[str]) -> None:
+        fileName = os.path.join(self.output_dir, f"{argv[0]}.isd.json")
+
+        with open(fileName, "w+") as f:
+            self.doc.save(f, DocumentFormat.RAW)
+
+        fileName = os.path.join(self.output_dir, f"{argv[0]}.isd")
+
+        with open(fileName, "wb") as f:
+            self.doc.save(f)
 
     def saveCanvas(self, argv: List[str]) -> None:
         fileName = os.path.join(self.output_dir, f"{argv[0]}.bmp")
@@ -124,7 +135,7 @@ class BuiltinInstruction:
         lt = Point.create(int(argv[1]), int(argv[2]))
         rb = Point.create(int(argv[3]), int(argv[4]))
         drawing.geometry.clip = Rect.from_points(lt, rb)
-        drawing.geometry.clip_algorithm = LineClipAlgorithm.CohenSutherland if argv[
+        drawing.geometry.clipAlgorithm = LineClipAlgorithm.CohenSutherland if argv[
             5] == "Cohen-Sutherland" else LineClipAlgorithm.LiangBarsky
 
     def execute(self, ins: str) -> None:

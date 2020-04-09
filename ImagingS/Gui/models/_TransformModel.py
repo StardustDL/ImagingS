@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, QModelIndex
+from PyQt5.QtCore import QModelIndex, Qt
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 
 from ImagingS.Gui import icons
@@ -8,7 +8,7 @@ from ImagingS.transform import (MatrixTransform, RotateTransform,
 
 
 class TransformModel(QStandardItemModel):
-    TYPE = range(1)
+    TYPE = 0
 
     def __init__(self, parent) -> None:
         super().__init__(0, 1, parent)
@@ -23,21 +23,21 @@ class TransformModel(QStandardItemModel):
 
         name = obj.__class__.__name__
         item = QStandardItem(name)
-        self.__set_icon(item, obj)
-        self.__set_data(item, obj)
+        self._setIcon(item, obj)
+        self._setData(item, obj)
         self.appendRow(item)
 
         if isinstance(obj, TransformGroup):
-            self.__add_children(item, obj)
+            self._addChildren(item, obj)
 
-    def get_data(self, index: QModelIndex) -> Transform:
+    def getData(self, index: QModelIndex) -> Transform:
         item = self.itemFromIndex(index)
         return item.data(Qt.UserRole)
 
-    def __set_data(self, item: QStandardItem, value: Transform) -> None:
+    def _setData(self, item: QStandardItem, value: Transform) -> None:
         item.setData(value, Qt.UserRole)
 
-    def __set_icon(self, item: QStandardItem, value: Transform) -> None:
+    def _setIcon(self, item: QStandardItem, value: Transform) -> None:
         if isinstance(value, TranslateTransform):
             item.setIcon(icons.translateTransform)
         elif isinstance(value, SkewTransform):
@@ -49,14 +49,14 @@ class TransformModel(QStandardItemModel):
         elif isinstance(value, MatrixTransform):
             item.setIcon(icons.matrixTransform)
         elif isinstance(value, TransformGroup):
-            item.setIcon(icons.groupTransform)
+            item.setIcon(icons.transformGroup)
 
-    def __add_children(self, root: QStandardItem, value: TransformGroup) -> None:
+    def _addChildren(self, root: QStandardItem, value: TransformGroup) -> None:
         for trans in value.children:
             name = trans.__class__.__name__
             item = QStandardItem(name)
-            self.__set_icon(item, trans)
-            self.__set_data(item, trans)
+            self._setIcon(item, trans)
+            self._setData(item, trans)
             root.appendRow(item)
             if isinstance(trans, TransformGroup):
-                self.__add_children(item, trans)
+                self._addChildren(item, trans)

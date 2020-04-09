@@ -4,7 +4,7 @@ from ImagingS import Color, IdObject, IdObjectList, Point, Rect, Size
 def test_color() -> None:
     c = Color.create(0, 0, 0)
     assert c == Color.create(0, 0, 0)
-    assert c.to_hex() == "#000000"
+    assert c.toHex() == "#000000"
     assert str(c).startswith("Color")
 
 
@@ -12,16 +12,16 @@ def test_point() -> None:
     c = Point.create(1, 1)
     assert c == Point.create(1, 1)
     assert c + c == c * 2
-    assert c.as_tuple() == (1, 1)
+    assert c.asTuple() == (1, 1)
     assert str(c).startswith("Point")
-    assert c.to_homogeneous().shape == (3, 1)
-    assert c.from_homogeneous(c.to_homogeneous()) == c
+    assert c.toHomogeneous().shape == (3, 1)
+    assert c.fromHomogeneous(c.toHomogeneous()) == c
 
 
 def test_size() -> None:
     c = Size.create(1, 1)
     assert c == Size.create(1, 1)
-    assert c.as_tuple() == (1, 1)
+    assert c.asTuple() == (1, 1)
     assert str(c).startswith("Size")
 
 

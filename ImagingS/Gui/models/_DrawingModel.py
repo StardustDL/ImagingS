@@ -1,7 +1,7 @@
-from PyQt5.QtCore import Qt, QModelIndex
+from PyQt5.QtCore import QModelIndex, Qt
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 
-from ImagingS.drawing import Drawing, GeometryDrawing, DrawingGroup
+from ImagingS.drawing import Drawing, DrawingGroup, GeometryDrawing
 from ImagingS.geometry import (CurveGeometry, EllipseGeometry, LineGeometry,
                                PolygonGeometry)
 from ImagingS.Gui import icons
@@ -23,42 +23,44 @@ class DrawingModel(QStandardItemModel):
             return
 
         type = obj.__class__.__name__
-        item = QStandardItem(obj.id)
+        item = QStandardItem(obj.id if obj.id else "Document")
         index = self.indexFromItem(item).row()
         self.setItem(index, self.TYPE, QStandardItem(type))
-        self.__set_icon(item, obj)
-        self.__set_data(item, obj)
+        self._setIcon(item, obj)
+        self._setData(item, obj)
         self.appendRow(item)
 
         if isinstance(obj, DrawingGroup):
-            self.__add_children(item, obj)
+            self._addChildren(item, obj)
 
-    def get_data(self, index: QModelIndex) -> Drawing:
+    def getData(self, index: QModelIndex) -> Drawing:
         item = self.itemFromIndex(index)
         return item.data(Qt.UserRole)
 
-    def __set_data(self, item: QStandardItem, value: Drawing) -> None:
+    def _setData(self, item: QStandardItem, value: Drawing) -> None:
         item.setData(value, Qt.UserRole)
 
-    def __set_icon(self, item: QStandardItem, value: Drawing) -> None:
+    def _setIcon(self, item: QStandardItem, value: Drawing) -> None:
         if isinstance(value, GeometryDrawing):
             if isinstance(value.geometry, LineGeometry):
-                item.setIcon(icons.line)
+                item.setIcon(icons.lineGeometry)
             elif isinstance(value.geometry, CurveGeometry):
-                item.setIcon(icons.curve)
+                item.setIcon(icons.curveGeometry)
             elif isinstance(value.geometry, EllipseGeometry):
-                item.setIcon(icons.ellipse)
+                item.setIcon(icons.ellipseGeometry)
             elif isinstance(value.geometry, PolygonGeometry):
-                item.setIcon(icons.polygon)
+                item.setIcon(icons.polygonGeometry)
+        else:
+            item.setIcon(icons.drawing)
 
-    def __add_children(self, root: QStandardItem, value: DrawingGroup) -> None:
+    def _addChildren(self, root: QStandardItem, value: DrawingGroup) -> None:
         for drawing in value.children:
             type = drawing.__class__.__name__
             item = QStandardItem(drawing.id)
+            self._setIcon(item, drawing)
+            self._setData(item, drawing)
+            root.appendRow(item)
             index = self.indexFromItem(item).row()
-            self.setItem(index, self.TYPE, QStandardItem(type))
-            self.__set_icon(item, drawing)
-            self.__set_data(item, drawing)
-            self.appendRow(item)
+            root.setChild(index, self.TYPE, QStandardItem(type))
             if isinstance(drawing, DrawingGroup):
-                self.__add_children(item, drawing)
+                self._addChildren(item, drawing)

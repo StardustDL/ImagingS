@@ -13,7 +13,7 @@ class RotateTransform(MatrixTransform):
     def __init__(self) -> None:
         super().__init__()
         self.center = Point()
-        self.angle = 0
+        self.angle = 0.0
 
     @staticmethod
     def create(center: Point, angle: float) -> RotateTransform:

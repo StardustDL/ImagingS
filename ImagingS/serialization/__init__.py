@@ -1,9 +1,9 @@
-from ._Property import Property, get_properties
+from ._Property import Property, getProperties
 from ._Serializable import PropertySerializable, Serializable
 
 __all__ = (
     "Property",
-    "get_properties",
+    "getProperties",
     "Serializable",
     "PropertySerializable"
 )

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import lzma
 import uuid
-from enum import IntEnum, unique
+from enum import Enum, unique
 from typing import List
 
 from ImagingS import IdObject, Size
@@ -14,7 +14,7 @@ from ImagingS.serialization.json import Decoder, Encoder
 
 
 @unique
-class DocumentFormat(IntEnum):
+class DocumentFormat(Enum):
     ISD = 1
     RAW = 2
 
@@ -63,9 +63,11 @@ class Document(PropertySerializable, IdObject):
     @staticmethod
     def load(file, format: DocumentFormat = DocumentFormat.ISD) -> Document:
         if format is DocumentFormat.RAW:
-            return json.load(file, cls=Decoder)
+            result = json.load(file, cls=Decoder)
         else:
             data = file.read()
             data = lzma.decompress(data)
             s = data.decode("utf8")
-            return json.loads(s, cls=Decoder)
+            result = json.loads(s, cls=Decoder)
+        assert isinstance(result, Document)
+        return result

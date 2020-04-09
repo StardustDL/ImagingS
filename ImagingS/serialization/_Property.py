@@ -8,26 +8,26 @@ class Property:
         self._get = prop.fget
         self._set = prop.fset
         self._del = prop.fdel
-        self._data_type = prop.fget.__annotations__["return"]
+        self._dataType = prop.fget.__annotations__["return"]
 
     @property
     def name(self) -> str:
         return self._name
 
     @property
-    def data_type(self) -> type:
-        return self._data_type
+    def dataType(self) -> type:
+        return self._dataType
 
     @property
-    def can_get(self) -> bool:
+    def canGet(self) -> bool:
         return self._get is not None
 
     @property
-    def can_set(self) -> bool:
+    def canSet(self) -> bool:
         return self._set is not None
 
     @property
-    def can_del(self) -> bool:
+    def canDel(self) -> bool:
         return self._del is not None
 
     def get(self) -> Any:
@@ -40,7 +40,7 @@ class Property:
         return self._del.__call__(self._onwer)
 
 
-def get_properties(obj: Any) -> Iterator[Property]:
+def getProperties(obj: Any) -> Iterator[Property]:
     cls = obj.__class__
     for name in dir(cls):
         item = getattr(cls, name)

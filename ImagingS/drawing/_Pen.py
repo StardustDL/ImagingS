@@ -7,7 +7,7 @@ from ImagingS.serialization import PropertySerializable
 class Pen(PropertySerializable):
     def __init__(self):
         super().__init__()
-        self.thickness = 1
+        self.thickness = 1.0
         self.brush = Brushes.Black
 
     @staticmethod

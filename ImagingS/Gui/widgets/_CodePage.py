@@ -1,3 +1,4 @@
+from enum import Enum, unique
 from io import StringIO
 from typing import Optional
 
@@ -10,11 +11,19 @@ from ImagingS.document import Document, DocumentFormat
 from ImagingS.Gui.models import PropertyModel
 
 
-class CodePage(QWidget, ui.CodePage):
-    uploaded = pyqtSignal()
-    messaged = pyqtSignal(str)
+@unique
+class CodePageState(Enum):
+    Disable = 0,
+    Normal = 1,
+    Changed = 2
 
-    def __init__(self):
+
+class CodePage(QWidget, ui.CodePage):
+    uploaded = pyqtSignal(Document)
+    messaged = pyqtSignal(str)
+    stateChanged = pyqtSignal(CodePageState)
+
+    def __init__(self) -> None:
         super().__init__()
         self.setupUi(self)
         self.setupIcon()
@@ -22,54 +31,34 @@ class CodePage(QWidget, ui.CodePage):
         self.modelCode = PropertyModel(self)
         self.trvCode.setModel(self.modelCode)
 
+        self.tetCode.textChanged.connect(self.tetCode_textChanged)
         self.actBuild.triggered.connect(self.actBuild_triggered)
         self.actRestore.triggered.connect(self.actRestore_triggered)
         self.actUpload.triggered.connect(self.actUpload_triggered)
 
-        self.document = None
+        self.setEnabled(False)
+        self._state = CodePageState.Disable
 
-    def setupIcon(self):
+    def setupIcon(self) -> None:
         self.actBuild.setIcon(qta.icon("mdi.play"))
         self.actRestore.setIcon(qta.icon("mdi.restore"))
         self.actUpload.setIcon(qta.icon("mdi.upload"))
         self.setWindowIcon(qta.icon("mdi.code-tags"))
 
-    def fresh(self) -> None:
-        if self.document is None:
-            self.tetCode.setText("")
-            self.modelCode.fresh()
-        else:
-            io = StringIO()
-            self.document.save(io, DocumentFormat.RAW)
-            self.tetCode.setText(io.getvalue())
-            self.modelCode.fresh(self.document)
-            width = self.trvCode.size().width() / 2
-            if width > 0:
-                self.trvCode.setColumnWidth(0, width)
-                self.trvCode.setColumnWidth(1, width)
-            self.trvCode.expandAll()
-
-    def upload(self) -> None:
-        doc = self.load_document()
+    def _showdoc(self, doc: Document) -> None:
+        io = StringIO()
+        doc.save(io, DocumentFormat.RAW)
+        self.tetCode.setText(io.getvalue())
         self.modelCode.fresh(doc)
-        if doc is None:
-            self.messaged.emit("Loading document from code FAILED.")
-        self.uploaded.emit()
+        width = self.trvCode.size().width() / 2
+        if width > 0:
+            self.trvCode.setColumnWidth(0, width)
+            self.trvCode.setColumnWidth(1, width)
+        self.trvCode.expandAll()
 
-    @property
-    def document(self) -> Optional[Document]:
-        return self._document
+    def _loaddoc(self) -> Optional[Document]:
+        assert self.state is not CodePageState.Disable
 
-    @document.setter
-    def document(self, value: Optional[Document]) -> None:
-        self._document = value
-        self.fresh()
-
-    @property
-    def code(self) -> str:
-        return self.tetCode.toPlainText()
-
-    def load_document(self) -> Optional[Document]:
         io = StringIO(self.code)
         try:
             tdoc = Document.load(io, DocumentFormat.RAW)
@@ -77,14 +66,51 @@ class CodePage(QWidget, ui.CodePage):
         except Exception:
             return None
 
+    def enable(self, doc: Document) -> None:
+        assert self.state is CodePageState.Disable
+        self.setEnabled(True)
+        self._document = doc
+        self._showdoc(self._document)
+        self._state = CodePageState.Normal
+
+    def disable(self) -> None:
+        assert self.state is not CodePageState.Disable
+        if hasattr(self, "_document"):
+            del self._document
+        self.tetCode.setText("")
+        self.modelCode.fresh()
+        self.setEnabled(False)
+        self._state = CodePageState.Disable
+
+    @property
+    def code(self) -> str:
+        return self.tetCode.toPlainText()
+
+    @property
+    def state(self) -> CodePageState:
+        return self._state
+
+    def tetCode_textChanged(self) -> None:
+        self._state = CodePageState.Changed
+
     def actBuild_triggered(self) -> None:
-        doc = self.load_document()
-        self.modelCode.fresh(doc)
+        doc = self._loaddoc()
+
         if doc is None:
+            self.modelCode.fresh()
             self.messaged.emit("Loading document from code FAILED.")
+        else:
+            self._showdoc(doc)
 
     def actRestore_triggered(self) -> None:
-        self.fresh()
+        self._showdoc(self._document)
 
     def actUpload_triggered(self) -> None:
-        self.upload()
+        doc = self._loaddoc()
+        if doc is None:
+            self.modelCode.fresh()
+            self.messaged.emit("Loading document from code FAILED.")
+        else:
+            self._showdoc(doc)
+            self.uploaded.emit(doc)
+            self._state = CodePageState.Normal

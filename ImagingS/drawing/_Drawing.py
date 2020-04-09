@@ -31,12 +31,12 @@ class Drawing(PropertySerializable, IdObject, ABC):
             self._boundingArea = None
             measurer = BoundingAreaMeasurer()
             self.render(measurer)
-            self._boundingArea = measurer.end_measure()
+            self._boundingArea = measurer.endMeasure()
         elif self._boundingArea is None:  # boundingArea is calculating
             return Rect()
         return self._boundingArea
 
-    def refresh_boundingArea(self) -> None:
+    def refreshBoundingArea(self) -> None:
         if hasattr(self, "_boundingArea"):
             del self._boundingArea
 

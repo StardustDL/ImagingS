@@ -22,13 +22,13 @@ class BoundingAreaMeasurer(DrawingContext):
         self._rx = float("-inf")
         self._ry = float("-inf")
 
-    def end_measure(self) -> Rect:
+    def endMeasure(self) -> Rect:
         result = Rect.from_points(Point.create(
             self._lx, self._ly), Point.create(self._rx, self._ry))
         return result
 
     def point(self, position: Point, color: Color) -> None:
-        x, y = position.as_tuple()
+        x, y = position.asTuple()
         self._lx = min(self._lx, x)
         self._ly = min(self._ly, y)
         self._rx = max(self._rx, x)
@@ -63,7 +63,7 @@ class NumpyArrayDrawingContext(DrawingContext):
             Point(), Size.create(value.shape[1], value.shape[0]))
 
     def point(self, position: Point, color: Color) -> None:
-        x, y = map(int, position.as_tuple())
+        x, y = map(int, position.asTuple())
         self.array[y, x, 0] = color.r
         self.array[y, x, 1] = color.g
         self.array[y, x, 2] = color.b
