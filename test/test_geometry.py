@@ -42,7 +42,7 @@ def test_curve() -> None:
 
 
 def test_ellipse() -> None:
-    ell = EllipseGeometry.from_rect(
+    ell = EllipseGeometry.fromRect(
         Rect.create(Point(), Size.create(10, 10)))
     assert not ell.inStroke(Pen(), Point())
 
@@ -50,7 +50,7 @@ def test_ellipse() -> None:
 def test_group() -> None:
     line = LineGeometry.create(Point.create(
         0, 0), Point.create(1, 1), LineAlgorithm.Dda)
-    ell = EllipseGeometry.from_rect(
+    ell = EllipseGeometry.fromRect(
         Rect.create(Point(), Size.create(10, 10)))
     group = GeometryGroup()
     group.children.append(line)

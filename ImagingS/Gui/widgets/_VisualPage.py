@@ -15,9 +15,12 @@ from ImagingS.geometry import (CurveAlgorithm, CurveGeometry, EllipseGeometry,
 from ImagingS.Gui import converters, icons
 from ImagingS.Gui.graphic import Canvas
 from ImagingS.Gui.interactivity import Interactivity, InteractivityState
-from ImagingS.Gui.interactivity.geometry import (GeometryInteractive,
+from ImagingS.Gui.interactivity.geometry import (CurveInteractive,
+                                                 EllipseInteractive,
+                                                 GeometryInteractive,
                                                  LineInteractive,
-                                                 PolylineInteractive)
+                                                 PolylineInteractive,
+                                                 RectangleInteractive)
 
 
 @unique
@@ -67,6 +70,16 @@ class VisualPage(QWidget, ui.VisualPage):
             self.actDrawingPolylineDDA_triggered)
         self.actDrawingPolylineBresenham.triggered.connect(
             self.actDrawingPolylineBresenham_triggered)
+        self.actDrawingRectangleDDA.triggered.connect(
+            self.actDrawingRectangleDDA_triggered)
+        self.actDrawingRectangleBresenham.triggered.connect(
+            self.actDrawingRectangleBresenham_triggered)
+        self.actDrawingCurveBezier.triggered.connect(
+            self.actDrawingCurveBezier_triggered)
+        self.actDrawingCurveBSpline.triggered.connect(
+            self.actDrawingCurveBSpline_triggered)
+        self.actDrawingEllipse.triggered.connect(
+            self.actDrawingEllipse_triggered)
 
         self.setEnabled(False)
         self._drawing = None
@@ -86,7 +99,9 @@ class VisualPage(QWidget, ui.VisualPage):
         menu.addActions([self.actDrawingPolygonDDA,
                          self.actDrawingPolygonBresenham,
                          self.actDrawingPolylineDDA,
-                         self.actDrawingPolylineBresenham])
+                         self.actDrawingPolylineBresenham,
+                         self.actDrawingRectangleDDA,
+                         self.actDrawingRectangleBresenham])
         tb.setDefaultAction(self.actDrawingPolygonDDA)
         tb.setMenu(menu)
         tb.setPopupMode(QToolButton.MenuButtonPopup)
@@ -126,6 +141,8 @@ class VisualPage(QWidget, ui.VisualPage):
         self.actDrawingPolygonBresenham.setIcon(icons.polygonGeometry)
         self.actDrawingPolylineDDA.setIcon(icons.polylineGeometry)
         self.actDrawingPolylineBresenham.setIcon(icons.polylineGeometry)
+        self.actDrawingRectangleDDA.setIcon(icons.rectangleGeometry)
+        self.actDrawingRectangleBresenham.setIcon(icons.rectangleGeometry)
         self.actTransformSkew.setIcon(icons.skewTransform)
         self.actTransformScale.setIcon(icons.scaleTransform)
         self.actTransformTranslate.setIcon(icons.translateTransform)
@@ -274,4 +291,33 @@ class VisualPage(QWidget, ui.VisualPage):
         geo = PolylineGeometry()
         geo.algorithm = LineAlgorithm.Bresenham
         self._beginInteractive(PolylineInteractive(
+            self._emptyGeometryDrawing(), geo, self._document.size))
+
+    def actDrawingRectangleDDA_triggered(self):
+        geo = RectangleGeometry()
+        geo.algorithm = LineAlgorithm.Dda
+        self._beginInteractive(RectangleInteractive(
+            self._emptyGeometryDrawing(), geo, self._document.size))
+
+    def actDrawingRectangleBresenham_triggered(self):
+        geo = RectangleGeometry()
+        geo.algorithm = LineAlgorithm.Bresenham
+        self._beginInteractive(RectangleInteractive(
+            self._emptyGeometryDrawing(), geo, self._document.size))
+
+    def actDrawingCurveBezier_triggered(self):
+        geo = CurveGeometry()
+        geo.algorithm = CurveAlgorithm.Bezier
+        self._beginInteractive(CurveInteractive(
+            self._emptyGeometryDrawing(), geo, self._document.size))
+
+    def actDrawingCurveBSpline_triggered(self):
+        geo = CurveGeometry()
+        geo.algorithm = CurveAlgorithm.BSpline
+        self._beginInteractive(CurveInteractive(
+            self._emptyGeometryDrawing(), geo, self._document.size))
+
+    def actDrawingEllipse_triggered(self):
+        geo = EllipseGeometry()
+        self._beginInteractive(EllipseInteractive(
             self._emptyGeometryDrawing(), geo, self._document.size))

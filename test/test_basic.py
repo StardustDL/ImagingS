@@ -29,7 +29,7 @@ def test_size() -> None:
 def test_rect() -> None:
     c = Rect.create(Point.create(1, 1), Size.create(1, 1))
     assert c == Rect.create(Point.create(1, 1), Size.create(1, 1))
-    assert c == Rect.from_points(Point.create(1, 2), Point.create(2, 1))
+    assert c == Rect.fromPoints(Point.create(1, 2), Point.create(2, 1))
     assert str(c).startswith("Rect")
 
 

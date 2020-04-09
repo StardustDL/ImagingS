@@ -37,7 +37,7 @@ def test_saveload() -> None:
     poly = GeometryDrawing.create(polyG)
     poly.id = "poly"
 
-    ellG = EllipseGeometry.from_rect(Rect.create(Point(), Size.create(10, 10)))
+    ellG = EllipseGeometry.fromRect(Rect.create(Point(), Size.create(10, 10)))
     tg = TransformGroup()
     tg.children.append(MatrixTransform.create(np.ones((3, 3))))
     tg.children.append(ScaleTransform.create(Point(), (2, 2)))

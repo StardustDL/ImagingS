@@ -90,7 +90,7 @@ class BuiltinInstruction:
     def drawEllipse(self, argv: List[str]) -> None:
         lt = Point.create(int(argv[1]), int(argv[2]))
         rb = Point.create(int(argv[3]), int(argv[4]))
-        geometry = EllipseGeometry.from_rect(Rect.from_points(lt, rb))
+        geometry = EllipseGeometry.fromRect(Rect.fromPoints(lt, rb))
         drawing = GeometryDrawing.create(geometry)
         drawing.id = argv[0]
         drawing.stroke = Pen.create(self.brush)
@@ -134,7 +134,7 @@ class BuiltinInstruction:
         assert isinstance(drawing.geometry, LineGeometry)
         lt = Point.create(int(argv[1]), int(argv[2]))
         rb = Point.create(int(argv[3]), int(argv[4]))
-        drawing.geometry.clip = Rect.from_points(lt, rb)
+        drawing.geometry.clip = Rect.fromPoints(lt, rb)
         drawing.geometry.clipAlgorithm = LineClipAlgorithm.CohenSutherland if argv[
             5] == "Cohen-Sutherland" else LineClipAlgorithm.LiangBarsky
 

@@ -24,6 +24,9 @@ def _calcPointCount(points: List[Point]) -> int:
 
 
 def _genBezier(points: List[Point]) -> Iterator[Point]:
+    if len(points) < 4:
+        return
+
     def casteljau(ps: List[Point], t: float) -> Point:
         cps = [p.clone() for p in ps]
         n = len(cps) - 1
@@ -38,6 +41,9 @@ def _genBezier(points: List[Point]) -> Iterator[Point]:
 
 
 def _genBSpline3(points: List[Point]) -> Iterator[Point]:
+    if len(points) < 4:
+        return
+
     def subline(ps: List[Point]) -> Iterator[Point]:
         assert len(ps) == 4
         cnt = _calcPointCount(ps)

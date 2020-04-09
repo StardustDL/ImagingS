@@ -133,6 +133,16 @@
     <string>Polyline(DDA)</string>
    </property>
   </action>
+  <action name="actDrawingRectangleBresenham">
+   <property name="text">
+    <string>Rectangle(Bresenham)</string>
+   </property>
+  </action>
+  <action name="actDrawingRectangleDDA">
+   <property name="text">
+    <string>Rectangle(DDA)</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

@@ -1,16 +1,16 @@
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QKeyEvent
 
-from ImagingS import Size
+from ImagingS import Rect, Size
 from ImagingS.drawing import GeometryDrawing
-from ImagingS.geometry import LineGeometry
+from ImagingS.geometry import RectangleGeometry
 from ImagingS.Gui import converters
 
 from . import GeometryInteractive
 
 
-class LineInteractive(GeometryInteractive[LineGeometry]):
-    def __init__(self, target: GeometryDrawing, geometry: LineGeometry, size: Size) -> None:
+class RectangleInteractive(GeometryInteractive[RectangleGeometry]):
+    def __init__(self, target: GeometryDrawing, geometry: RectangleGeometry, size: Size) -> None:
         super().__init__(target, geometry, size)
 
     def start(self) -> None:
@@ -18,24 +18,28 @@ class LineInteractive(GeometryInteractive[LineGeometry]):
         self._isShift = False
         super().start()
 
+    def _setGeometry(self) -> None:
+        self.geometry.rect = Rect.fromPoints(self._beginPoint, self._endPoint)
+
     def _setEndPoint(self, point: QPointF) -> None:
         if self._isShift:
             tp = converters.point(point)
-            delta = tp - self.geometry.start
+            delta = tp - self._beginPoint
             if abs(delta.x) <= abs(delta.y):
-                delta.x = 0
+                delta.y = delta.x
             else:
-                delta.y = 0
-            self.geometry.end = self.geometry.start + delta
+                delta.x = delta.y
+            self._endPoint = self._beginPoint + delta
         else:
-            self.geometry.end = converters.point(point)
+            self._endPoint = converters.point(point)
 
     def onMouseRelease(self, point: QPointF) -> None:
         if not self._hasStarted:
-            self.geometry.start = converters.point(point)
+            self._beginPoint = converters.point(point)
             self._hasStarted = True
         else:
             self._setEndPoint(point)
+            self._setGeometry()
             self.target.refreshBoundingRect()
             self.end(True)
         super().onMouseRelease(point)
@@ -43,6 +47,7 @@ class LineInteractive(GeometryInteractive[LineGeometry]):
     def onMouseMove(self, point: QPointF) -> None:
         if self._hasStarted:
             self._setEndPoint(point)
+            self._setGeometry()
             self.update()
         super().onMouseMove(point)
 

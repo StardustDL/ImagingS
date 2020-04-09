@@ -148,12 +148,12 @@ class Rect(PropertySerializable):
     @classmethod
     def infinite(cls) -> Rect:
         if cls._infinite is None:
-            cls._infinite = Rect.from_points(Point.create(
+            cls._infinite = Rect.fromPoints(Point.create(
                 float("-inf"), float("-inf")), Point.create(float("inf"), float("inf")))
         return cls._infinite
 
     @staticmethod
-    def from_points(p1: Point, p2: Point) -> Rect:
+    def fromPoints(p1: Point, p2: Point) -> Rect:
         x1, y1 = p1.asTuple()
         x2, y2 = p2.asTuple()
         xmin, xmax = min(x1, x2), max(x1, x2)

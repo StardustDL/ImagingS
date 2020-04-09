@@ -10,6 +10,8 @@ from . import Geometry
 
 def _gen(center: Point, radius: Tuple[float, float]) -> Iterator[Point]:
     def genFirst(a: int, b: int) -> Iterator[Point]:
+        if a == 0 and b == 0:
+            return
         x, y = 0, b
         a2, b2 = a**2, b**2
         d = b2 - a2*(b-0.25)
@@ -53,7 +55,7 @@ class EllipseGeometry(Geometry):
         return result
 
     @staticmethod
-    def from_rect(rect: Rect) -> EllipseGeometry:
+    def fromRect(rect: Rect) -> EllipseGeometry:
         po, pv = rect.origin, rect.vertex()
         result = EllipseGeometry()
         result.center = (po+pv)*0.5
@@ -89,7 +91,7 @@ class EllipseGeometry(Geometry):
                 lt.x, rt.x, lb.x, rb.x)
             minY, maxY = min(lt.y, rt.y, lb.y, rb.y), max(
                 lt.y, rt.y, lb.y, rb.y)
-            nell = self.from_rect(Rect.from_points(
+            nell = self.fromRect(Rect.fromPoints(
                 Point.create(minX, minY), Point.create(maxX, maxY)))
             center, radius = nell.center, nell.radius
 

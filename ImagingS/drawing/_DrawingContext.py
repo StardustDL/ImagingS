@@ -23,7 +23,7 @@ class BoundingRectMeasurer(DrawingContext):
         self._ry = float("-inf")
 
     def endMeasure(self) -> Rect:
-        result = Rect.from_points(Point.create(
+        result = Rect.fromPoints(Point.create(
             self._lx, self._ly), Point.create(self._rx, self._ry))
         return result
 
