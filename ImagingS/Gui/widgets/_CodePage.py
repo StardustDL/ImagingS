@@ -111,6 +111,7 @@ class CodePage(QWidget, ui.CodePage):
             self.modelCode.fresh()
             self.messaged.emit("Loading document from code FAILED.")
         else:
+            self._document = doc
             self._showdoc(doc)
             self.uploaded.emit(doc)
             self._state = CodePageState.Normal

@@ -15,7 +15,8 @@ from ImagingS.Gui import icons
 from ImagingS.Gui.models import (BrushModel, DrawingModel, PropertyModel,
                                  TransformModel)
 
-from . import DocumentEditor, DocumentEditorState, NewDocumentDialog
+from . import (DocumentEditor, DocumentEditorState, NewDocumentDialog,
+               VisualPageState)
 
 
 @unique
@@ -102,6 +103,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.editor.messaged.connect(self.editor_messaged)
         self.editor.documentChanged.connect(self.editor_documentChanged)
         self.editor.stateChanged.connect(self.editor_stateChanged)
+        self.editor.visual.stateChanged.connect(
+            self.editor_visual_stateChanged)
 
     def setupIcon(self):
         self.actNew.setIcon(qta.icon("mdi.file"))
@@ -201,17 +204,17 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.mnuBrush.setEnabled(hasDoc)
         self.mnuTool.setEnabled(hasDoc)
 
-        isVisual = self.editor.state is DocumentEditorState.Visual
-        self.actDrawingClear.setEnabled(isVisual)
-        self.actBrushClear.setEnabled(isVisual)
-        self.actTransformClear.setEnabled(isVisual)
-        self.actDrawingRemove.setEnabled(isVisual)
-        self.actBrushRemove.setEnabled(isVisual)
-        self.actTransformRemove.setEnabled(isVisual)
-        self.mnuDrawing.setEnabled(isVisual)
-        self.mnuTransform.setEnabled(isVisual)
-        self.mnuBrush.setEnabled(isVisual)
-        self.mnuTool.setEnabled(isVisual)
+        isVisualNormal = self.editor.state is DocumentEditorState.Visual and self.editor.visual.state is VisualPageState.Normal
+        self.actDrawingClear.setEnabled(isVisualNormal)
+        self.actBrushClear.setEnabled(isVisualNormal)
+        self.actTransformClear.setEnabled(isVisualNormal)
+        self.actDrawingRemove.setEnabled(isVisualNormal)
+        self.actBrushRemove.setEnabled(isVisualNormal)
+        self.actTransformRemove.setEnabled(isVisualNormal)
+        self.mnuDrawing.setEnabled(isVisualNormal)
+        self.mnuTransform.setEnabled(isVisualNormal)
+        self.mnuBrush.setEnabled(isVisualNormal)
+        self.mnuTool.setEnabled(isVisualNormal)
 
     def _freshEditor(self):
         if self.editor.state is not DocumentEditorState.Disable:
@@ -222,25 +225,29 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
     def _freshAll(self):
         self._freshTitle()
-        self._freshActions()
         self._freshDockWidgets()
         self._freshEditor()
+        self._freshActions()
 
     def trvBrushes_clicked(self, index):
         item = self.modelBrush.getData(index)
         if self.modelProperties.obj is not item:
+            self.editor.visual.brush = item
             self.modelProperties.fresh(item)
             self.trvProperties.expandAll()
         else:
+            self.editor.visual.brush = None
             self.modelProperties.fresh()
             self.trvBrushes.clearSelection()
 
     def trvDrawings_clicked(self, index):
         item = self.modelDrawing.getData(index)
         if self.modelProperties.obj is not item:
+            self.editor.visual.drawing = item
             self.modelProperties.fresh(item)
             self.trvProperties.expandAll()
         else:
+            self.editor.visual.drawing = None
             self.modelProperties.fresh()
             self.trvDrawings.clearSelection()
 
@@ -390,4 +397,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self._freshDockWidgets()
 
     def editor_stateChanged(self) -> None:
+        self._freshActions()
+
+    def editor_visual_stateChanged(self) -> None:
         self._freshActions()

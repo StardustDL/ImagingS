@@ -128,6 +128,7 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
         self.messaged.emit(message)
 
     def code_uploaded(self, doc: Document):
+        self._document = doc
         self.documentChanged.emit(doc)
 
     def tbxMain_currentChanged(self, index):

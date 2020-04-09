@@ -19,7 +19,7 @@ def _calcPointCount(points: List[Point]) -> int:
     cnt = 0
     for i in range(len(points)-1):
         cnt += abs(points[i+1]-points[i])
-    cnt = int(cnt) * 3
+    cnt = int(cnt) * 2
     return cnt
 
 
