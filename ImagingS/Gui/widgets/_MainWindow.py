@@ -4,19 +4,18 @@ from typing import Optional
 
 import qtawesome as qta
 from PIL import Image
-from PyQt5.QtWidgets import QColorDialog, QFileDialog, QMainWindow
+from PyQt5.QtWidgets import QColorDialog, QDialog, QFileDialog, QMainWindow
 
 import ImagingS.Gui.ui as ui
 from ImagingS import Color
-from ImagingS.brush import Brush, Brushes, SolidBrush
+from ImagingS.brush import SolidBrush
 from ImagingS.document import Document, DocumentFormat
 from ImagingS.drawing import NumpyArrayDrawingContext
 from ImagingS.Gui import icons
-from ImagingS.Gui.app import Application
 from ImagingS.Gui.models import (BrushModel, DrawingModel, PropertyModel,
                                  TransformModel)
 
-from . import DocumentEditor, DocumentEditorState
+from . import DocumentEditor, DocumentEditorState, NewDocumentDialog
 
 
 @unique
@@ -26,24 +25,16 @@ class MainWindowState(Enum):
     Code = 2
 
 
-def _create_new_document() -> Document:
-    result = Document()
-    for name, item in Brushes.__dict__.items():
-        if name.startswith("__") and name.endswith("__"):
-            continue
-        if isinstance(item, Brush):
-            result.brushes.append(item)
-    return result
-
-
 class MainWindow(QMainWindow, ui.MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self.setupDockWidget()
+        self.setupStatusBar()
         self.setupEditor()
         self.setupIcon()
-        self.current_file = None
+        self._file = None
+        self._document = None
 
         self.actClose.triggered.connect(self.actClose_triggered)
         self.actQuit.triggered.connect(self.close)
@@ -81,10 +72,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.modelProperties = PropertyModel(self)
         self.trvProperties.setModel(self.modelProperties)
 
-        Application.current().documentChanged.connect(self.app_documentChanged)
-
-        self.actViewVisual.trigger()
-        self.actNew.trigger()
+        self._freshAll()
 
     def setupDockWidget(self):
         self.actToggleBrushes = self.dwgBrushes.toggleViewAction()
@@ -104,11 +92,16 @@ class MainWindow(QMainWindow, ui.MainWindow):
                        self.actToggleTransforms, self.actToggleProperties]
         self.mnuView.addActions(viewActions)
 
+    def setupStatusBar(self) -> None:
+        pass
+
     def setupEditor(self) -> None:
         self.editor = DocumentEditor()
         self.editor.setObjectName("editor")
         self.gridLayout.addWidget(self.editor, 0, 0, 1, 1)
         self.editor.messaged.connect(self.editor_messaged)
+        self.editor.documentChanged.connect(self.editor_documentChanged)
+        self.editor.stateChanged.connect(self.editor_stateChanged)
 
     def setupIcon(self):
         self.actNew.setIcon(qta.icon("mdi.file"))
@@ -140,63 +133,98 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.setWindowIcon(qta.icon("mdi.pencil-box-multiple", color="purple"))
 
     @property
-    def current_file(self) -> Optional[str]:
-        return self._current_file
+    def file(self) -> Optional[str]:
+        return self._file
 
-    @current_file.setter
-    def current_file(self, value: Optional[str]) -> None:
-        self._current_file = os.path.realpath(value) if value else None
-        if self._current_file is None:
-            if Application.current().document is None:
+    @file.setter
+    def file(self, value: Optional[str]) -> None:
+        self._file = os.path.realpath(value) if value else None
+        self._freshTitle()
+
+    @property
+    def document(self) -> Optional[Document]:
+        return self._document
+
+    @document.setter
+    def document(self, value: Optional[Document]) -> None:
+        self._document = value
+        self._freshTitle()
+
+    def _freshTitle(self) -> None:
+        if self.file is None:
+            if self.document is None:
                 self.setWindowTitle("ImagingS")
             else:
                 self.setWindowTitle("Untitled - ImagingS")
         else:
-            filename = os.path.split(self._current_file)[1].rstrip(".isd.json")
-            self.setWindowTitle(f"{filename} - ImagingS")
+            self.setWindowTitle(f"{self.file} - ImagingS")
 
-    def fresh_brushes(self):
+    def _freshBrushes(self):
+        hasDoc = self.document is not None
+        self.dwgBrushes.setEnabled(hasDoc)
         self.modelBrush.clear_items()
-
-        doc = Application.current().document
-        hasDoc = doc is not None
-
         if hasDoc:
-            for br in doc.brushes:
+            for br in self.document.brushes:
                 self.modelBrush.append(br)
 
-        self.dwgBrushes.setEnabled(hasDoc)
-
-    def fresh_drawings(self):
-        doc = Application.current().document
-        hasDoc = doc is not None
+    def _freshDrawings(self):
+        hasDoc = self.document is not None
         self.dwgDrawings.setEnabled(hasDoc)
         if hasDoc:
-            self.modelDrawing.fresh(doc.drawings)
+            self.modelDrawing.fresh(self.document.drawings)
             self.trvDrawings.expandAll()
         else:
             self.modelDrawing.fresh()
 
-    def app_documentChanged(self):
-        doc = Application.current().document
-        hasDoc = doc is not None
+    def _freshProperties(self):
+        hasDoc = self.document is not None
+        self.modelProperties.fresh()
+        self.dwgProperties.setEnabled(hasDoc)
+
+    def _freshDockWidgets(self):
+        self._freshProperties()
+        self._freshBrushes()
+        self._freshDrawings()
+
+    def _freshActions(self):
+        hasDoc = self.document is not None
+
         self.actClose.setEnabled(hasDoc)
         self.actSave.setEnabled(hasDoc)
         self.actSaveAs.setEnabled(hasDoc)
         self.actExport.setEnabled(hasDoc)
+
+        self.mnuEdit.setEnabled(hasDoc)
+        self.mnuView.setEnabled(hasDoc)
         self.mnuDrawing.setEnabled(hasDoc)
         self.mnuTransform.setEnabled(hasDoc)
         self.mnuBrush.setEnabled(hasDoc)
-        self.dwgProperties.setEnabled(hasDoc)
-        self.fresh_brushes()
-        self.fresh_drawings()
-        self.modelProperties.fresh()
+        self.mnuTool.setEnabled(hasDoc)
 
+        isVisual = self.editor.state is DocumentEditorState.Visual
+        self.actDrawingClear.setEnabled(isVisual)
+        self.actBrushClear.setEnabled(isVisual)
+        self.actTransformClear.setEnabled(isVisual)
+        self.actDrawingRemove.setEnabled(isVisual)
+        self.actBrushRemove.setEnabled(isVisual)
+        self.actTransformRemove.setEnabled(isVisual)
+        self.mnuDrawing.setEnabled(isVisual)
+        self.mnuTransform.setEnabled(isVisual)
+        self.mnuBrush.setEnabled(isVisual)
+        self.mnuTool.setEnabled(isVisual)
+
+    def _freshEditor(self):
         if self.editor.state is not DocumentEditorState.Disable:
             self.editor.disable()
 
-        if doc is not None:
-            self.editor.enable(doc)
+        if self.document is not None:
+            self.editor.enable(self.document)
+
+    def _freshAll(self):
+        self._freshTitle()
+        self._freshActions()
+        self._freshDockWidgets()
+        self._freshEditor()
 
     def trvBrushes_clicked(self, index):
         item = self.modelBrush.getData(index)
@@ -205,7 +233,6 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.trvProperties.expandAll()
         else:
             self.modelProperties.fresh()
-            self.trvProperties.expandAll()
             self.trvBrushes.clearSelection()
 
     def trvDrawings_clicked(self, index):
@@ -215,7 +242,6 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.trvProperties.expandAll()
         else:
             self.modelProperties.fresh()
-            self.trvProperties.expandAll()
             self.trvDrawings.clearSelection()
 
     def trvTransforms_clicked(self, index):
@@ -225,7 +251,6 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.trvProperties.expandAll()
         else:
             self.modelProperties.fresh()
-            self.trvProperties.expandAll()
             self.trvTransforms.clearSelection()
 
     def actViewVisual_triggered(self):
@@ -238,13 +263,17 @@ class MainWindow(QMainWindow, ui.MainWindow):
         indexs = self.trvDrawings.selectedIndexes()
         if len(indexs) == 0:
             return
-        r = indexs[0].row()
-        del Application.current().document.drawings.children[r]
-        self.fresh_drawings()
+        item = self.modelDrawing.getData(indexs[0])
+        del self.document.drawings.children[item]
+        self._freshDrawings()
+        self.editor.fresh()
+        self.stbMain.showMessage(f"Deleted drawing ({item}).")
 
     def actDrawingClear_triggered(self):
-        Application.current().document.drawings.children.clear()
-        self.fresh_drawings()
+        self.document.drawings.children.clear()
+        self._freshDrawings()
+        self.editor.fresh()
+        self.stbMain.showMessage("Cleared drawings.")
 
     def actBrushSolid_triggered(self):
         color = QColorDialog.getColor()
@@ -252,40 +281,53 @@ class MainWindow(QMainWindow, ui.MainWindow):
             return
         br = SolidBrush.create(Color.create(
             color.red(), color.green(), color.blue()))
-        Application.current().document.brushes.append(br)
-        self.modelBrush.append(br)
+        self.document.brushes.append(br)
+        self._freshBrushes()
+        self.stbMain.showMessage(
+            f"Add new brush ({br}).")
 
     def actBrushRemove_triggered(self):
         indexs = self.trvBrushes.selectedIndexes()
         if len(indexs) == 0:
             return
-        r = indexs[0].row()
-        Application.current().document.brushes.remove(
-            Application.current().document.brushes[r])
-        self.fresh_brushes()
+        item = self.modelBrush.getData(indexs[0])
+        self.document.brushes.remove(item)
+        self._freshBrushes()
+        self.stbMain.showMessage(
+            f"Deleted brush ({item}).")
 
     def actBrushClear_triggered(self):
-        Application.current().document.brushes.clear()
-        self.fresh_brushes()
+        self.document.brushes.clear()
+        self._freshBrushes()
+        self.stbMain.showMessage("Cleared brushes.")
 
     def actClose_triggered(self):
-        Application.current().document = None
-        self.current_file = None
+        self.document = None
+        self.file = None
+        self._freshAll()
 
     def actNew_triggered(self):
-        Application.current().document = _create_new_document()
+        newDialog = NewDocumentDialog()
+        if newDialog.exec_() == QDialog.Accepted:
+            doc = Document()
+            doc.size = newDialog.documentSize
+            self.document = doc
+            self._freshAll()
+            self.stbMain.showMessage(
+                f"Created new document with size ({doc.size.width}, {doc.size.height}).")
 
     def actSave_triggered(self):
-        file = self.current_file
+        file = self.file
         if file is None:
             self.actSaveAs_triggered()
             return
         if file.endswith(".isd.json"):
             with open(file, mode="w+") as f:
-                Application.current().document.save(f, DocumentFormat.RAW)
+                self.document.save(f, DocumentFormat.RAW)
         else:
             with open(file, mode="wb") as f:
-                Application.current().document.save(f)
+                self.document.save(f)
+        self.stbMain.showMessage(f"Saved to {self.file}.")
 
     def actSaveAs_triggered(self):
         options = QFileDialog.Options()
@@ -293,28 +335,32 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self, "Save As", "", "ImagingS Document (*.isd);; ImagingS Raw Document (*.isd.json)", options=options)
         if not fileName:
             return
-
+        fileName = os.path.realpath(fileName)
         if fileName.endswith(".isd.json"):
             with open(fileName, mode="w+") as f:
-                Application.current().document.save(f, DocumentFormat.RAW)
+                self.document.save(f, DocumentFormat.RAW)
         else:
             with open(fileName, mode="wb") as f:
-                Application.current().document.save(f)
-        self.current_file = fileName
+                self.document.save(f)
+        self.file = fileName
+        self.stbMain.showMessage(f"Saved to {self.file}.")
 
     def actOpen_triggered(self):
         options = QFileDialog.Options()
         fileName, _ = QFileDialog.getOpenFileName(
             self, "Open", "", "ImagingS Document (*.isd);; ImagingS Raw Document (*.isd.json)", options=options)
         if fileName:
+            fileName = os.path.realpath(fileName)
             if fileName.endswith(".isd.json"):
                 with open(fileName, mode="r") as f:
                     doc = Document.load(f, DocumentFormat.RAW)
             else:
                 with open(fileName, mode="rb") as f:
                     doc = Document.load(f)
-            Application.current().document = doc
-            self.current_file = fileName
+            self.file = fileName
+            self.document = doc
+            self._freshAll()
+            self.stbMain.showMessage(f"Opend document at {self.file}.")
 
     def actExport_triggered(self):
         options = QFileDialog.Options()
@@ -323,8 +369,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
             "PNG Image (*.png);; JPEG Image (*.jpeg);; BMP Image (*.bmp)",
             options=options)
         if fileName:
+            fileName = os.path.realpath(fileName)
             ext = os.path.splitext(fileName)[1].lstrip(".")
-            doc = Application.current().document
+            doc = self.document
             assert doc is not None
             context = NumpyArrayDrawingContext(
                 NumpyArrayDrawingContext.create_array(doc.size))
@@ -333,5 +380,14 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
             Image.fromarray(context.array).save(fileName, ext, quality=95)
 
+            self.stbMain.showMessage(f"Exported to {fileName}.")
+
     def editor_messaged(self, message: str) -> None:
         self.stbMain.showMessage(message)
+
+    def editor_documentChanged(self, document: Document) -> None:
+        self.document = document
+        self._freshDockWidgets()
+
+    def editor_stateChanged(self) -> None:
+        self._freshActions()

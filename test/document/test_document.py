@@ -15,7 +15,7 @@ from ImagingS.transform import (MatrixTransform, RotateTransform,
                                 TranslateTransform)
 
 
-def test_sl() -> None:
+def test_saveload() -> None:
     curdir = get_temp_dir()
     doc = Document()
     doc.brushes.append(Brushes.Black)

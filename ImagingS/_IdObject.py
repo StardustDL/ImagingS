@@ -61,7 +61,7 @@ class IdObjectList(PropertySerializable, Collection[_T]):
         elif isinstance(key, int):
             key = self._items[key].id
         if key not in self:
-            raise KeyError(key)
+            return
         self._items.remove(self._ids[key])
         del self._ids[key]
 

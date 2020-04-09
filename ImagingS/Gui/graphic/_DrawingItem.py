@@ -12,7 +12,7 @@ from . import PainterDrawingContext
 
 
 class DrawingItem(QGraphicsItem):
-    def __init__(self, drawing: Drawing, size: QSizeF, parent: QGraphicsItem = None):
+    def __init__(self, drawing: Drawing, size: QSizeF, parent: Optional[QGraphicsItem] = None):
         super().__init__(parent)
         self._drawing = drawing
         self._size = size

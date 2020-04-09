@@ -1,6 +1,6 @@
 from enum import Enum, unique
 
-from PyQt5.QtCore import QSizeF, pyqtSignal
+from PyQt5.QtCore import QPointF, QSizeF, pyqtSignal
 from PyQt5.QtWidgets import QWidget
 
 import ImagingS.Gui.ui as ui
@@ -63,18 +63,15 @@ class VisualPage(QWidget, ui.VisualPage):
         self.cvsMain.setObjectName("cvsMain")
         self.grdMain.addWidget(self.cvsMain, 0, 0, 1, 1)
         self.cvsMain.resize(QSizeF(600, 600))
+        self.cvsMain.mousePositionMoved.connect(
+            self.cvsMain_mousePositionMoved)
 
     def enable(self, doc: Document) -> None:
         assert self.state is VisualPageState.Disable
         self.setEnabled(True)
         self._document = doc
-
-        self.cvsMain.clear()
-        self.cvsMain.resize(converters.qsize(self._document.size))
-        for dr in self._document.drawings.children:
-            self.cvsMain.add(dr)
-
         self._state = VisualPageState.Normal
+        self.fresh()
 
     def disable(self) -> None:
         assert self.state is not VisualPageState.Disable
@@ -90,8 +87,15 @@ class VisualPage(QWidget, ui.VisualPage):
 
     def fresh(self) -> None:
         assert self.state is VisualPageState.Normal
+        self.cvsMain.clear()
+        self.cvsMain.resize(converters.qsize(self._document.size))
+        for dr in self._document.drawings.children:
+            self.cvsMain.add(dr)
 
     def resetDrawingActionChecked(self, checkedAction=None):
         for act in self.actionDrawings:
             if act.isCheckable() and act is not checkedAction:
                 act.setChecked(False)
+
+    def cvsMain_mousePositionMoved(self, point: QPointF):
+        self.messaged.emit(str((round(point.x()), round(point.y()))))

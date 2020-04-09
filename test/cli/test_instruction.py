@@ -4,7 +4,7 @@ from ImagingS.Cli.instruction import BuiltinInstruction
 from ImagingS.document import Document
 
 
-def test_ins() -> None:
+def test_instruction() -> None:
     host = BuiltinInstruction(Document(), get_temp_dir())
     instr = """
 resetCanvas 600 600

@@ -20,6 +20,7 @@ class DocumentEditorState(Enum):
 
 class DocumentEditor(QWidget, ui.DocumentEditor):
     documentChanged = pyqtSignal(Document)
+    stateChanged = pyqtSignal()
     messaged = pyqtSignal(str)
 
     def __init__(self) -> None:
@@ -82,6 +83,16 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
         if self.code.state is not CodePageState.Disable:
             self.code.disable()
         self.setEnabled(False)
+        self.stateChanged.emit()
+
+    def fresh(self) -> None:
+        state = self.state
+        if state is DocumentEditorState.Disable:
+            return
+        elif state is DocumentEditorState.Visual:
+            self.visual.fresh()
+        elif state is DocumentEditorState.Code:
+            self.code.fresh()
 
     def switchCode(self) -> bool:
         if self.document is None:
@@ -95,6 +106,7 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
             return False
         self.code.enable(self.document)
         self.tbxMain.setCurrentIndex(1)
+        self.stateChanged.emit()
         return True
 
     def switchVisual(self) -> bool:
@@ -109,6 +121,7 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
             return False
         self.visual.enable(self.document)
         self.tbxMain.setCurrentIndex(0)
+        self.stateChanged.emit()
         return True
 
     def visualCode_messaged(self, message: str) -> None:

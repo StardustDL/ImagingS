@@ -81,9 +81,9 @@
     </property>
     <addaction name="actBrushSolid"/>
    </widget>
-   <widget class="QMenu" name="mnuTools">
+   <widget class="QMenu" name="mnuTool">
     <property name="title">
-     <string>Tools</string>
+     <string>Tool</string>
     </property>
    </widget>
    <widget class="QMenu" name="mnuTransform">
@@ -103,7 +103,7 @@
    <addaction name="mnuDrawing"/>
    <addaction name="mnuTransform"/>
    <addaction name="mnuBrush"/>
-   <addaction name="mnuTools"/>
+   <addaction name="mnuTool"/>
   </widget>
   <widget class="QStatusBar" name="stbMain"/>
   <widget class="QDockWidget" name="dwgDrawings">
@@ -133,13 +133,6 @@
      <property name="bottomMargin">
       <number>0</number>
      </property>
-     <item>
-      <widget class="QLineEdit" name="lneDrawings">
-       <property name="placeholderText">
-        <string>Filter</string>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QTreeView" name="trvDrawings">
        <property name="contextMenuPolicy">
@@ -266,13 +259,6 @@
      <property name="bottomMargin">
       <number>0</number>
      </property>
-     <item>
-      <widget class="QLineEdit" name="lneProperties">
-       <property name="placeholderText">
-        <string>Filter</string>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QTreeView" name="trvProperties">
        <property name="editTriggers">
