@@ -11,10 +11,10 @@ class DrawingContext(ABC):
     def point(self, position: Point, color: Color) -> None: pass
 
     @abstractmethod
-    def area(self) -> Rect: pass
+    def rect(self) -> Rect: pass
 
 
-class BoundingAreaMeasurer(DrawingContext):
+class BoundingRectMeasurer(DrawingContext):
     def __init__(self) -> None:
         super().__init__()
         self._lx = float("inf")
@@ -34,7 +34,7 @@ class BoundingAreaMeasurer(DrawingContext):
         self._rx = max(self._rx, x)
         self._ry = max(self._ry, y)
 
-    def area(self) -> Rect:
+    def rect(self) -> Rect:
         return Rect.infinite()
 
 
@@ -59,7 +59,7 @@ class NumpyArrayDrawingContext(DrawingContext):
         assert len(value.shape) == 3
         assert value.shape[2] == 3
         self._array = value
-        self._area = Rect.create(
+        self._rect = Rect.create(
             Point(), Size.create(value.shape[1], value.shape[0]))
 
     def point(self, position: Point, color: Color) -> None:
@@ -68,18 +68,18 @@ class NumpyArrayDrawingContext(DrawingContext):
         self.array[y, x, 1] = color.g
         self.array[y, x, 2] = color.b
 
-    def area(self) -> Rect:
-        return self._area
+    def rect(self) -> Rect:
+        return self._rect
 
 
 class ProxyDrawingContext(DrawingContext):
-    def __init__(self, fpoint: Callable[[Point, Color], None], farea: Callable[[], Rect]) -> None:
+    def __init__(self, fpoint: Callable[[Point, Color], None], frect: Callable[[], Rect]) -> None:
         super().__init__()
         self._fpoint = fpoint
-        self._farea = farea
+        self._frect = frect
 
     def point(self, position: Point, color: Color) -> None:
         self._fpoint(position, color)
 
-    def area(self) -> Rect:
-        return self._farea()
+    def rect(self) -> Rect:
+        return self._frect()

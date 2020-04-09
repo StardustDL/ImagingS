@@ -4,11 +4,11 @@ from typing import Optional
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget
 
-from ImagingS.Gui import icons
 import ImagingS.Gui.ui as ui
 from ImagingS.document import Document
+from ImagingS.Gui import icons
 
-from . import VisualPage, CodePage, VisualPageState, CodePageState
+from . import CodePage, CodePageState, VisualPage, VisualPageState
 
 
 @unique

@@ -24,7 +24,7 @@ class SolidBrush(Brush):
     def color(self, value: Color) -> None:
         self._color = value
 
-    def colorAt(self, position: Point, area: Rect) -> Color:
+    def colorAt(self, position: Point, rect: Rect) -> Color:
         return self.color
 
     def __repr__(self) -> str:

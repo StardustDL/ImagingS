@@ -6,7 +6,7 @@ from ImagingS.geometry import Geometry
 from ImagingS.serialization import PropertySerializable
 from ImagingS.transform import Transform
 
-from . import BoundingAreaMeasurer, DrawingContext, ProxyDrawingContext
+from . import BoundingRectMeasurer, DrawingContext, ProxyDrawingContext
 
 
 class Drawing(PropertySerializable, IdObject, ABC):
@@ -26,19 +26,19 @@ class Drawing(PropertySerializable, IdObject, ABC):
     def render(self, context: DrawingContext) -> None: pass
 
     @property
-    def boundingArea(self) -> Rect:
-        if not hasattr(self, "_boundingArea"):
-            self._boundingArea = None
-            measurer = BoundingAreaMeasurer()
+    def boundingRect(self) -> Rect:
+        if not hasattr(self, "_boundingRect"):
+            self._boundingRect = None
+            measurer = BoundingRectMeasurer()
             self.render(measurer)
-            self._boundingArea = measurer.endMeasure()
-        elif self._boundingArea is None:  # boundingArea is calculating
+            self._boundingRect = measurer.endMeasure()
+        elif self._boundingRect is None:  # boundingRect is calculating
             return Rect()
-        return self._boundingArea
+        return self._boundingRect
 
-    def refreshBoundingArea(self) -> None:
-        if hasattr(self, "_boundingArea"):
-            del self._boundingArea
+    def refreshBoundingRect(self) -> None:
+        if hasattr(self, "_boundingRect"):
+            del self._boundingRect
 
 
 class DrawingGroup(Drawing):
@@ -70,10 +70,10 @@ class DrawingGroup(Drawing):
                 position = self.transform.transform(position)
                 context.point(position, color)
 
-            def farea() -> Rect:
-                return context.area()
+            def frect() -> Rect:
+                return context.rect()
 
-            renderContext = ProxyDrawingContext(fpoint, farea)
+            renderContext = ProxyDrawingContext(fpoint, frect)
 
         for item in self.children:
             item.render(renderContext)

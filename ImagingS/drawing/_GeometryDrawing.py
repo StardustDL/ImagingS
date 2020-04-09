@@ -41,15 +41,15 @@ class GeometryDrawing(Drawing):
     @geometry.setter
     def geometry(self, value: Geometry) -> None:
         self._geometry = value
-        self.refreshBoundingArea()
+        self.refreshBoundingRect()
 
     def render(self, context: DrawingContext) -> None:
-        area = context.area()
+        rect = context.rect()
         for point in self.geometry.strokePoints(self.stroke):
-            if point in area:
+            if point in rect:
                 context.point(point,
-                              self.stroke.brush.colorAt(point, self.boundingArea))
+                              self.stroke.brush.colorAt(point, self.boundingRect))
         for point in self.geometry.fillPoints():
-            if point in area:
+            if point in rect:
                 context.point(point, self.fill.colorAt(
-                    point, self.boundingArea))
+                    point, self.boundingRect))

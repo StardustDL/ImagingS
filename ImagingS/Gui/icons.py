@@ -14,7 +14,7 @@ code: QIcon = qta.icon("mdi.code-tags")
 
 visual: QIcon = qta.icon("mdi.image")
 
-dictionary: QIcon = qta.icon("mdi.dictionary")
+dict: QIcon = qta.icon("mdi.dictionary")
 
 vertex: QIcon = qta.icon("mdi.vector-point")
 
@@ -25,6 +25,16 @@ fill: QIcon = qta.icon("mdi.format-color-fill")
 x: QIcon = qta.icon("mdi.axis-x-arrow")
 
 y: QIcon = qta.icon("mdi.axis-y-arrow")
+
+r: QIcon = qta.icon("mdi.alpha-r-circle", color="red")
+
+g: QIcon = qta.icon("mdi.alpha-g-circle", color="green")
+
+b: QIcon = qta.icon("mdi.alpha-b-circle", color="blue")
+
+width: QIcon = qta.icon("mdi.alpha-w-circle")
+
+height: QIcon = qta.icon("mdi.alpha-h-circle")
 
 id: QIcon = qta.icon("mdi.identifier")
 

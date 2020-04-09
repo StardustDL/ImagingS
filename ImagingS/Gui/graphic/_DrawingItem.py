@@ -34,15 +34,15 @@ class DrawingItem(QGraphicsItem):
         self.drawing.render(context)
         if self._is_active:
             painter.setPen(QColor(255, 0, 0))
-            area = self.drawing.boundingArea
-            painter.drawRect(converters.qrect(area))
+            rect = self.drawing.boundingRect
+            painter.drawRect(converters.qrect(rect))
 
     def boundingRect(self) -> QRectF:  # must be efficient
         # to fix prepareGeometryChange bug
         return QRectF(0, 0, self._size.width(), self._size.height())
         # self.prepareGeometryChange()  # important!!!
-        # area = self.drawing.boundingArea
-        # return QRectF(area.origin.x - 1, area.origin.y - 1, area.size.width + 2, area.size.height + 2)
+        # rect = self.drawing.boundingRect
+        # return QRectF(rect.origin.x - 1, rect.origin.y - 1, rect.size.width + 2, rect.size.height + 2)
 
 
 # class DrawingGroupItem(QGraphicsItemGroup):
@@ -77,5 +77,5 @@ class DrawingItem(QGraphicsItem):
 #         super().paint(painter, option, widget)
 #         if self._is_active:
 #             painter.setPen(QColor(255, 0, 0))
-#             area = self.drawing.boundingArea
-#             painter.drawRect(converters.qrect(area))
+#             rect = self.drawing.boundingRect
+#             painter.drawRect(converters.qrect(rect))

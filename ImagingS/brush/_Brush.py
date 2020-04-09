@@ -9,4 +9,4 @@ class Brush(PropertySerializable, ABC):
         super().__init__()
 
     @abstractmethod
-    def colorAt(self, position: Point, area: Rect) -> Color: pass
+    def colorAt(self, position: Point, rect: Rect) -> Color: pass

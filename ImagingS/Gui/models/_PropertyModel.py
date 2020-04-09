@@ -51,16 +51,6 @@ class PropertyModel(QStandardItemModel):
             return
         if name == "vertexes" or name == "controlPoints":
             item.setIcon(icons.vertex)
-        elif name == "r":
-            item.setIcon(qta.icon("mdi.alpha-r-circle"))
-        elif name == "g":
-            item.setIcon(qta.icon("mdi.alpha-g-circle"))
-        elif name == "b":
-            item.setIcon(qta.icon("mdi.alpha-b-circle"))
-        elif name == "width":
-            item.setIcon(qta.icon("mdi.alpha-w-circle"))
-        elif name == "height":
-            item.setIcon(qta.icon("mdi.alpha-h-circle"))
         elif name == "brushes":
             item.setIcon(icons.brush)
         elif name == "drawings":
@@ -69,12 +59,6 @@ class PropertyModel(QStandardItemModel):
             item.setIcon(qta.icon("mdi.lightbulb"))
         elif isinstance(value, Color):
             item.setIcon(icons.getColorIcon(value))
-        elif isinstance(value, list):
-            item.setIcon(icons.list)
-        elif isinstance(value, dict):
-            item.setIcon(icons.dictionary)
-        elif isinstance(value, set):
-            item.setIcon(icons.set)
 
     def _addDictChildren(self, root: QStandardItem, li: Dict) -> None:
         for k, v in li.items():
@@ -100,7 +84,8 @@ class PropertyModel(QStandardItemModel):
         if value is None or isinstance(value, str) or isinstance(value, int):
             root.setChild(index, self.VALUE, QStandardItem(str(value)))
         elif isinstance(value, float):
-            root.setChild(index, self.VALUE, QStandardItem(str(round(value, 2))))
+            root.setChild(index, self.VALUE,
+                          QStandardItem(str(round(value, 2))))
         elif isinstance(value, Enum):
             root.setChild(index, self.VALUE, QStandardItem(value.name))
         elif isinstance(value, list):

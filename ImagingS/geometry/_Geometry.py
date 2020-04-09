@@ -30,7 +30,7 @@ class Geometry(PropertySerializable, ABC):
         return point in self.strokePoints(pen)
 
     def inFill(self, point: Point) -> bool:
-        return point in self.fillPoints
+        return point in self.fillPoints()
 
 
 class GeometryGroup(Geometry):

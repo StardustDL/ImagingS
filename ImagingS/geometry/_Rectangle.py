@@ -10,28 +10,28 @@ from . import LineAlgorithm, PolygonGeometry
 class RectangleGeometry(PolygonGeometry):
     def __init__(self) -> None:
         super().__init__()
-        self.area = Rect()
+        self.rect = Rect()
 
     @staticmethod
-    def create(area: Rect, algorithm: LineAlgorithm) -> RectangleGeometry:
+    def create(rect: Rect, algorithm: LineAlgorithm) -> RectangleGeometry:
         result = RectangleGeometry()
-        result.area = area
+        result.rect = rect
         result.algorithm = algorithm
         return result
 
     @property
-    def area(self) -> Rect:
-        return self._area
+    def rect(self) -> Rect:
+        return self._rect
 
-    @area.setter
-    def area(self, value: Rect) -> None:
-        self._area = value
+    @rect.setter
+    def rect(self, value: Rect) -> None:
+        self._rect = value
         self.vertexes = [
-            self._area.origin,
-            self._area.origin + Point.create(self._area.size.width, 0),
-            self._area.origin +
-            Point.create(self._area.size.width, self._area.size.height),
-            self._area.origin + Point.create(0, self._area.size.height),
+            self._rect.origin,
+            self._rect.origin + Point.create(self._rect.size.width, 0),
+            self._rect.origin +
+            Point.create(self._rect.size.width, self._rect.size.height),
+            self._rect.origin + Point.create(0, self._rect.size.height),
         ]
 
     def serialize(self) -> Dict:

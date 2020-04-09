@@ -1,5 +1,5 @@
-from enum import Enum, unique
 import os
+from enum import Enum, unique
 from typing import Optional
 
 import qtawesome as qta
