@@ -31,6 +31,7 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
         self.setupIcon()
 
         self.code.uploaded.connect(self.code_uploaded)
+        self.visual.documentChanged.connect(self.visual_documentChanged)
         self.tbxMain.currentChanged.connect(self.tbxMain_currentChanged)
 
         self.setEnabled(False)
@@ -128,6 +129,10 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
         self.messaged.emit(message)
 
     def code_uploaded(self, doc: Document):
+        self._document = doc
+        self.documentChanged.emit(doc)
+
+    def visual_documentChanged(self, doc: Document):
         self._document = doc
         self.documentChanged.emit(doc)
 

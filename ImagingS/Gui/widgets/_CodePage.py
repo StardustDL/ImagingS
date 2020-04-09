@@ -21,7 +21,7 @@ class CodePageState(Enum):
 class CodePage(QWidget, ui.CodePage):
     uploaded = pyqtSignal(Document)
     messaged = pyqtSignal(str)
-    stateChanged = pyqtSignal(CodePageState)
+    stateChanged = pyqtSignal()
 
     def __init__(self) -> None:
         super().__init__()
@@ -66,12 +66,23 @@ class CodePage(QWidget, ui.CodePage):
         except Exception:
             return None
 
+    def _setState(self, value: CodePageState) -> None:
+        self._state = value
+        self.stateChanged.emit()
+
+    def fresh(self) -> None:
+        if self.state is not CodePageState.Normal:
+            return
+
+        self._showdoc(self._document)
+        self._setState(CodePageState.Normal)
+
     def enable(self, doc: Document) -> None:
         assert self.state is CodePageState.Disable
         self.setEnabled(True)
         self._document = doc
-        self._showdoc(self._document)
-        self._state = CodePageState.Normal
+        self._setState(CodePageState.Normal)
+        self.fresh()
 
     def disable(self) -> None:
         assert self.state is not CodePageState.Disable
@@ -80,7 +91,7 @@ class CodePage(QWidget, ui.CodePage):
         self.tetCode.setText("")
         self.modelCode.fresh()
         self.setEnabled(False)
-        self._state = CodePageState.Disable
+        self._setState(CodePageState.Disable)
 
     @property
     def code(self) -> str:

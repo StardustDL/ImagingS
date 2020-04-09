@@ -1,15 +1,19 @@
+import uuid
 from enum import Enum, unique
-from typing import Optional
+from typing import Optional, cast
 
 from PyQt5.QtCore import QPointF, QSizeF, pyqtSignal
 from PyQt5.QtWidgets import QWidget
 
 import ImagingS.Gui.ui as ui
-from ImagingS.document import Document
-from ImagingS.drawing import Drawing
 from ImagingS.brush import Brush
+from ImagingS.document import Document
+from ImagingS.drawing import Drawing, GeometryDrawing, Pen
 from ImagingS.Gui import converters, icons
 from ImagingS.Gui.graphic import Canvas
+from ImagingS.Gui.interactivity import Interactivity, InteractivityState
+from ImagingS.Gui.interactivity.geometry import (GeometryInteractive,
+                                                 LineInteractive)
 
 
 @unique
@@ -21,7 +25,7 @@ class VisualPageState(Enum):
 
 class VisualPage(QWidget, ui.VisualPage):
     messaged = pyqtSignal(str)
-    drawingCreated = pyqtSignal(Drawing)
+    documentChanged = pyqtSignal(Document)
     stateChanged = pyqtSignal()
 
     def __init__(self):
@@ -30,20 +34,23 @@ class VisualPage(QWidget, ui.VisualPage):
         self.setupIcon()
         self.setupCanvas()
 
-        self.actionDrawings = [
-            self.actDrawingLine,
-            self.actDrawingPolygon,
-            self.actDrawingCurve,
-            self.actDrawingEllipse,
-        ]
+        # self.actionDrawings = [
+        #     self.actDrawingLine,
+        #     self.actDrawingPolygon,
+        #     self.actDrawingCurve,
+        #     self.actDrawingEllipse,
+        # ]
 
-        self.actionTransforms = [
-            self.actTransformTranslate,
-            self.actTransformScale,
-            self.actTransformRotate,
-            self.actTransformSkew,
-            self.actTransformMatrix,
-        ]
+        # self.actionTransforms = [
+        #     self.actTransformTranslate,
+        #     self.actTransformScale,
+        #     self.actTransformRotate,
+        #     self.actTransformSkew,
+        #     self.actTransformMatrix,
+        #     self.actTransformGroup,
+        # ]
+
+        self.actDrawingLine.triggered.connect(self.actDrawingLine_triggered)
 
         self.setEnabled(False)
         self._drawing = None
@@ -90,6 +97,12 @@ class VisualPage(QWidget, ui.VisualPage):
 
     def _setState(self, value: VisualPageState) -> None:
         self._state = value
+
+        if self._state is VisualPageState.Interactive:
+            self.tlbMain.setEnabled(False)
+        elif self._state is VisualPageState.Normal:
+            self.tlbMain.setEnabled(True)
+
         self.stateChanged.emit()
 
     @property
@@ -116,17 +129,50 @@ class VisualPage(QWidget, ui.VisualPage):
         self._brush = value
 
     def fresh(self) -> None:
-        assert self.state is VisualPageState.Normal
+        if self.state is not VisualPageState.Normal:
+            return
 
         self.cvsMain.clear()
         self.cvsMain.resize(converters.qsize(self._document.size))
         for dr in self._document.drawings.children:
             self.cvsMain.add(dr)
 
-    def resetDrawingActionChecked(self, checkedAction=None):
-        for act in self.actionDrawings:
-            if act.isCheckable() and act is not checkedAction:
-                act.setChecked(False)
-
     def cvsMain_mousePositionMoved(self, point: QPointF):
         self.messaged.emit(str((round(point.x()), round(point.y()))))
+
+    def _emptyGeometryDrawing(self) -> GeometryDrawing:
+        drawing = GeometryDrawing()
+        drawing.id = str(uuid.uuid1())
+        if self.brush is not None:
+            drawing.stroke = Pen.create(self.brush)
+        return drawing
+
+    def actDrawingLine_triggered(self):
+        inter = LineInteractive(
+            self._emptyGeometryDrawing(), self._document.size)
+        inter.ended.connect(self.interactivity_ended)
+        inter.started.connect(self.interactivity_started)
+        inter.updated.connect(self.interactivity_updated)
+        self.cvsMain.interactivity = inter
+        inter.start()
+
+    def interactivity_started(self, inter: Interactivity) -> None:
+        self._setState(VisualPageState.Interactive)
+        if inter.viewItem is not None:
+            self.cvsMain.scene().addItem(inter.viewItem)
+        self.cvsMain.rerender()
+
+    def interactivity_updated(self, inter: Interactivity) -> None:
+        self.cvsMain.rerender()
+
+    def interactivity_ended(self, inter: Interactivity) -> None:
+        self._setState(VisualPageState.Normal)
+        if inter.viewItem is not None:
+            self.cvsMain.scene().removeItem(inter.viewItem)
+        self.cvsMain.interactivity = None
+        if inter.state is InteractivityState.Success:
+            if isinstance(inter, GeometryInteractive):
+                drawing = cast(GeometryInteractive, inter).target
+                self._document.drawings.children.append(drawing)
+                self.documentChanged.emit(self._document)
+        self.fresh()

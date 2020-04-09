@@ -8,12 +8,14 @@ from PyQt5.QtWidgets import QColorDialog, QDialog, QFileDialog, QMainWindow
 
 import ImagingS.Gui.ui as ui
 from ImagingS import Color
-from ImagingS.brush import SolidBrush
+from ImagingS.brush import Brush, SolidBrush
 from ImagingS.document import Document, DocumentFormat
-from ImagingS.drawing import NumpyArrayDrawingContext
+from ImagingS.drawing import (Drawing, DrawingGroup, GeometryDrawing,
+                              NumpyArrayDrawingContext)
 from ImagingS.Gui import icons
 from ImagingS.Gui.models import (BrushModel, DrawingModel, PropertyModel,
                                  TransformModel)
+from ImagingS.transform import Transform, TransformGroup
 
 from . import (DocumentEditor, DocumentEditorState, NewDocumentDialog,
                VisualPageState)
@@ -69,6 +71,10 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.trvTransforms.setModel(self.modelTransform)
         self.trvTransforms.clicked.connect(
             self.trvTransforms_clicked)
+        self.actTransformRemove.triggered.connect(
+            self.actTransformRemove_triggered)
+        self.actTransformClear.triggered.connect(
+            self.actTransformClear_triggered)
 
         self.modelProperties = PropertyModel(self)
         self.trvProperties.setModel(self.modelProperties)
@@ -103,8 +109,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.editor.messaged.connect(self.editor_messaged)
         self.editor.documentChanged.connect(self.editor_documentChanged)
         self.editor.stateChanged.connect(self.editor_stateChanged)
-        self.editor.visual.stateChanged.connect(
-            self.editor_visual_stateChanged)
+        self.editor.visual.stateChanged.connect(self.editor_stateChanged)
+        self.editor.code.stateChanged.connect(self.editor_stateChanged)
 
     def setupIcon(self):
         self.actNew.setIcon(qta.icon("mdi.file"))
@@ -179,6 +185,20 @@ class MainWindow(QMainWindow, ui.MainWindow):
         else:
             self.modelDrawing.fresh()
 
+    def _freshTransforms(self):
+        drawing = self._currentDrawing()
+        hasDrawing = drawing is not None
+        self.dwgTransforms.setEnabled(hasDrawing)
+        trans = None
+        if hasDrawing:
+            if isinstance(drawing, GeometryDrawing):
+                trans = drawing.geometry.transform
+            elif isinstance(drawing, DrawingGroup):
+                trans = drawing.transform
+        self.modelTransform.fresh(trans)
+        if trans is not None:
+            self.trvTransforms.expandAll()
+
     def _freshProperties(self):
         hasDoc = self.document is not None
         self.modelProperties.fresh()
@@ -229,6 +249,24 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self._freshEditor()
         self._freshActions()
 
+    def _currentDrawing(self) -> Optional[Drawing]:
+        indexs = self.trvDrawings.selectedIndexes()
+        if len(indexs) == 0:
+            return None
+        return self.modelDrawing.getData(indexs[0])
+
+    def _currentBrush(self) -> Optional[Brush]:
+        indexs = self.trvBrushes.selectedIndexes()
+        if len(indexs) == 0:
+            return None
+        return self.modelBrush.getData(indexs[0])
+
+    def _currentTransform(self) -> Optional[Transform]:
+        indexs = self.trvTransforms.selectedIndexes()
+        if len(indexs) == 0:
+            return None
+        return self.modelTransform.getData(indexs[0])
+
     def trvBrushes_clicked(self, index):
         item = self.modelBrush.getData(index)
         if self.modelProperties.obj is not item:
@@ -236,20 +274,22 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.modelProperties.fresh(item)
             self.trvProperties.expandAll()
         else:
+            self.trvBrushes.clearSelection()
             self.editor.visual.brush = None
             self.modelProperties.fresh()
-            self.trvBrushes.clearSelection()
 
     def trvDrawings_clicked(self, index):
         item = self.modelDrawing.getData(index)
         if self.modelProperties.obj is not item:
             self.editor.visual.drawing = item
+            self._freshTransforms()
             self.modelProperties.fresh(item)
             self.trvProperties.expandAll()
         else:
-            self.editor.visual.drawing = None
-            self.modelProperties.fresh()
             self.trvDrawings.clearSelection()
+            self.editor.visual.drawing = None
+            self._freshTransforms()
+            self.modelProperties.fresh()
 
     def trvTransforms_clicked(self, index):
         item = self.modelTransform.getData(index)
@@ -257,8 +297,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.modelProperties.fresh(item)
             self.trvProperties.expandAll()
         else:
-            self.modelProperties.fresh()
             self.trvTransforms.clearSelection()
+            self.modelProperties.fresh()
 
     def actViewVisual_triggered(self):
         self.editor.switchVisual()
@@ -267,10 +307,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.editor.switchCode()
 
     def actDrawingRemove_triggered(self):
-        indexs = self.trvDrawings.selectedIndexes()
-        if len(indexs) == 0:
+        item = self._currentDrawing()
+        if item is None:
             return
-        item = self.modelDrawing.getData(indexs[0])
         del self.document.drawings.children[item]
         self._freshDrawings()
         self.editor.fresh()
@@ -294,10 +333,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
             f"Add new brush ({br}).")
 
     def actBrushRemove_triggered(self):
-        indexs = self.trvBrushes.selectedIndexes()
-        if len(indexs) == 0:
+        item = self._currentBrush()
+        if item is None:
             return
-        item = self.modelBrush.getData(indexs[0])
         self.document.brushes.remove(item)
         self._freshBrushes()
         self.stbMain.showMessage(
@@ -307,6 +345,44 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.document.brushes.clear()
         self._freshBrushes()
         self.stbMain.showMessage("Cleared brushes.")
+
+    def actTransformRemove_triggered(self):
+        item = self._currentTransform()
+        if item is None:
+            return
+        drawing = self._currentDrawing()
+        if isinstance(drawing, GeometryDrawing):
+            if isinstance(drawing.geometry.transform, TransformGroup):
+                drawing.geometry.transform.children.remove(item)
+            elif item == drawing.geometry.transform:
+                drawing.geometry.transform = None
+        elif isinstance(drawing, DrawingGroup):
+            if isinstance(drawing.transform, TransformGroup):
+                drawing.transform.children.remove(item)
+            elif item == drawing.transform:
+                drawing.transform = None
+        self._freshTransforms()
+        self.editor.fresh()
+        self.stbMain.showMessage(
+            f"Deleted transform ({item}).")
+
+    def actTransformClear_triggered(self):
+        drawing = self._currentDrawing()
+        if drawing is None:
+            return
+        if isinstance(drawing, GeometryDrawing):
+            if isinstance(drawing.geometry.transform, TransformGroup):
+                drawing.geometry.transform.children.clear()
+            else:
+                drawing.geometry.transform = None
+        elif isinstance(drawing, DrawingGroup):
+            if isinstance(drawing.transform, TransformGroup):
+                drawing.transform.children.clear()
+            else:
+                drawing.transform = None
+        self._freshTransforms()
+        self.editor.fresh()
+        self.stbMain.showMessage("Cleared transforms.")
 
     def actClose_triggered(self):
         self.document = None
@@ -397,7 +473,4 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self._freshDockWidgets()
 
     def editor_stateChanged(self) -> None:
-        self._freshActions()
-
-    def editor_visual_stateChanged(self) -> None:
         self._freshActions()

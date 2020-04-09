@@ -5,6 +5,7 @@ from PyQt5.QtGui import QKeyEvent, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsScene, QGraphicsView
 
 from ImagingS.drawing import Drawing
+from ImagingS.Gui.interactivity import Interactivity
 
 from . import DrawingItem
 
@@ -24,6 +25,14 @@ class Canvas(QGraphicsView):
         self.scene().addItem(self._sceneBorder)
 
         self.setMouseTracking(True)
+
+    @property
+    def interactivity(self) -> Optional[Interactivity]:
+        return self._interactivity
+
+    @interactivity.setter
+    def interactivity(self, value: Optional[Interactivity]) -> None:
+        self._interactivity = value
 
     def rerender(self) -> None:
         self.updateScene([self.sceneRect()])
@@ -73,14 +82,14 @@ class Canvas(QGraphicsView):
         pos = self.mapToScene(event.localPos().toPoint())
         if self.interactivity is not None:
             inter = self.interactivity
-            # inter.onMousePress(pos)
+            inter.onMousePress(pos)
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
         pos = self.mapToScene(event.localPos().toPoint())
         if self.interactivity is not None:
             inter = self.interactivity
-            # inter.onMouseMove(pos)
+            inter.onMouseMove(pos)
         self.mousePositionMoved.emit(pos)
         super().mouseMoveEvent(event)
 
@@ -88,20 +97,20 @@ class Canvas(QGraphicsView):
         pos = self.mapToScene(event.localPos().toPoint())
         if self.interactivity is not None:
             inter = self.interactivity
-            # inter.onMouseRelease(pos)
+            inter.onMouseRelease(pos)
         super().mouseReleaseEvent(event)
 
     def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
         pos = self.mapToScene(event.localPos().toPoint())
         if self.interactivity is not None:
             inter = self.interactivity
-            # inter.onMouseDoubleClick(pos)
+            inter.onMouseDoubleClick(pos)
         super().mouseDoubleClickEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         if self.interactivity is not None:
             inter = self.interactivity
-            # inter.onKeyPress(event)
+            inter.onKeyPress(event)
         elif event.key() == Qt.Key_F5:
             self.rerender()
         super().keyPressEvent(event)
@@ -109,5 +118,5 @@ class Canvas(QGraphicsView):
     def keyReleaseEvent(self, event: QKeyEvent) -> None:
         if self.interactivity is not None:
             inter = self.interactivity
-            # inter.onKeyRelease(event)
+            inter.onKeyRelease(event)
         super().keyReleaseEvent(event)

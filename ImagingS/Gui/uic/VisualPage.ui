@@ -70,33 +70,21 @@
    </item>
   </layout>
   <action name="actDrawingLine">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="text">
     <string>Line</string>
    </property>
   </action>
   <action name="actDrawingPolygon">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="text">
     <string>Polygon</string>
    </property>
   </action>
   <action name="actDrawingCurve">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="text">
     <string>Curve</string>
    </property>
   </action>
   <action name="actDrawingEllipse">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="text">
     <string>Ellipse</string>
    </property>
@@ -126,19 +114,9 @@
     <string>Matrix</string>
    </property>
   </action>
-  <action name="actTransformClip">
-   <property name="text">
-    <string>Clip</string>
-   </property>
-  </action>
   <action name="actTransformGroup">
    <property name="text">
     <string>Group</string>
-   </property>
-  </action>
-  <action name="actClip">
-   <property name="text">
-    <string>Clip</string>
    </property>
   </action>
  </widget>

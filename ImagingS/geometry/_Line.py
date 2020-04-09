@@ -23,11 +23,16 @@ def _genDDA(start: Point, end: Point) -> Iterator[Point]:
     xe, ye = map(round, end.asTuple())
     dx, dy = xe-xs, ye-ys
     sx, sy = fsign(dx), fsign(dy)
+    dx, dy = abs(dx), abs(dy)
     flag = False
-    if abs(dy) > abs(dx):
+    if dy > dx:
         dx, dy = dy, dx
         flag = True
     k = dy / dx
+    if flag:
+        k *= sx
+    else:
+        k *= sy
     xc, yc = xs, ys
     for _ in range(round(abs(dx))+1):
         yield Point.create(xc, yc)

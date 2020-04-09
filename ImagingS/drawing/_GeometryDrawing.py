@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from ImagingS.brush import Brush, Brushes
 from ImagingS.geometry import Geometry
 
@@ -9,6 +11,7 @@ from . import Drawing, DrawingContext, Pen
 class GeometryDrawing(Drawing):
     def __init__(self) -> None:
         super().__init__()
+        self.geometry = None
         self.stroke = Pen()
         self.fill = Brushes.White
 
@@ -35,15 +38,17 @@ class GeometryDrawing(Drawing):
         self._fill = value
 
     @property
-    def geometry(self) -> Geometry:
+    def geometry(self) -> Optional[Geometry]:
         return self._geometry
 
     @geometry.setter
-    def geometry(self, value: Geometry) -> None:
+    def geometry(self, value: Optional[Geometry]) -> None:
         self._geometry = value
         self.refreshBoundingRect()
 
     def render(self, context: DrawingContext) -> None:
+        if self.geometry is None:
+            return
         rect = context.rect()
         for point in self.geometry.strokePoints(self.stroke):
             if point in rect:
