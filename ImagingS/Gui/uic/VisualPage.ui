@@ -37,17 +37,6 @@
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <addaction name="actDrawingLine"/>
-     <addaction name="actDrawingPolygon"/>
-     <addaction name="actDrawingCurve"/>
-     <addaction name="actDrawingEllipse"/>
-     <addaction name="separator"/>
-     <addaction name="actTransformTranslate"/>
-     <addaction name="actTransformScale"/>
-     <addaction name="actTransformRotate"/>
-     <addaction name="actTransformSkew"/>
-     <addaction name="actTransformMatrix"/>
-     <addaction name="actTransformGroup"/>
     </widget>
    </item>
    <item>
@@ -69,19 +58,19 @@
     </widget>
    </item>
   </layout>
-  <action name="actDrawingLine">
+  <action name="actDrawingLineDDA">
    <property name="text">
-    <string>Line</string>
+    <string>Line(DDA)</string>
    </property>
   </action>
-  <action name="actDrawingPolygon">
+  <action name="actDrawingPolygonDDA">
    <property name="text">
-    <string>Polygon</string>
+    <string>Polygon(DDA)</string>
    </property>
   </action>
-  <action name="actDrawingCurve">
+  <action name="actDrawingCurveBezier">
    <property name="text">
-    <string>Curve</string>
+    <string>Curve(Bezier)</string>
    </property>
   </action>
   <action name="actDrawingEllipse">
@@ -117,6 +106,31 @@
   <action name="actTransformGroup">
    <property name="text">
     <string>Group</string>
+   </property>
+  </action>
+  <action name="actDrawingLineBresenham">
+   <property name="text">
+    <string>Line(Bresenham)</string>
+   </property>
+  </action>
+  <action name="actDrawingPolygonBresenham">
+   <property name="text">
+    <string>Polygon(Bresenham)</string>
+   </property>
+  </action>
+  <action name="actDrawingCurveBSpline">
+   <property name="text">
+    <string>Curve(BSpline)</string>
+   </property>
+  </action>
+  <action name="actDrawingPolylineBresenham">
+   <property name="text">
+    <string>Polyline(Bresenham)</string>
+   </property>
+  </action>
+  <action name="actDrawingPolylineDDA">
+   <property name="text">
+    <string>Polyline(DDA)</string>
    </property>
   </action>
  </widget>

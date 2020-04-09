@@ -72,6 +72,10 @@ ellipseGeometry: QIcon = qta.icon("mdi.vector-ellipse")
 
 polygonGeometry: QIcon = qta.icon("mdi.vector-polygon")
 
+polylineGeometry: QIcon = qta.icon("mdi.vector-polyline")
+
+rectangleGeometry: QIcon = qta.icon("mdi.vector-rectangle")
+
 clip: QIcon = qta.icon("mdi.crop")
 
 skewTransform: QIcon = qta.icon("mdi.skew-more")

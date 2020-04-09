@@ -3,17 +3,21 @@ from enum import Enum, unique
 from typing import Optional, cast
 
 from PyQt5.QtCore import QPointF, QSizeF, pyqtSignal
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QMenu, QToolButton, QWidget
 
 import ImagingS.Gui.ui as ui
 from ImagingS.brush import Brush
 from ImagingS.document import Document
 from ImagingS.drawing import Drawing, GeometryDrawing, Pen
+from ImagingS.geometry import (CurveAlgorithm, CurveGeometry, EllipseGeometry,
+                               LineAlgorithm, LineGeometry, PolygonGeometry,
+                               PolylineGeometry, RectangleGeometry)
 from ImagingS.Gui import converters, icons
 from ImagingS.Gui.graphic import Canvas
 from ImagingS.Gui.interactivity import Interactivity, InteractivityState
 from ImagingS.Gui.interactivity.geometry import (GeometryInteractive,
-                                                 LineInteractive)
+                                                 LineInteractive,
+                                                 PolylineInteractive)
 
 
 @unique
@@ -31,6 +35,7 @@ class VisualPage(QWidget, ui.VisualPage):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setupToolBar()
         self.setupIcon()
         self.setupCanvas()
 
@@ -50,17 +55,77 @@ class VisualPage(QWidget, ui.VisualPage):
         #     self.actTransformGroup,
         # ]
 
-        self.actDrawingLine.triggered.connect(self.actDrawingLine_triggered)
+        self.actDrawingLineDDA.triggered.connect(
+            self.actDrawingLineDDA_triggered)
+        self.actDrawingLineBresenham.triggered.connect(
+            self.actDrawingLineBresenham_triggered)
+        self.actDrawingPolygonDDA.triggered.connect(
+            self.actDrawingPolygonDDA_triggered)
+        self.actDrawingPolygonBresenham.triggered.connect(
+            self.actDrawingPolygonBresenham_triggered)
+        self.actDrawingPolylineDDA.triggered.connect(
+            self.actDrawingPolylineDDA_triggered)
+        self.actDrawingPolylineBresenham.triggered.connect(
+            self.actDrawingPolylineBresenham_triggered)
 
         self.setEnabled(False)
         self._drawing = None
         self._state = VisualPageState.Disable
 
+    def setupToolBar(self):
+        tb = QToolButton()
+        menu = QMenu()
+        menu.addActions([self.actDrawingLineDDA, self.actDrawingLineBresenham])
+        tb.setDefaultAction(self.actDrawingLineDDA)
+        tb.setMenu(menu)
+        tb.setPopupMode(QToolButton.MenuButtonPopup)
+        self.tlbMain.addWidget(tb)
+
+        tb = QToolButton()
+        menu = QMenu()
+        menu.addActions([self.actDrawingPolygonDDA,
+                         self.actDrawingPolygonBresenham,
+                         self.actDrawingPolylineDDA,
+                         self.actDrawingPolylineBresenham])
+        tb.setDefaultAction(self.actDrawingPolygonDDA)
+        tb.setMenu(menu)
+        tb.setPopupMode(QToolButton.MenuButtonPopup)
+        self.tlbMain.addWidget(tb)
+
+        tb = QToolButton()
+        menu = QMenu()
+        menu.addActions([self.actDrawingCurveBezier,
+                         self.actDrawingCurveBSpline])
+        tb.setDefaultAction(self.actDrawingCurveBezier)
+        tb.setMenu(menu)
+        tb.setPopupMode(QToolButton.MenuButtonPopup)
+        self.tlbMain.addWidget(tb)
+
+        tb = QToolButton()
+        tb.setDefaultAction(self.actDrawingEllipse)
+        self.tlbMain.addWidget(tb)
+
+        self.tlbMain.addSeparator()
+
+        self.tlbMain.addActions([
+            self.actTransformTranslate,
+            self.actTransformScale,
+            self.actTransformRotate,
+            self.actTransformSkew,
+            self.actTransformMatrix,
+            self.actTransformGroup,
+        ])
+
     def setupIcon(self):
-        self.actDrawingLine.setIcon(icons.lineGeometry)
-        self.actDrawingCurve.setIcon(icons.curveGeometry)
+        self.actDrawingLineDDA.setIcon(icons.lineGeometry)
+        self.actDrawingLineBresenham.setIcon(icons.lineGeometry)
+        self.actDrawingCurveBezier.setIcon(icons.curveGeometry)
+        self.actDrawingCurveBSpline.setIcon(icons.curveGeometry)
         self.actDrawingEllipse.setIcon(icons.ellipseGeometry)
-        self.actDrawingPolygon.setIcon(icons.polygonGeometry)
+        self.actDrawingPolygonDDA.setIcon(icons.polygonGeometry)
+        self.actDrawingPolygonBresenham.setIcon(icons.polygonGeometry)
+        self.actDrawingPolylineDDA.setIcon(icons.polylineGeometry)
+        self.actDrawingPolylineBresenham.setIcon(icons.polylineGeometry)
         self.actTransformSkew.setIcon(icons.skewTransform)
         self.actTransformScale.setIcon(icons.scaleTransform)
         self.actTransformTranslate.setIcon(icons.translateTransform)
@@ -147,9 +212,7 @@ class VisualPage(QWidget, ui.VisualPage):
             drawing.stroke = Pen.create(self.brush)
         return drawing
 
-    def actDrawingLine_triggered(self):
-        inter = LineInteractive(
-            self._emptyGeometryDrawing(), self._document.size)
+    def _beginInteractive(self, inter: Interactivity) -> None:
         inter.ended.connect(self.interactivity_ended)
         inter.started.connect(self.interactivity_started)
         inter.updated.connect(self.interactivity_updated)
@@ -176,3 +239,39 @@ class VisualPage(QWidget, ui.VisualPage):
                 self._document.drawings.children.append(drawing)
                 self.documentChanged.emit(self._document)
         self.fresh()
+
+    def actDrawingLineDDA_triggered(self):
+        geo = LineGeometry()
+        geo.algorithm = LineAlgorithm.Dda
+        self._beginInteractive(LineInteractive(
+            self._emptyGeometryDrawing(), geo, self._document.size))
+
+    def actDrawingLineBresenham_triggered(self):
+        geo = LineGeometry()
+        geo.algorithm = LineAlgorithm.Bresenham
+        self._beginInteractive(LineInteractive(
+            self._emptyGeometryDrawing(), geo, self._document.size))
+
+    def actDrawingPolygonDDA_triggered(self):
+        geo = PolygonGeometry()
+        geo.algorithm = LineAlgorithm.Dda
+        self._beginInteractive(PolylineInteractive(
+            self._emptyGeometryDrawing(), geo, self._document.size))
+
+    def actDrawingPolygonBresenham_triggered(self):
+        geo = PolygonGeometry()
+        geo.algorithm = LineAlgorithm.Bresenham
+        self._beginInteractive(PolylineInteractive(
+            self._emptyGeometryDrawing(), geo, self._document.size))
+
+    def actDrawingPolylineDDA_triggered(self):
+        geo = PolylineGeometry()
+        geo.algorithm = LineAlgorithm.Dda
+        self._beginInteractive(PolylineInteractive(
+            self._emptyGeometryDrawing(), geo, self._document.size))
+
+    def actDrawingPolylineBresenham_triggered(self):
+        geo = PolylineGeometry()
+        geo.algorithm = LineAlgorithm.Bresenham
+        self._beginInteractive(PolylineInteractive(
+            self._emptyGeometryDrawing(), geo, self._document.size))

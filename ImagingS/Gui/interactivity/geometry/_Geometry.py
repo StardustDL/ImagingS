@@ -1,4 +1,4 @@
-from typing import Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeyEvent
@@ -17,7 +17,7 @@ from .. import Interactivity
 _T = TypeVar("_T")
 
 
-class GeometryInteractive(Interactivity):
+class GeometryInteractive(Interactivity, Generic[_T]):
     def __init__(self, target: GeometryDrawing, geometry: _T, size: Size) -> None:
         super().__init__()
         self._target = target

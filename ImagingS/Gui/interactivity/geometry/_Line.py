@@ -8,9 +8,9 @@ from ImagingS.Gui import converters
 from . import GeometryInteractive
 
 
-class LineInteractive(GeometryInteractive):
-    def __init__(self, target: GeometryDrawing, size: Size) -> None:
-        super().__init__(target, LineGeometry(), size)
+class LineInteractive(GeometryInteractive[LineGeometry]):
+    def __init__(self, target: GeometryDrawing, geometry: LineGeometry, size: Size) -> None:
+        super().__init__(target, geometry, size)
 
     def start(self) -> None:
         self._hasStarted = False
