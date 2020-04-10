@@ -8,15 +8,11 @@ class Property:
         self._get = prop.fget
         self._set = prop.fset
         self._del = prop.fdel
-        self._dataType = prop.fget.__annotations__["return"]
+        # self._dataType = prop.fget.__annotations__["return"]
 
     @property
     def name(self) -> str:
         return self._name
-
-    @property
-    def dataType(self) -> type:
-        return self._dataType
 
     @property
     def canGet(self) -> bool:

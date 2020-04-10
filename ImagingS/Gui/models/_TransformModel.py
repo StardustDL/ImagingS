@@ -24,17 +24,17 @@ class TransformModel(QStandardItemModel):
         name = obj.__class__.__name__
         item = QStandardItem(name)
         self._setIcon(item, obj)
-        self._setData(item, obj)
+        self._setUserData(item, obj)
         self.appendRow(item)
 
         if isinstance(obj, TransformGroup):
             self._addChildren(item, obj)
 
-    def getData(self, index: QModelIndex) -> Transform:
+    def getUserData(self, index: QModelIndex) -> Transform:
         item = self.itemFromIndex(index)
         return item.data(Qt.UserRole)
 
-    def _setData(self, item: QStandardItem, value: Transform) -> None:
+    def _setUserData(self, item: QStandardItem, value: Transform) -> None:
         item.setData(value, Qt.UserRole)
 
     def _setIcon(self, item: QStandardItem, value: Transform) -> None:
@@ -56,7 +56,7 @@ class TransformModel(QStandardItemModel):
             name = trans.__class__.__name__
             item = QStandardItem(name)
             self._setIcon(item, trans)
-            self._setData(item, trans)
+            self._setUserData(item, trans)
             root.appendRow(item)
             if isinstance(trans, TransformGroup):
                 self._addChildren(item, trans)

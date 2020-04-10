@@ -3,7 +3,7 @@ from typing import Any, Dict, List
 
 import qtawesome as qta
 from PyQt5.QtCore import QModelIndex, Qt
-from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from PyQt5.QtGui import QStandardItem, QStandardItemModel, QIcon
 
 from ImagingS import Color
 from ImagingS.Gui import icons
@@ -27,22 +27,23 @@ class PropertyModel(QStandardItemModel):
         name = obj.__class__.__name__
         item = QStandardItem(name)
         self._setIcon(item, name, obj)
-        self._setData(item, obj)
+        self._setUserData(item, obj)
         self.appendRow(item)
         self._addPropChildren(item, obj)
 
-    def getData(self, index: QModelIndex) -> Any:
+    def getUserData(self, index: QModelIndex) -> Any:
         item = self.itemFromIndex(index)
         return item.data(Qt.UserRole)
 
-    def _setData(self, item: QStandardItem, value: Any) -> None:
+    def _setUserData(self, item: QStandardItem, value: Any) -> None:
         item.setData(value, Qt.UserRole)
 
     def _setIcon(self, item: QStandardItem, name: str, value: Any) -> None:
         if hasattr(icons, name):
             icon = getattr(icons, name)
-            item.setIcon(icon)
-            return
+            if isinstance(icon, QIcon):
+                item.setIcon(icon)
+                return
         typeName = value.__class__.__name__
         typeName = typeName[0].lower() + typeName[1:]
         if hasattr(icons, typeName):
@@ -78,7 +79,7 @@ class PropertyModel(QStandardItemModel):
     def _addChild(self, root: QStandardItem, name: str, value: Any) -> None:
         item = QStandardItem(name)
         self._setIcon(item, name, value)
-        self._setData(item, value)
+        self._setUserData(item, value)
         root.appendRow(item)
         index = self.indexFromItem(item).row()
         if value is None or isinstance(value, str) or isinstance(value, int):

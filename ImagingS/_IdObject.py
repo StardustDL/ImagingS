@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Collection, Dict, Iterator, List, TypeVar, Union
+from typing import Collection, Dict, Iterator, List, TypeVar, Union, Optional
 
 from ImagingS.serialization import PropertySerializable
 
@@ -17,6 +17,18 @@ class IdObject:
     @id.setter
     def id(self, value: str) -> None:
         self._id = value
+
+    def parent(self) -> Optional[IdObjectList]:
+        if hasattr(self, "_parent"):
+            return self._parent
+        return None
+
+    def setParent(self, value: Optional[IdObjectList]) -> None:
+        if value is None:
+            if hasattr(self, "_parent"):
+                del self._parent
+        else:
+            self._parent = value
 
 
 _T = TypeVar("_T", bound=IdObject)
@@ -43,11 +55,22 @@ class IdObjectList(PropertySerializable, Collection[_T]):
     def append(self, item: _T) -> None:
         if item.id in self:
             raise Exception(f"The id '{item.id}' has been added.")
+        item.setParent(self)
         self._items.append(item)
         self._ids[item.id] = item
 
     def clear(self) -> None:
         self.items = []
+
+    def setItemId(self, oldId, newId) -> None:
+        if oldId not in self._ids:
+            return
+        if newId in self._ids:
+            raise Exception(f"The id '{newId}' has been added.")
+        item = self._ids[oldId]
+        del self._ids[oldId]
+        item.id = newId
+        self._ids[item.id] = item
 
     def __contains__(self, item: Union[str, IdObject]) -> bool:
         if isinstance(item, str):

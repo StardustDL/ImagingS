@@ -138,9 +138,6 @@
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
        </property>
-       <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
-       </property>
        <addaction name="actDrawingRemove"/>
        <addaction name="actDrawingClear"/>
       </widget>
@@ -179,9 +176,6 @@
       <widget class="QListView" name="trvBrushes">
        <property name="contextMenuPolicy">
         <enum>Qt::ActionsContextMenu</enum>
-       </property>
-       <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
        </property>
        <addaction name="actBrushRemove"/>
        <addaction name="actBrushClear"/>

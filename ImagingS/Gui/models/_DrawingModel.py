@@ -1,5 +1,6 @@
-from PyQt5.QtCore import QModelIndex, Qt
-from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from typing import Any
+from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal
+from PyQt5.QtGui import QStandardItem, QStandardItemModel, QIcon
 
 from ImagingS.drawing import Drawing, DrawingGroup, GeometryDrawing
 from ImagingS.geometry import (CurveGeometry, EllipseGeometry, LineGeometry,
@@ -9,6 +10,7 @@ from ImagingS.Gui import icons
 
 class DrawingModel(QStandardItemModel):
     ID, TYPE = range(2)
+    changed = pyqtSignal()
 
     def __init__(self, parent) -> None:
         super().__init__(0, 1, parent)
@@ -23,44 +25,77 @@ class DrawingModel(QStandardItemModel):
             return
 
         type = obj.__class__.__name__
-        item = QStandardItem(obj.id if obj.id else "Document")
+        item = QStandardItem()
+        item.setEditable(False)
         index = self.indexFromItem(item).row()
-        self.setItem(index, self.TYPE, QStandardItem(type))
-        self._setIcon(item, obj)
-        self._setData(item, obj)
+        typeItem = QStandardItem(type)
+        typeItem.setEditable(False)
+        self.setItem(index, self.TYPE, typeItem)
+        self._setUserData(item, obj)
         self.appendRow(item)
 
         if isinstance(obj, DrawingGroup):
             self._addChildren(item, obj)
 
-    def getData(self, index: QModelIndex) -> Drawing:
+    def data(self, index: QModelIndex, role: int) -> Any:
+        if index.column() == self.ID:
+            drawing = self.getUserData(index)
+            if role == Qt.DisplayRole or role == Qt.EditRole:
+                if drawing == self.obj:  # Root
+                    return "Document"
+                else:
+                    return drawing.id
+            elif role == Qt.DecorationRole:
+                return self._getIcon(drawing)
+        return super().data(index, role)
+
+    def setData(self, index: QModelIndex, value: Any, role: int) -> bool:
+        if role == Qt.EditRole:
+            if index.column() == self.ID:
+                drawing = self.getUserData(index)
+                try:
+                    parent = drawing.parent()
+                    if parent is not None:
+                        parent.setItemId(drawing.id, str(value))
+                    else:
+                        drawing.id = str(value)
+                except Exception:
+                    return False
+                self.changed.emit()
+                return True
+        return super().setData(index, value, role)
+
+    def getUserData(self, index: QModelIndex) -> Drawing:
         item = self.itemFromIndex(index)
         return item.data(Qt.UserRole)
 
-    def _setData(self, item: QStandardItem, value: Drawing) -> None:
+    def _setUserData(self, item: QStandardItem, value: Drawing) -> None:
         item.setData(value, Qt.UserRole)
 
-    def _setIcon(self, item: QStandardItem, value: Drawing) -> None:
+    def _getIcon(self, value: Drawing) -> QIcon:
         if isinstance(value, GeometryDrawing):
             if isinstance(value.geometry, LineGeometry):
-                item.setIcon(icons.lineGeometry)
+                return icons.lineGeometry
             elif isinstance(value.geometry, CurveGeometry):
-                item.setIcon(icons.curveGeometry)
+                return icons.curveGeometry
             elif isinstance(value.geometry, EllipseGeometry):
-                item.setIcon(icons.ellipseGeometry)
+                return icons.ellipseGeometry
             elif isinstance(value.geometry, PolygonGeometry):
-                item.setIcon(icons.polygonGeometry)
+                return icons.polygonGeometry
         else:
-            item.setIcon(icons.drawing)
+            return icons.drawing
 
     def _addChildren(self, root: QStandardItem, value: DrawingGroup) -> None:
         for drawing in value.children:
             type = drawing.__class__.__name__
             item = QStandardItem(drawing.id)
-            self._setIcon(item, drawing)
-            self._setData(item, drawing)
+            self._setUserData(item, drawing)
             root.appendRow(item)
             index = self.indexFromItem(item).row()
-            root.setChild(index, self.TYPE, QStandardItem(type))
+
+            typeItem = QStandardItem(type)
+            typeItem.setEditable(False)
+            root.setChild(index, self.TYPE, typeItem)
+
             if isinstance(drawing, DrawingGroup):
                 self._addChildren(item, drawing)

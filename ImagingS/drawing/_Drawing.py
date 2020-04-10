@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Optional
 
@@ -13,6 +15,7 @@ class Drawing(PropertySerializable, IdObject, ABC):
     def __init__(self) -> None:
         super().__init__()
         self.clip = None
+        self.setParent(None)
 
     @property
     def clip(self) -> Optional[Geometry]:

@@ -31,6 +31,11 @@ class Color(PropertySerializable):
     def toHex(self) -> str:
         return f"#{_hexNopre(self.r).zfill(2)}{_hexNopre(self.g).zfill(2)}{_hexNopre(self.b).zfill(2)}"
 
+    @staticmethod
+    def fromHex(h: str) -> Color:
+        h = h.lstrip("#").zfill(6)[0:6]
+        return Color.create(int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16))
+
     @property
     def r(self) -> int:
         return self._r

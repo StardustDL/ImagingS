@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QColorDialog, QDialog, QFileDialog, QMainWindow
 
 import ImagingS.Gui.ui as ui
 from ImagingS import Color
-from ImagingS.brush import Brush, SolidBrush
+from ImagingS.brush import Brush, Brushes, SolidBrush
 from ImagingS.document import Document, DocumentFormat
 from ImagingS.drawing import (Drawing, DrawingGroup, GeometryDrawing,
                               NumpyArrayDrawingContext)
@@ -60,6 +60,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actBrushClear.triggered.connect(self.actBrushClear_triggered)
 
         self.modelDrawing = DrawingModel(self)
+        self.modelDrawing.changed.connect(self.modelDrawing_changed)
         self.trvDrawings.setModel(self.modelDrawing)
         self.trvDrawings.clicked.connect(
             self.trvDrawings_clicked)
@@ -91,7 +92,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actToggleTransforms = self.dwgTransforms.toggleViewAction()
         self.actToggleTransforms.setShortcut("Ctrl+Shift+T")
 
-        self.tabifyDockWidget(self.dwgDrawings, self.dwgBrushes)
+        self.tabifyDockWidget(self.dwgBrushes, self.dwgDrawings)
         self.tabifyDockWidget(self.dwgBrushes, self.dwgTransforms)
         self.dwgDrawings.raise_()
 
@@ -253,22 +254,22 @@ class MainWindow(QMainWindow, ui.MainWindow):
         indexs = self.trvDrawings.selectedIndexes()
         if len(indexs) == 0:
             return None
-        return self.modelDrawing.getData(indexs[0])
+        return self.modelDrawing.getUserData(indexs[0])
 
     def _currentBrush(self) -> Optional[Brush]:
         indexs = self.trvBrushes.selectedIndexes()
         if len(indexs) == 0:
             return None
-        return self.modelBrush.getData(indexs[0])
+        return self.modelBrush.getUserData(indexs[0])
 
     def _currentTransform(self) -> Optional[Transform]:
         indexs = self.trvTransforms.selectedIndexes()
         if len(indexs) == 0:
             return None
-        return self.modelTransform.getData(indexs[0])
+        return self.modelTransform.getUserData(indexs[0])
 
     def trvBrushes_clicked(self, index):
-        item = self.modelBrush.getData(index)
+        item = self.modelBrush.getUserData(index)
         if self.modelProperties.obj is not item:
             self.editor.visual.brush = item
             self.modelProperties.fresh(item)
@@ -279,7 +280,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.modelProperties.fresh()
 
     def trvDrawings_clicked(self, index):
-        item = self.modelDrawing.getData(index)
+        item = self.modelDrawing.getUserData(index)
         if self.modelProperties.obj is not item:
             self.editor.visual.drawing = item
             self._freshTransforms()
@@ -292,7 +293,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.modelProperties.fresh()
 
     def trvTransforms_clicked(self, index):
-        item = self.modelTransform.getData(index)
+        item = self.modelTransform.getUserData(index)
         if self.modelProperties.obj is not item:
             self.modelProperties.fresh(item)
             self.trvProperties.expandAll()
@@ -393,6 +394,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         newDialog = NewDocumentDialog()
         if newDialog.exec_() == QDialog.Accepted:
             doc = Document()
+            doc.brushes.append(Brushes.Black)
             doc.size = newDialog.documentSize
             self.document = doc
             self._freshAll()
@@ -474,3 +476,6 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
     def editor_stateChanged(self) -> None:
         self._freshActions()
+
+    def modelDrawing_changed(self) -> None:
+        self._freshDrawings()
