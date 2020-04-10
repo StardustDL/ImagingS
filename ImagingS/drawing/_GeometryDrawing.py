@@ -9,17 +9,11 @@ from . import Drawing, DrawingContext, Pen
 
 
 class GeometryDrawing(Drawing):
-    def __init__(self) -> None:
+    def __init__(self, geometry: Optional[Geometry] = None) -> None:
         super().__init__()
-        self.geometry = None
+        self.geometry = geometry
         self.stroke = Pen()
         self.fill = Brushes.White
-
-    @staticmethod
-    def create(geometry: Geometry) -> GeometryDrawing:
-        result = GeometryDrawing()
-        result.geometry = geometry
-        return result
 
     @property
     def stroke(self) -> Pen:
@@ -27,6 +21,7 @@ class GeometryDrawing(Drawing):
 
     @stroke.setter
     def stroke(self, value: Pen) -> None:
+        assert isinstance(value, Pen)
         self._stroke = value
 
     @property
@@ -35,6 +30,7 @@ class GeometryDrawing(Drawing):
 
     @fill.setter
     def fill(self, value: Brush) -> None:
+        assert isinstance(value, Brush)
         self._fill = value
 
     @property
@@ -43,6 +39,7 @@ class GeometryDrawing(Drawing):
 
     @geometry.setter
     def geometry(self, value: Optional[Geometry]) -> None:
+        assert isinstance(value, (type(None), Geometry))
         self._geometry = value
         self.refreshBoundingRect()
 

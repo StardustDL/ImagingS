@@ -18,7 +18,7 @@ class Geometry(PropertySerializable, ABC):
 
     @transform.setter
     def transform(self, value: Optional[Transform]) -> None:
-        assert value is None or isinstance(value, Transform)
+        assert isinstance(value, (type(None), Transform))
         self._transform = value
 
     @abstractmethod

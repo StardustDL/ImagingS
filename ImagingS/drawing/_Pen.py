@@ -1,21 +1,15 @@
 from __future__ import annotations
+from typing import Optional
 
 from ImagingS.brush import Brush, Brushes
 from ImagingS.serialization import PropertySerializable
 
 
 class Pen(PropertySerializable):
-    def __init__(self):
+    def __init__(self, brush: Optional[Brush] = None, thickness: float = 1.0):
         super().__init__()
         self.thickness = 1.0
-        self.brush = Brushes.Black
-
-    @staticmethod
-    def create(brush: Brush, thickness: float = 1) -> Pen:
-        result = Pen()
-        result.thickness = thickness
-        result.brush = brush
-        return result
+        self.brush = brush if brush else Brushes.Black
 
     @property
     def thickness(self) -> float:
@@ -23,6 +17,7 @@ class Pen(PropertySerializable):
 
     @thickness.setter
     def thickness(self, value: float) -> None:
+        value = float(value)
         self._thickness = value
 
     @property
@@ -31,4 +26,5 @@ class Pen(PropertySerializable):
 
     @brush.setter
     def brush(self, value: Brush) -> None:
+        assert isinstance(value, Brush)
         self._brush = value

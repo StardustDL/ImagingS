@@ -30,7 +30,7 @@ class DrawingItem(QGraphicsItem):
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: Optional[QWidget] = None) -> None:
         context = PainterDrawingContext(
-            painter, Rect.create(Point(), converters.size(self._size)))
+            painter, Rect(Point(), converters.size(self._size)))
         self.drawing.render(context)
         if self._is_active:
             painter.setPen(QColor(255, 0, 0))

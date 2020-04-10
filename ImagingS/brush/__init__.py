@@ -10,8 +10,8 @@ __all__ = (
 
 
 class Brushes:
-    Black = SolidBrush.create(Colors.Black)
-    White = SolidBrush.create(Colors.White)
-    Red = SolidBrush.create(Colors.Red)
-    Blue = SolidBrush.create(Colors.Blue)
-    Green = SolidBrush.create(Colors.Green)
+    Black = SolidBrush(Colors.Black)
+    White = SolidBrush(Colors.White)
+    Red = SolidBrush(Colors.Red)
+    Blue = SolidBrush(Colors.Blue)
+    Green = SolidBrush(Colors.Green)

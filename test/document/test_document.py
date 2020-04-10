@@ -21,28 +21,28 @@ def test_saveload() -> None:
     doc.brushes.append(Brushes.Black)
     doc.brushes.append(Brushes.White)
 
-    lineG = LineGeometry.create(Point.create(
-        0, 0), Point.create(1, 1), LineAlgorithm.Dda)
+    lineG = LineGeometry(Point(
+        0, 0), Point(1, 1), LineAlgorithm.Dda)
     lineG.transform = TranslateTransform()
-    line = GeometryDrawing.create(lineG)
+    line = GeometryDrawing(lineG)
     line.id = "line"
 
-    curveG = CurveGeometry.create([Point.create(2, 2)], CurveAlgorithm.Bezier)
-    curveG.transform = SkewTransform.create(Point(), (1, 1))
-    curve = GeometryDrawing.create(curveG)
+    curveG = CurveGeometry([Point(2, 2)], CurveAlgorithm.Bezier)
+    curveG.transform = SkewTransform(Point(), (1, 1))
+    curve = GeometryDrawing(curveG)
     curve.id = "curve"
 
-    polyG = PolygonGeometry.create([Point.create(2, 2)], LineAlgorithm.Dda)
-    polyG.transform = RotateTransform.create(Point(), 3)
-    poly = GeometryDrawing.create(polyG)
+    polyG = PolygonGeometry([Point(2, 2)], LineAlgorithm.Dda)
+    polyG.transform = RotateTransform(Point(), 3)
+    poly = GeometryDrawing(polyG)
     poly.id = "poly"
 
-    ellG = EllipseGeometry.fromRect(Rect.create(Point(), Size.create(10, 10)))
+    ellG = EllipseGeometry.fromRect(Rect(Point(), Size(10, 10)))
     tg = TransformGroup()
-    tg.children.append(MatrixTransform.create(np.ones((3, 3))))
-    tg.children.append(ScaleTransform.create(Point(), (2, 2)))
+    tg.children.append(MatrixTransform(np.ones((3, 3))))
+    tg.children.append(ScaleTransform(Point(), (2, 2)))
     ellG.transform = tg
-    ell = GeometryDrawing.create(ellG)
+    ell = GeometryDrawing(ellG)
     ell.id = "ell"
 
     doc.drawings.children.append(line)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from math import cos, sin
-from typing import Dict
+from typing import Dict, Optional
 
 import numpy as np
 
@@ -10,17 +10,10 @@ from ImagingS.transform import MatrixTransform
 
 
 class RotateTransform(MatrixTransform):
-    def __init__(self) -> None:
+    def __init__(self, center: Optional[Point] = None, angle: float = 0.0) -> None:
         super().__init__()
-        self.center = Point()
-        self.angle = 0.0
-
-    @staticmethod
-    def create(center: Point, angle: float) -> RotateTransform:
-        result = RotateTransform()
-        result.center = center
-        result.angle = angle
-        return result
+        self.center = center if center else Point()
+        self.angle = angle
 
     @property
     def center(self) -> Point:

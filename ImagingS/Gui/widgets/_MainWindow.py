@@ -341,7 +341,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         color = QColorDialog.getColor()
         if not color.isValid():
             return
-        br = SolidBrush.create(Color.create(
+        br = SolidBrush(Color(
             color.red(), color.green(), color.blue()))
         self.document.brushes.append(br)
         self._freshBrushes()

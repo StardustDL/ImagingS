@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Optional
 
 from ImagingS import Color, Colors, Point, Rect
 
@@ -6,15 +7,9 @@ from . import Brush
 
 
 class SolidBrush(Brush):
-    def __init__(self) -> None:
+    def __init__(self, color: Optional[Color] = None) -> None:
         super().__init__()
-        self.color = Colors.Black
-
-    @staticmethod
-    def create(color: Color) -> SolidBrush:
-        result = SolidBrush()
-        result.color = color
-        return result
+        self.color = color if color else Colors.Black
 
     @property
     def color(self) -> Color:

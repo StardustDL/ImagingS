@@ -2,16 +2,16 @@ from ImagingS import Color, IdObject, IdObjectList, Point, Rect, Size
 
 
 def test_color() -> None:
-    c = Color.create(0, 0, 0)
-    assert c == Color.create(0, 0, 0)
+    c = Color(0, 0, 0)
+    assert c == Color(0, 0, 0)
     assert c.toHex() == "#000000"
     assert str(c).startswith("Color")
 
 
 def test_point() -> None:
-    c = Point.create(1, 1)
+    c = Point(1, 1)
     assert +c == c.clone()
-    assert -c == Point.create(-1, -1)
+    assert -c == Point(-1, -1)
     assert c + c == 2 * c
     assert c.asTuple() == (1, 1)
     assert str(c).startswith("Point")
@@ -20,16 +20,16 @@ def test_point() -> None:
 
 
 def test_size() -> None:
-    c = Size.create(1, 1)
-    assert c == Size.create(1, 1)
+    c = Size(1, 1)
+    assert c == Size(1, 1)
     assert c.asTuple() == (1, 1)
     assert str(c).startswith("Size")
 
 
 def test_rect() -> None:
-    c = Rect.create(Point.create(1, 1), Size.create(1, 1))
-    assert c == Rect.create(Point.create(1, 1), Size.create(1, 1))
-    assert c == Rect.fromPoints(Point.create(1, 2), Point.create(2, 1))
+    c = Rect(Point(1, 1), Size(1, 1))
+    assert c == Rect(Point(1, 1), Size(1, 1))
+    assert c == Rect.fromPoints(Point(1, 2), Point(2, 1))
     assert str(c).startswith("Rect")
 
 

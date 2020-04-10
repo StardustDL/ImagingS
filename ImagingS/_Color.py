@@ -8,19 +8,11 @@ def _hexNopre(i: int) -> str:
 
 
 class Color(PropertySerializable):
-    def __init__(self) -> None:
+    def __init__(self, r: int = 0, g: int = 0, b: int = 0) -> None:
         super().__init__()
-        self.r = 0
-        self.g = 0
-        self.b = 0
-
-    @staticmethod
-    def create(r: int, g: int, b: int) -> Color:
-        result = Color()
-        result.r = r
-        result.g = g
-        result.b = b
-        return result
+        self.r = r
+        self.g = g
+        self.b = b
 
     def __eq__(self, obj: Color) -> bool:
         return self.r == obj.r and self.g == obj.g and self.b == obj.b
@@ -34,7 +26,7 @@ class Color(PropertySerializable):
     @staticmethod
     def fromHex(h: str) -> Color:
         h = h.lstrip("#").zfill(6)[0:6]
-        return Color.create(int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16))
+        return Color(int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16))
 
     @property
     def r(self) -> int:
@@ -62,8 +54,8 @@ class Color(PropertySerializable):
 
 
 class Colors:
-    Black = Color.create(0, 0, 0)
-    White = Color.create(255, 255, 255)
-    Red = Color.create(255, 0, 0)
-    Blue = Color.create(0, 0, 255)
-    Green = Color.create(0, 255, 0)
+    Black = Color(0, 0, 0)
+    White = Color(255, 255, 255)
+    Red = Color(255, 0, 0)
+    Blue = Color(0, 0, 255)
+    Green = Color(0, 255, 0)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict
+from typing import Dict, Optional
 
 from ImagingS import Point, Rect
 
@@ -8,16 +8,9 @@ from . import LineAlgorithm, PolygonGeometry
 
 
 class RectangleGeometry(PolygonGeometry):
-    def __init__(self) -> None:
-        super().__init__()
-        self.rect = Rect()
-
-    @staticmethod
-    def create(rect: Rect, algorithm: LineAlgorithm) -> RectangleGeometry:
-        result = RectangleGeometry()
-        result.rect = rect
-        result.algorithm = algorithm
-        return result
+    def __init__(self, rect: Optional[Rect] = None, algorithm: Optional[LineAlgorithm] = None) -> None:
+        super().__init__(algorithm=algorithm)
+        self.rect = rect if rect else Rect()
 
     @property
     def rect(self) -> Rect:
@@ -29,10 +22,10 @@ class RectangleGeometry(PolygonGeometry):
         self._rect = value
         self.vertexes = [
             self._rect.origin,
-            self._rect.origin + Point.create(self._rect.size.width, 0),
+            self._rect.origin + Point(self._rect.size.width, 0),
             self._rect.origin +
-            Point.create(self._rect.size.width, self._rect.size.height),
-            self._rect.origin + Point.create(0, self._rect.size.height),
+            Point(self._rect.size.width, self._rect.size.height),
+            self._rect.origin + Point(0, self._rect.size.height),
         ]
 
     def serialize(self) -> Dict:

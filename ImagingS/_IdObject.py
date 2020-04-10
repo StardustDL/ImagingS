@@ -4,11 +4,13 @@ from typing import Collection, Dict, Iterator, List, Optional, TypeVar, Union
 
 from ImagingS.serialization import PropertySerializable
 
+import uuid
+
 
 class IdObject:
-    def __init__(self) -> None:
+    def __init__(self, id: str = "") -> None:
         super().__init__()
-        self.id = ""
+        self.id = id if id else str(uuid.uuid1())
 
     @property
     def id(self) -> str:

@@ -226,7 +226,7 @@ class VisualPage(QWidget, ui.VisualPage):
         drawing = GeometryDrawing()
         drawing.id = str(uuid.uuid1())
         if self.brush is not None:
-            drawing.stroke = Pen.create(self.brush)
+            drawing.stroke = Pen(self.brush)
         return drawing
 
     def _beginInteractive(self, inter: Interactivity) -> None:

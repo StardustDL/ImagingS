@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 from ImagingS import Point
 from ImagingS.drawing import Pen
@@ -11,17 +11,10 @@ from . import Geometry, LineAlgorithm, LineGeometry
 class PolylineGeometry(Geometry):
     S_Vertexes = "vertexes"
 
-    def __init__(self) -> None:
+    def __init__(self, vertexes: Optional[List[Point]] = None, algorithm: Optional[LineAlgorithm] = None) -> None:
         super().__init__()
-        self.vertexes = []
-        self.algorithm = LineAlgorithm.Dda
-
-    @staticmethod
-    def create(vertexes: List[Point], algorithm: LineAlgorithm) -> PolylineGeometry:
-        result = PolylineGeometry()
-        result.vertexes = vertexes
-        result.algorithm = algorithm
-        return result
+        self.vertexes = vertexes if vertexes else []
+        self.algorithm = algorithm if algorithm else LineAlgorithm.Dda
 
     @property
     def algorithm(self) -> LineAlgorithm:
@@ -46,8 +39,8 @@ class PolylineGeometry(Geometry):
         if cnt == 0:
             return
         for i in range(cnt - 1):
-            ln = LineGeometry.create(self.vertexes[i],
-                                     self.vertexes[i+1], self.algorithm)
+            ln = LineGeometry(self.vertexes[i],
+                              self.vertexes[i+1], self.algorithm)
             ln.transform = self.transform
             for point in ln.strokePoints(pen):
                 yield point
@@ -57,23 +50,16 @@ class PolylineGeometry(Geometry):
 
 
 class PolygonGeometry(PolylineGeometry):
-    def __init__(self) -> None:
-        super().__init__()
-
-    @staticmethod
-    def create(vertexes: List[Point], algorithm: LineAlgorithm) -> PolygonGeometry:
-        result = PolygonGeometry()
-        result.vertexes = vertexes
-        result.algorithm = algorithm
-        return result
+    def __init__(self, vertexes: Optional[List[Point]] = None, algorithm: Optional[LineAlgorithm] = None) -> None:
+        super().__init__(vertexes, algorithm)
 
     def strokePoints(self, pen: Pen) -> Iterable[Point]:
         cnt = len(self.vertexes)
         if cnt > 0:
             for point in super().strokePoints(pen):
                 yield point
-            ln = LineGeometry.create(self.vertexes[-1],
-                                     self.vertexes[0], self.algorithm)
+            ln = LineGeometry(self.vertexes[-1],
+                              self.vertexes[0], self.algorithm)
             ln.transform = self.transform
             for point in ln.strokePoints(pen):
                 yield point

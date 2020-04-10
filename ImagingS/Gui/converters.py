@@ -23,16 +23,16 @@ def qcolor(o: Color) -> QColor:
 
 
 def point(o: Union[QPointF, QPoint]) -> Point:
-    return Point.create(o.x(), o.y())
+    return Point(o.x(), o.y())
 
 
 def size(o: Union[QSizeF, QSize]) -> Size:
-    return Size.create(o.width(), o.height())
+    return Size(o.width(), o.height())
 
 
 def rect(o: Union[QRectF, QRect]) -> Rect:
-    return Rect.create(qpoint(o.topLeft()), qsize(o.size()))
+    return Rect(qpoint(o.topLeft()), qsize(o.size()))
 
 
 def color(o: QColor) -> Color:
-    return Color.create(o.red(), o.green(), o.blue())
+    return Color(o.red(), o.green(), o.blue())

@@ -37,7 +37,7 @@ class BuiltinInstruction:
         self.output_dir = output_dir
 
     def resetCanvas(self, argv: List[str]) -> None:
-        self.doc.size = Size.create(int(argv[0]), int(argv[1]))
+        self.doc.size = Size(int(argv[0]), int(argv[1]))
         self.doc.drawings.children.clear()
 
     def saveDoc(self, argv: List[str]) -> None:
@@ -62,15 +62,15 @@ class BuiltinInstruction:
         Image.fromarray(context.array).save(fileName, "bmp")
 
     def setColor(self, argv: List[str]) -> None:
-        self.brush = SolidBrush.create(
-            Color.create(int(argv[0]), int(argv[1]), int(argv[2])))
+        self.brush = SolidBrush(
+            Color(int(argv[0]), int(argv[1]), int(argv[2])))
 
     def drawLine(self, argv: List[str]) -> None:
-        geometry = LineGeometry.create(Point.create(int(argv[1]), int(argv[2])), Point.create(
+        geometry = LineGeometry(Point(int(argv[1]), int(argv[2])), Point(
             int(argv[3]), int(argv[4])), LineAlgorithm.Dda if argv[5] == "DDA" else LineAlgorithm.Bresenham)
-        drawing = GeometryDrawing.create(geometry)
+        drawing = GeometryDrawing(geometry)
         drawing.id = argv[0]
-        drawing.stroke = Pen.create(self.brush)
+        drawing.stroke = Pen(self.brush)
         self.doc.drawings.children.append(drawing)
 
     def drawPolygon(self, argv: List[str]) -> None:
@@ -78,22 +78,22 @@ class BuiltinInstruction:
         ps = argv[1:-1]
         i = 0
         while i < len(ps):
-            vers.append(Point.create(int(ps[i]), int(ps[i+1])))
+            vers.append(Point(int(ps[i]), int(ps[i+1])))
             i += 2
-        geometry = PolygonGeometry.create(
+        geometry = PolygonGeometry(
             vers, LineAlgorithm.Dda if argv[-1] == "DDA" else LineAlgorithm.Bresenham)
-        drawing = GeometryDrawing.create(geometry)
+        drawing = GeometryDrawing(geometry)
         drawing.id = argv[0]
-        drawing.stroke = Pen.create(self.brush)
+        drawing.stroke = Pen(self.brush)
         self.doc.drawings.children.append(drawing)
 
     def drawEllipse(self, argv: List[str]) -> None:
-        lt = Point.create(int(argv[1]), int(argv[2]))
-        rb = Point.create(int(argv[3]), int(argv[4]))
+        lt = Point(int(argv[1]), int(argv[2]))
+        rb = Point(int(argv[3]), int(argv[4]))
         geometry = EllipseGeometry.fromRect(Rect.fromPoints(lt, rb))
-        drawing = GeometryDrawing.create(geometry)
+        drawing = GeometryDrawing(geometry)
         drawing.id = argv[0]
-        drawing.stroke = Pen.create(self.brush)
+        drawing.stroke = Pen(self.brush)
         self.doc.drawings.children.append(drawing)
 
     def drawCurve(self, argv: List[str]) -> None:
@@ -101,39 +101,39 @@ class BuiltinInstruction:
         ps = argv[1:-1]
         i = 0
         while i < len(ps):
-            vers.append(Point.create(int(ps[i]), int(ps[i+1])))
+            vers.append(Point(int(ps[i]), int(ps[i+1])))
             i += 2
-        geometry = CurveGeometry.create(
+        geometry = CurveGeometry(
             vers, CurveAlgorithm.Bezier if argv[-1] == "Bezier" else CurveAlgorithm.BSpline)
-        drawing = GeometryDrawing.create(geometry)
+        drawing = GeometryDrawing(geometry)
         drawing.id = argv[0]
-        drawing.stroke = Pen.create(self.brush)
+        drawing.stroke = Pen(self.brush)
         self.doc.drawings.children.append(drawing)
 
     def translate(self, argv: List[str]) -> None:
         drawing = self.doc.drawings.children[argv[0]]
         assert isinstance(drawing, GeometryDrawing)
-        _append_transform(drawing, TranslateTransform.create(
-            Point.create(int(argv[1]), int(argv[2]))))
+        _append_transform(drawing, TranslateTransform(
+            Point(int(argv[1]), int(argv[2]))))
 
     def rotate(self, argv: List[str]) -> None:
         drawing = self.doc.drawings.children[argv[0]]
         assert isinstance(drawing, GeometryDrawing)
-        _append_transform(drawing, RotateTransform.create(
-            Point.create(int(argv[1]), int(argv[2])), int(argv[3]) / 360 * 2 * math.pi))
+        _append_transform(drawing, RotateTransform(
+            Point(int(argv[1]), int(argv[2])), int(argv[3]) / 360 * 2 * math.pi))
 
     def scale(self, argv: List[str]) -> None:
         drawing = self.doc.drawings.children[argv[0]]
         assert isinstance(drawing, GeometryDrawing)
-        _append_transform(drawing, ScaleTransform.create(
-            Point.create(int(argv[1]), int(argv[2])), (int(argv[3]), int(argv[3]))))
+        _append_transform(drawing, ScaleTransform(
+            Point(int(argv[1]), int(argv[2])), (int(argv[3]), int(argv[3]))))
 
     def clip(self, argv: List[str]) -> None:
         drawing = self.doc.drawings.children[argv[0]]
         assert isinstance(drawing, GeometryDrawing)
         assert isinstance(drawing.geometry, LineGeometry)
-        lt = Point.create(int(argv[1]), int(argv[2]))
-        rb = Point.create(int(argv[3]), int(argv[4]))
+        lt = Point(int(argv[1]), int(argv[2]))
+        rb = Point(int(argv[3]), int(argv[4]))
         drawing.geometry.clip = Rect.fromPoints(lt, rb)
         drawing.geometry.clipAlgorithm = LineClipAlgorithm.CohenSutherland if argv[
             5] == "Cohen-Sutherland" else LineClipAlgorithm.LiangBarsky

@@ -25,7 +25,7 @@ class Document(PropertySerializable, IdObject):
         self.id = str(uuid.uuid1())
         self.brushes = []
         self.drawings = DrawingGroup()
-        self.size = Size.create(600, 600)
+        self.size = Size(600, 600)
 
     @property
     def brushes(self) -> List[Brush]:

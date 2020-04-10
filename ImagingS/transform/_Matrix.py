@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict
+from typing import Dict, Optional
 
 import numpy as np
 
@@ -12,15 +12,9 @@ from . import Transform
 class MatrixTransform(Transform):
     S_Matrix = "_matrix"
 
-    def __init__(self) -> None:
+    def __init__(self, matrix: Optional[np.ndarray] = None) -> None:
         super().__init__()
-        self.matrix = np.eye(3)
-
-    @staticmethod
-    def create(matrix: np.ndarray) -> MatrixTransform:
-        result = MatrixTransform()
-        result.matrix = matrix
-        return result
+        self.matrix = matrix if matrix is not None else np.eye(3)
 
     @property
     def matrix(self) -> np.ndarray:

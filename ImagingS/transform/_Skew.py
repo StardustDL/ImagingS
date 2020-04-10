@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from math import tan
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 
@@ -10,17 +10,10 @@ from ImagingS.transform import MatrixTransform
 
 
 class SkewTransform(MatrixTransform):
-    def __init__(self) -> None:
+    def __init__(self, center: Optional[Point] = None, angle: Tuple[float, float] = (0, 0)) -> None:
         super().__init__()
-        self.center = Point()
-        self.angle = (0, 0)
-
-    @staticmethod
-    def create(center: Point, angle: Tuple[float, float]) -> SkewTransform:
-        result = SkewTransform()
-        result.center = center
-        result.angle = angle
-        return result
+        self.center = center if center else Point()
+        self.angle = angle
 
     @property
     def center(self) -> Point:
@@ -37,7 +30,6 @@ class SkewTransform(MatrixTransform):
 
     @angle.setter
     def angle(self, value: Tuple[float, float]) -> None:
-        assert isinstance(value, tuple) or isinstance(value, list)
         assert len(value) == 2
         self._angle = float(value[0]), float(value[1])
         self.matrix = np.array(

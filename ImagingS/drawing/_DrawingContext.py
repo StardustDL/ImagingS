@@ -23,8 +23,8 @@ class BoundingRectMeasurer(DrawingContext):
         self._ry = float("-inf")
 
     def endMeasure(self) -> Rect:
-        result = Rect.fromPoints(Point.create(
-            self._lx, self._ly), Point.create(self._rx, self._ry))
+        result = Rect.fromPoints(Point(
+            self._lx, self._ly), Point(self._rx, self._ry))
         return result
 
     def point(self, position: Point, color: Color) -> None:
@@ -60,8 +60,8 @@ class NumpyArrayDrawingContext(DrawingContext):
         assert len(value.shape) == 3
         assert value.shape[2] == 3
         self._array = value
-        self._rect = Rect.create(
-            Point(), Size.create(value.shape[1], value.shape[0]))
+        self._rect = Rect(
+            Point(), Size(value.shape[1], value.shape[0]))
 
     def point(self, position: Point, color: Color) -> None:
         x, y = map(int, position.asTuple())

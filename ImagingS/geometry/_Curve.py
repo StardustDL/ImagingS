@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum, unique
-from typing import Iterable, Iterator, List
+from typing import Iterable, Iterator, List, Optional
 
 from ImagingS import Point
 from ImagingS.drawing import Pen
@@ -62,17 +62,10 @@ def _genBSpline3(points: List[Point]) -> Iterator[Point]:
 
 
 class CurveGeometry(Geometry):
-    def __init__(self, ) -> None:
+    def __init__(self, controlPoints: Optional[List[Point]] = None, algorithm: Optional[CurveAlgorithm] = None) -> None:
         super().__init__()
-        self.controlPoints = []
-        self.algorithm = CurveAlgorithm.Bezier
-
-    @staticmethod
-    def create(controlPoints: List[Point], algorithm: CurveAlgorithm) -> CurveGeometry:
-        result = CurveGeometry()
-        result.controlPoints = controlPoints
-        result.algorithm = algorithm
-        return result
+        self.controlPoints = controlPoints if controlPoints else []
+        self.algorithm = algorithm if algorithm else CurveAlgorithm.Bezier
 
     @property
     def controlPoints(self) -> List[Point]:

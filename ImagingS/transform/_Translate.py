@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict
+from typing import Dict, Optional
 
 import numpy as np
 
@@ -10,15 +10,9 @@ from . import MatrixTransform
 
 
 class TranslateTransform(MatrixTransform):
-    def __init__(self) -> None:
+    def __init__(self, delta: Optional[Point] = None) -> None:
         super().__init__()
-        self.delta = Point()
-
-    @staticmethod
-    def create(delta: Point) -> TranslateTransform:
-        result = TranslateTransform()
-        result.delta = delta
-        return result
+        self.delta = delta if delta else Point()
 
     @property
     def delta(self) -> Point:

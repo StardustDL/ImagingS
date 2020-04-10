@@ -19,35 +19,28 @@ def fsign(a: float) -> int:
 
 
 class Point(PropertySerializable):
-    def __init__(self) -> None:
+    def __init__(self, x: float = 0.0, y: float = 0.0) -> None:
         super().__init__()
-        self.x = 0
-        self.y = 0
-
-    @staticmethod
-    def create(x: float, y: float) -> Point:
-        result = Point()
-        result.x = x
-        result.y = y
-        return result
+        self.x = x
+        self.y = y
 
     def __eq__(self, other: Point) -> bool:
         return feq(self.x, other.x) and feq(self.y, other.y)
 
     def __add__(self, other: Point) -> Point:
-        return Point.create(self.x + other.x, self.y + other.y)
+        return Point(self.x + other.x, self.y + other.y)
 
     def __sub__(self, other: Point) -> Point:
-        return Point.create(self.x - other.x, self.y - other.y)
+        return Point(self.x - other.x, self.y - other.y)
 
     def __neg__(self) -> Point:
-        return Point.create(-self.x, -self.y)
+        return Point(-self.x, -self.y)
 
     def __pos__(self) -> Point:
         return self.clone()
 
     def __mul__(self, other: float) -> Point:
-        return Point.create(self.x * other, self.y * other)
+        return Point(self.x * other, self.y * other)
 
     def __rmul__(self, other: float) -> Point:
         return self * other
@@ -59,7 +52,7 @@ class Point(PropertySerializable):
         return f"Point({self.x}, {self.y})"
 
     def clone(self) -> Point:
-        return Point.create(self.x, self.y)
+        return Point(self.x, self.y)
 
     @property
     def x(self) -> float:
@@ -88,21 +81,14 @@ class Point(PropertySerializable):
         assert arr.shape == (3, 1)
         w = float(arr[2][0])
         assert w != 0
-        return Point.create(float(arr[0][0]) / w, float(arr[1][0]) / w)
+        return Point(float(arr[0][0]) / w, float(arr[1][0]) / w)
 
 
 class Size(PropertySerializable):
-    def __init__(self) -> None:
+    def __init__(self, width: float = 0.0, height: float = 0.0) -> None:
         super().__init__()
-        self.width = 0
-        self.height = 0
-
-    @staticmethod
-    def create(width: float, height: float) -> Size:
-        result = Size()
-        result.width = width
-        result.height = height
-        return result
+        self.width = width
+        self.height = height
 
     def __eq__(self, obj: Size) -> bool:
         return self.width == obj.width and self.height == obj.height
@@ -133,23 +119,16 @@ class Size(PropertySerializable):
 class Rect(PropertySerializable):
     _infinite: Optional[Rect] = None
 
-    def __init__(self) -> None:
+    def __init__(self, origin: Optional[Point] = None, size: Optional[Size] = None) -> None:
         super().__init__()
-        self.origin = Point()
-        self.size = Size()
-
-    @staticmethod
-    def create(origin: Point, size: Size) -> Rect:
-        result = Rect()
-        result.origin = origin
-        result.size = size
-        return result
+        self.origin = origin if origin else Point()
+        self.size = size if size else Size()
 
     @classmethod
     def infinite(cls) -> Rect:
         if cls._infinite is None:
-            cls._infinite = Rect.fromPoints(Point.create(
-                float("-inf"), float("-inf")), Point.create(float("inf"), float("inf")))
+            cls._infinite = Rect.fromPoints(Point(
+                float("-inf"), float("-inf")), Point(float("inf"), float("inf")))
         return cls._infinite
 
     @staticmethod
@@ -158,7 +137,7 @@ class Rect(PropertySerializable):
         x2, y2 = p2.asTuple()
         xmin, xmax = min(x1, x2), max(x1, x2)
         ymin, ymax = min(y1, y2), max(y1, y2)
-        return Rect.create(Point.create(xmin, ymin), Size.create(xmax - xmin, ymax - ymin))
+        return Rect(Point(xmin, ymin), Size(xmax - xmin, ymax - ymin))
 
     def __eq__(self, obj: Rect) -> bool:
         return self.origin == obj.origin and self.size == obj.size
@@ -189,4 +168,4 @@ class Rect(PropertySerializable):
         self._size = value
 
     def vertex(self) -> Point:
-        return Point.create(self.origin.x+self.size.width, self.origin.y+self.size.height)
+        return Point(self.origin.x+self.size.width, self.origin.y+self.size.height)

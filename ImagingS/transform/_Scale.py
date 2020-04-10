@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 
@@ -9,17 +9,10 @@ from ImagingS.transform import MatrixTransform
 
 
 class ScaleTransform(MatrixTransform):
-    def __init__(self) -> None:
+    def __init__(self, center: Optional[Point] = None, factor: Tuple[float, float] = (1, 1)) -> None:
         super().__init__()
-        self.center = Point()
-        self.factor = (1, 1)
-
-    @staticmethod
-    def create(center: Point, factor: Tuple[float, float]) -> ScaleTransform:
-        result = ScaleTransform()
-        result.center = center
-        result.factor = factor
-        return result
+        self.center = center if center else Point()
+        self.factor = factor
 
     @property
     def center(self) -> Point:
@@ -36,7 +29,6 @@ class ScaleTransform(MatrixTransform):
 
     @factor.setter
     def factor(self, value: Tuple[float, float]) -> None:
-        assert isinstance(value, tuple) or isinstance(value, list)
         assert len(value) == 2
         self._factor = float(value[0]), float(value[1])
         self.matrix = np.array(

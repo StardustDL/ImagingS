@@ -35,7 +35,7 @@ def _genDDA(start: Point, end: Point) -> Iterator[Point]:
         k *= sy
     xc, yc = xs, ys
     for _ in range(round(abs(dx))+1):
-        yield Point.create(xc, yc)
+        yield Point(xc, yc)
         if flag:
             yc += sy
             xc += k
@@ -60,7 +60,7 @@ def _genBresenham(start: Point, end: Point) -> Iterator[Point]:
     xc, yc = xs, ys
     ne = 2*dy-dx
     for _ in range(round(dx)+1):
-        yield Point.create(xc, yc)
+        yield Point(xc, yc)
         if ne >= 0:
             if flag:
                 xc += sx
@@ -81,21 +81,13 @@ class LineClipAlgorithm(Enum):
 
 
 class LineGeometry(Geometry):
-    def __init__(self) -> None:
+    def __init__(self, start: Optional[Point] = None, end: Optional[Point] = None, algorithm: Optional[LineAlgorithm] = None) -> None:
         super().__init__()
-        self.start = Point()
-        self.end = Point()
-        self.algorithm = LineAlgorithm.Dda
+        self.start = start if start else Point()
+        self.end = end if end else Point()
+        self.algorithm = algorithm if algorithm else LineAlgorithm.Dda
         self.clip = None
         self.clipAlgorithm = LineClipAlgorithm.CohenSutherland
-
-    @staticmethod
-    def create(start: Point, end: Point, algorithm: LineAlgorithm) -> LineGeometry:
-        result = LineGeometry()
-        result.start = start
-        result.end = end
-        result.algorithm = algorithm
-        return result
 
     @property
     def start(self) -> Point:

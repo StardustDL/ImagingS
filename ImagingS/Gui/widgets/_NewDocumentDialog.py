@@ -16,4 +16,4 @@ class NewDocumentDialog(QDialog, ui.NewDocumentDialog):
 
     @property
     def documentSize(self) -> Size:
-        return Size.create(self.sbxWidth.value(), self.sbxHeight.value())
+        return Size(self.sbxWidth.value(), self.sbxHeight.value())
