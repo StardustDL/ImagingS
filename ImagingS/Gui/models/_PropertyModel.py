@@ -50,6 +50,8 @@ class PropertyModel(QStandardItemModel):
                 if role == Qt.DisplayRole or role == Qt.EditRole:
                     if realValue is None:
                         return "None"
+                    elif isinstance(realValue, str):
+                        return realValue
                     elif isinstance(realValue, int):
                         return str(realValue)
                     elif isinstance(realValue, float):
@@ -65,7 +67,12 @@ class PropertyModel(QStandardItemModel):
                 realData = data.get()
                 if role == Qt.DisplayRole or role == Qt.EditRole:
                     modified = True
-                    if isinstance(realData, int):
+                    if isinstance(realData, str):
+                        try:
+                            data.set(str(value))
+                        except Exception:
+                            return False
+                    elif isinstance(realData, int):
                         try:
                             data.set(int(value))
                         except Exception:
@@ -173,4 +180,6 @@ class PropertyModel(QStandardItemModel):
             else:
                 valueItem.setText(str(realValue))
                 valueItem.setEditable(False)
+        if name == "id":
+            valueItem.setEditable(False)
         root.setChild(index, self.VALUE, valueItem)

@@ -327,7 +327,10 @@ class MainWindow(QMainWindow, ui.MainWindow):
         item = self._currentDrawing()
         if item is None:
             return
-        del self.document.drawings.children[item]
+        parent = item.parent()
+        if parent is None:
+            return
+        del parent[item.id]
         self._freshDrawings()
         self.editor.fresh()
         self.stbMain.showMessage(f"Deleted drawing ({item}).")
@@ -353,7 +356,10 @@ class MainWindow(QMainWindow, ui.MainWindow):
         item = self._currentBrush()
         if item is None:
             return
-        self.document.brushes.remove(item)
+        parent = item.parent()
+        if parent is None:
+            return
+        del parent[item.id]
         self._freshBrushes()
         self.stbMain.showMessage(
             f"Deleted brush ({item}).")
@@ -371,13 +377,19 @@ class MainWindow(QMainWindow, ui.MainWindow):
         if isinstance(drawing, GeometryDrawing):
             if item == drawing.geometry.transform:
                 drawing.geometry.transform = None
-            elif isinstance(drawing.geometry.transform, TransformGroup):
-                drawing.geometry.transform.children.remove(item)
+            else:
+                parent = item.parent()
+                if parent is None:
+                    return
+                del parent[item.id]
         elif isinstance(drawing, DrawingGroup):
             if item == drawing.transform:
                 drawing.transform = None
             elif isinstance(drawing.transform, TransformGroup):
-                drawing.transform.children.remove(item)
+                parent = item.parent()
+                if parent is None:
+                    return
+                del parent[item.id]
         self._freshTransforms()
         self.editor.fresh()
         self.stbMain.showMessage(

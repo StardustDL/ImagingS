@@ -4,9 +4,8 @@ import json
 import lzma
 import uuid
 from enum import Enum, unique
-from typing import List
 
-from ImagingS import IdObject, Size
+from ImagingS import IdObject, IdObjectList, Size
 from ImagingS.brush import Brush
 from ImagingS.drawing import DrawingGroup
 from ImagingS.serialization import PropertySerializable
@@ -23,16 +22,17 @@ class Document(PropertySerializable, IdObject):
     def __init__(self) -> None:
         super().__init__()
         self.id = str(uuid.uuid1())
-        self.brushes = []
+        self.brushes = IdObjectList()
         self.drawings = DrawingGroup()
         self.size = Size(600, 600)
 
     @property
-    def brushes(self) -> List[Brush]:
+    def brushes(self) -> IdObjectList[Brush]:
         return self._brushes
 
     @brushes.setter
-    def brushes(self, value: List[Brush]) -> None:
+    def brushes(self, value: IdObjectList[Brush]) -> None:
+        assert isinstance(value, IdObjectList)
         self._brushes = value
 
     @property
@@ -41,6 +41,7 @@ class Document(PropertySerializable, IdObject):
 
     @drawings.setter
     def drawings(self, value: DrawingGroup) -> None:
+        assert isinstance(value, DrawingGroup)
         self._drawings = value
 
     @property
@@ -49,6 +50,7 @@ class Document(PropertySerializable, IdObject):
 
     @size.setter
     def size(self, value: Size) -> None:
+        assert isinstance(value, Size)
         self._size = value
 
     def save(self, file, format: DocumentFormat = DocumentFormat.ISD) -> None:

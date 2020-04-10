@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from ImagingS import Point
+from ImagingS import IdObject, IdObjectList, Point
 from ImagingS.serialization import PropertySerializable
 
 
-class Transform(PropertySerializable, ABC):
+class Transform(PropertySerializable, IdObject, ABC):
     def __init__(self) -> None:
         super().__init__()
 
@@ -16,15 +16,15 @@ class Transform(PropertySerializable, ABC):
 class TransformGroup(Transform):
     def __init__(self) -> None:
         super().__init__()
-        self.children = []
+        self.children = IdObjectList()
 
     @property
-    def children(self) -> List[Transform]:
+    def children(self) -> IdObjectList[Transform]:
         return self._children
 
     @children.setter
-    def children(self, value: List[Transform]) -> None:
-        assert isinstance(value, list)
+    def children(self, value: IdObjectList[Transform]) -> None:
+        assert isinstance(value, IdObjectList)
         self._children = value
 
     def transform(self, origin: Point) -> Point:

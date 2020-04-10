@@ -1,4 +1,3 @@
-import uuid
 from enum import Enum, unique
 from typing import Optional, Union, cast
 
@@ -245,7 +244,6 @@ class VisualPage(QWidget, ui.VisualPage):
 
     def _emptyGeometryDrawing(self) -> GeometryDrawing:
         drawing = GeometryDrawing()
-        drawing.id = str(uuid.uuid1())
         if self.brush is not None:
             drawing.stroke = Pen(self.brush)
         return drawing

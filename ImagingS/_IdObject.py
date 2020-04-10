@@ -86,7 +86,9 @@ class IdObjectList(PropertySerializable, Collection[_T]):
             key = self._items[key].id
         if key not in self:
             return
-        self._items.remove(self._ids[key])
+        item = self._ids[key]
+        item.setParent(None)
+        self._items.remove(item)
         del self._ids[key]
 
     def __getitem__(self, key: Union[str, int]) -> _T:

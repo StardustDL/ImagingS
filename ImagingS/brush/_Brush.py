@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 
-from ImagingS import Color, Point, Rect
+from ImagingS import Color, IdObject, Point, Rect
 from ImagingS.serialization import PropertySerializable
 
 
-class Brush(PropertySerializable, ABC):
+class Brush(PropertySerializable, IdObject, ABC):
     def __init__(self) -> None:
         super().__init__()
 
