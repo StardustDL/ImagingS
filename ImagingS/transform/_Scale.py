@@ -27,6 +27,7 @@ class ScaleTransform(MatrixTransform):
 
     @center.setter
     def center(self, value: Point) -> None:
+        assert isinstance(value, Point)
         self._center = value
 
     @property
@@ -35,7 +36,9 @@ class ScaleTransform(MatrixTransform):
 
     @factor.setter
     def factor(self, value: Tuple[float, float]) -> None:
-        self._factor = value
+        assert isinstance(value, tuple) or isinstance(value, list)
+        assert len(value) == 2
+        self._factor = float(value[0]), float(value[1])
         self.matrix = np.array(
             [[self._factor[0], 0, 0],
              [0, self._factor[1], 0],

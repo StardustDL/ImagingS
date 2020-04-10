@@ -28,6 +28,7 @@ class SkewTransform(MatrixTransform):
 
     @center.setter
     def center(self, value: Point) -> None:
+        assert isinstance(value, Point)
         self._center = value
 
     @property
@@ -36,7 +37,9 @@ class SkewTransform(MatrixTransform):
 
     @angle.setter
     def angle(self, value: Tuple[float, float]) -> None:
-        self._angle = value
+        assert isinstance(value, tuple) or isinstance(value, list)
+        assert len(value) == 2
+        self._angle = float(value[0]), float(value[1])
         self.matrix = np.array(
             [[1, tan(self._angle[0]), 0],
              [tan(self._angle[1]), 1, 0],

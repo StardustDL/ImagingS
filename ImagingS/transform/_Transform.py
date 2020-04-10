@@ -24,6 +24,7 @@ class TransformGroup(Transform):
 
     @children.setter
     def children(self, value: List[Transform]) -> None:
+        assert isinstance(value, list)
         self._children = value
 
     def transform(self, origin: Point) -> Point:

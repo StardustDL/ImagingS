@@ -68,6 +68,7 @@ class EllipseGeometry(Geometry):
 
     @center.setter
     def center(self, value: Point) -> None:
+        assert isinstance(value, Point)
         self._center = value
 
     @property
@@ -76,7 +77,9 @@ class EllipseGeometry(Geometry):
 
     @radius.setter
     def radius(self, value: Tuple[float, float]) -> None:
-        self._radius = value
+        assert isinstance(value, tuple) or isinstance(value, list)
+        assert len(value) == 2
+        self._radius = float(value[0]), float(value[1])
 
     def strokePoints(self, pen: Pen) -> Iterable[Point]:
         center, radius = self.center, self.radius

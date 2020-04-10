@@ -26,6 +26,7 @@ class TranslateTransform(MatrixTransform):
 
     @delta.setter
     def delta(self, value: Point) -> None:
+        assert isinstance(value, Point)
         self._delta = value
         self.matrix = np.array(
             [[1, 0, 0],

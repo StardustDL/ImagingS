@@ -67,7 +67,7 @@ class Point(PropertySerializable):
 
     @x.setter
     def x(self, value: float) -> None:
-        self._x = value
+        self._x = float(value)
 
     @property
     def y(self) -> float:
@@ -75,7 +75,7 @@ class Point(PropertySerializable):
 
     @y.setter
     def y(self, value: float) -> None:
-        self._y = value
+        self._y = float(value)
 
     def toHomogeneous(self) -> np.ndarray:
         return np.array([[self.x], [self.y], [1]])
@@ -119,7 +119,7 @@ class Size(PropertySerializable):
 
     @width.setter
     def width(self, value: float) -> None:
-        self._width = value
+        self._width = float(value)
 
     @property
     def height(self) -> float:
@@ -127,7 +127,7 @@ class Size(PropertySerializable):
 
     @height.setter
     def height(self, value: float) -> None:
-        self._height = value
+        self._height = float(value)
 
 
 class Rect(PropertySerializable):
@@ -176,6 +176,7 @@ class Rect(PropertySerializable):
 
     @origin.setter
     def origin(self, value: Point) -> None:
+        assert isinstance(value, Point)
         self._origin = value
 
     @property
@@ -184,6 +185,7 @@ class Rect(PropertySerializable):
 
     @size.setter
     def size(self, value: Size) -> None:
+        assert isinstance(value, Size)
         self._size = value
 
     def vertex(self) -> Point:

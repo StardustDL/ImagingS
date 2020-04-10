@@ -18,6 +18,7 @@ class Geometry(PropertySerializable, ABC):
 
     @transform.setter
     def transform(self, value: Optional[Transform]) -> None:
+        assert value is None or isinstance(value, Transform)
         self._transform = value
 
     @abstractmethod
@@ -44,6 +45,7 @@ class GeometryGroup(Geometry):
 
     @children.setter
     def children(self, value: List[Geometry]) -> None:
+        assert isinstance(value, list)
         self._children = value
 
     def strokePoints(self, pen: Pen) -> Iterable[Point]:

@@ -29,6 +29,7 @@ class PolylineGeometry(Geometry):
 
     @algorithm.setter
     def algorithm(self, value: LineAlgorithm) -> None:
+        assert isinstance(value, LineAlgorithm)
         self._algorithm = value
 
     @property
@@ -37,6 +38,7 @@ class PolylineGeometry(Geometry):
 
     @vertexes.setter
     def vertexes(self, value: List[Point]) -> None:
+        assert isinstance(value, list)
         self._vertexes = value
 
     def strokePoints(self, pen: Pen) -> Iterable[Point]:

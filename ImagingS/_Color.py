@@ -42,7 +42,7 @@ class Color(PropertySerializable):
 
     @r.setter
     def r(self, value: int) -> None:
-        self._r = value
+        self._r = int(value)
 
     @property
     def g(self) -> int:
@@ -50,7 +50,7 @@ class Color(PropertySerializable):
 
     @g.setter
     def g(self, value: int) -> None:
-        self._g = value
+        self._g = int(value)
 
     @property
     def b(self) -> int:
@@ -58,7 +58,7 @@ class Color(PropertySerializable):
 
     @b.setter
     def b(self, value: int) -> None:
-        self._b = value
+        self._b = int(value)
 
 
 class Colors:

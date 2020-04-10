@@ -103,6 +103,7 @@ class LineGeometry(Geometry):
 
     @start.setter
     def start(self, value: Point) -> None:
+        assert isinstance(value, Point)
         self._start = value
 
     @property
@@ -111,6 +112,7 @@ class LineGeometry(Geometry):
 
     @end.setter
     def end(self, value: Point) -> None:
+        assert isinstance(value, Point)
         self._end = value
 
     @property
@@ -119,6 +121,7 @@ class LineGeometry(Geometry):
 
     @algorithm.setter
     def algorithm(self, value: LineAlgorithm) -> None:
+        assert isinstance(value, LineAlgorithm)
         self._algorithm = value
 
     @property

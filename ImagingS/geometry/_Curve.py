@@ -80,6 +80,7 @@ class CurveGeometry(Geometry):
 
     @controlPoints.setter
     def controlPoints(self, value: List[Point]) -> None:
+        assert isinstance(value, list)
         self._controlPoints = value
 
     @property
@@ -88,6 +89,7 @@ class CurveGeometry(Geometry):
 
     @algorithm.setter
     def algorithm(self, value: CurveAlgorithm) -> None:
+        assert isinstance(value, CurveAlgorithm)
         self._algorithm = value
 
     def strokePoints(self, pen: Pen) -> Iterable[Point]:

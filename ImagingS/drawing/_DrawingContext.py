@@ -41,7 +41,7 @@ class BoundingRectMeasurer(DrawingContext):
 class NumpyArrayDrawingContext(DrawingContext):
     @staticmethod
     def create_array(size: Size) -> np.ndarray:
-        result = np.zeros([size.height, size.width, 3], np.uint8)
+        result = np.zeros([int(size.height), int(size.width), 3], np.uint8)
         result.fill(255)
         return result
 
@@ -55,6 +55,7 @@ class NumpyArrayDrawingContext(DrawingContext):
 
     @array.setter
     def array(self, value: np.ndarray) -> None:
+        assert isinstance(value, np.ndarray)
         assert value.dtype == np.uint8
         assert len(value.shape) == 3
         assert value.shape[2] == 3

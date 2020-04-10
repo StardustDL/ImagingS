@@ -28,6 +28,7 @@ class MatrixTransform(Transform):
 
     @matrix.setter
     def matrix(self, value: np.ndarray) -> None:
+        assert isinstance(value, np.ndarray)
         assert value.shape == (3, 3)
         self._matrix = value
 

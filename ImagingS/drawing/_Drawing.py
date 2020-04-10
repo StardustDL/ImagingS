@@ -23,6 +23,7 @@ class Drawing(PropertySerializable, IdObject, ABC):
 
     @clip.setter
     def clip(self, value: Optional[Geometry]) -> None:
+        assert value is None or isinstance(value, Geometry)
         self._clip = value
 
     @abstractmethod
@@ -56,6 +57,7 @@ class DrawingGroup(Drawing):
 
     @children.setter
     def children(self, value: IdObjectList[Drawing]) -> None:
+        assert isinstance(value, IdObjectList)
         self._children = value
 
     @property
@@ -64,6 +66,7 @@ class DrawingGroup(Drawing):
 
     @transform.setter
     def transform(self, value: Optional[Transform]) -> None:
+        assert value is None or isinstance(value, Transform)
         self._transform = value
 
     def render(self, context: DrawingContext) -> None:

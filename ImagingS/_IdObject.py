@@ -16,7 +16,7 @@ class IdObject:
 
     @id.setter
     def id(self, value: str) -> None:
-        self._id = value
+        self._id = str(value)
 
     def parent(self) -> Optional[IdObjectList]:
         if hasattr(self, "_parent"):

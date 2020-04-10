@@ -25,6 +25,7 @@ class RectangleGeometry(PolygonGeometry):
 
     @rect.setter
     def rect(self, value: Rect) -> None:
+        assert isinstance(value, Rect)
         self._rect = value
         self.vertexes = [
             self._rect.origin,

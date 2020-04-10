@@ -28,6 +28,7 @@ class RotateTransform(MatrixTransform):
 
     @center.setter
     def center(self, value: Point) -> None:
+        assert isinstance(value, Point)
         self._center = value
 
     @property
@@ -36,7 +37,7 @@ class RotateTransform(MatrixTransform):
 
     @angle.setter
     def angle(self, value: float) -> None:
-        self._angle = value
+        self._angle = float(value)
         self.matrix = np.array(
             [[cos(self._angle), -sin(self._angle), 0],
              [sin(self._angle), cos(self._angle), 0],
