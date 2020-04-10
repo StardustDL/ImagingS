@@ -6,10 +6,10 @@ from ImagingS.drawing import GeometryDrawing
 from ImagingS.geometry import LineGeometry
 from ImagingS.Gui import converters
 
-from . import GeometryInteractive
+from . import GeometryInteractivity
 
 
-class LineInteractive(GeometryInteractive[LineGeometry]):
+class LineInteractivity(GeometryInteractivity[LineGeometry]):
     def __init__(self, target: GeometryDrawing, geometry: LineGeometry, size: Size) -> None:
         super().__init__(target, geometry, size)
 

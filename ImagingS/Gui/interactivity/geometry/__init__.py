@@ -1,15 +1,15 @@
-from ._Geometry import GeometryInteractive
-from ._Line import LineInteractive
-from ._Polyline import PolylineInteractive
-from ._Curve import CurveInteractive
-from ._Ellipse import EllipseInteractive
-from ._Rectangle import RectangleInteractive
+from ._Geometry import GeometryInteractivity
+from ._Line import LineInteractivity
+from ._Polyline import PolylineInteractivity
+from ._Curve import CurveInteractivity
+from ._Ellipse import EllipseInteractivity
+from ._Rectangle import RectangleInteractivity
 
 __all__ = (
-    "GeometryInteractive",
-    "LineInteractive",
-    "PolylineInteractive",
-    "CurveInteractive",
-    "EllipseInteractive",
-    "RectangleInteractive",
+    "GeometryInteractivity",
+    "LineInteractivity",
+    "PolylineInteractivity",
+    "CurveInteractivity",
+    "EllipseInteractivity",
+    "RectangleInteractivity",
 )

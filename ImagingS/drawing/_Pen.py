@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import Optional
 
 from ImagingS.brush import Brush, Brushes

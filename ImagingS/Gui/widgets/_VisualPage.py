@@ -1,6 +1,6 @@
 import uuid
 from enum import Enum, unique
-from typing import Optional, cast
+from typing import Optional, Union, cast
 
 from PyQt5.QtCore import QPointF, QSizeF, pyqtSignal
 from PyQt5.QtWidgets import QMenu, QToolButton, QWidget
@@ -8,19 +8,27 @@ from PyQt5.QtWidgets import QMenu, QToolButton, QWidget
 import ImagingS.Gui.ui as ui
 from ImagingS.brush import Brush
 from ImagingS.document import Document
-from ImagingS.drawing import Drawing, GeometryDrawing, Pen
+from ImagingS.drawing import Drawing, DrawingGroup, GeometryDrawing, Pen
 from ImagingS.geometry import (CurveAlgorithm, CurveGeometry, EllipseGeometry,
-                               LineAlgorithm, LineGeometry, PolygonGeometry,
-                               PolylineGeometry, RectangleGeometry)
+                               Geometry, LineAlgorithm, LineGeometry,
+                               PolygonGeometry, PolylineGeometry,
+                               RectangleGeometry)
 from ImagingS.Gui import converters, icons
 from ImagingS.Gui.graphic import Canvas
 from ImagingS.Gui.interactivity import Interactivity, InteractivityState
-from ImagingS.Gui.interactivity.geometry import (CurveInteractive,
-                                                 EllipseInteractive,
-                                                 GeometryInteractive,
-                                                 LineInteractive,
-                                                 PolylineInteractive,
-                                                 RectangleInteractive)
+from ImagingS.Gui.interactivity.geometry import (CurveInteractivity,
+                                                 EllipseInteractivity,
+                                                 GeometryInteractivity,
+                                                 LineInteractivity,
+                                                 PolylineInteractivity,
+                                                 RectangleInteractivity)
+from ImagingS.Gui.interactivity.transform import (
+    RotateTransformInteractivity, ScaleTransformInteractivity,
+    SkewTransformInteractivity, TransformInteractivity,
+    TranslateTransformInteractivity)
+from ImagingS.transform import (MatrixTransform, RotateTransform,
+                                ScaleTransform, SkewTransform, TransformGroup,
+                                TranslateTransform)
 
 
 @unique
@@ -80,6 +88,19 @@ class VisualPage(QWidget, ui.VisualPage):
             self.actDrawingCurveBSpline_triggered)
         self.actDrawingEllipse.triggered.connect(
             self.actDrawingEllipse_triggered)
+
+        self.actTransformTranslate.triggered.connect(
+            self.actTransformTranslate_triggered)
+        self.actTransformRotate.triggered.connect(
+            self.actTransformRotate_triggered)
+        self.actTransformSkew.triggered.connect(
+            self.actTransformSkew_triggered)
+        self.actTransformScale.triggered.connect(
+            self.actTransformScale_triggered)
+        self.actTransformGroup.triggered.connect(
+            self.actTransformGroup_triggered)
+        self.actTransformMatrix.triggered.connect(
+            self.actTransformMatrix_triggered)
 
         self.setEnabled(False)
         self._drawing = None
@@ -251,73 +272,133 @@ class VisualPage(QWidget, ui.VisualPage):
             self.cvsMain.scene().removeItem(inter.viewItem)
         self.cvsMain.interactivity = None
         if inter.state is InteractivityState.Success:
-            if isinstance(inter, GeometryInteractive):
-                drawing = cast(GeometryInteractive, inter).target
+            if isinstance(inter, GeometryInteractivity):
+                drawing = cast(GeometryInteractivity, inter).target
                 self._document.drawings.children.append(drawing)
                 self.documentChanged.emit(self._document)
+            elif isinstance(inter, TransformInteractivity):
+                if self.drawing is not None:
+                    self.drawing.refreshBoundingRect()
+                    self.documentChanged.emit(self._document)
         self.fresh()
 
     def actDrawingLineDDA_triggered(self):
         geo = LineGeometry()
         geo.algorithm = LineAlgorithm.Dda
-        self._beginInteractive(LineInteractive(
+        self._beginInteractive(LineInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
     def actDrawingLineBresenham_triggered(self):
         geo = LineGeometry()
         geo.algorithm = LineAlgorithm.Bresenham
-        self._beginInteractive(LineInteractive(
+        self._beginInteractive(LineInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
     def actDrawingPolygonDDA_triggered(self):
         geo = PolygonGeometry()
         geo.algorithm = LineAlgorithm.Dda
-        self._beginInteractive(PolylineInteractive(
+        self._beginInteractive(PolylineInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
     def actDrawingPolygonBresenham_triggered(self):
         geo = PolygonGeometry()
         geo.algorithm = LineAlgorithm.Bresenham
-        self._beginInteractive(PolylineInteractive(
+        self._beginInteractive(PolylineInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
     def actDrawingPolylineDDA_triggered(self):
         geo = PolylineGeometry()
         geo.algorithm = LineAlgorithm.Dda
-        self._beginInteractive(PolylineInteractive(
+        self._beginInteractive(PolylineInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
     def actDrawingPolylineBresenham_triggered(self):
         geo = PolylineGeometry()
         geo.algorithm = LineAlgorithm.Bresenham
-        self._beginInteractive(PolylineInteractive(
+        self._beginInteractive(PolylineInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
     def actDrawingRectangleDDA_triggered(self):
         geo = RectangleGeometry()
         geo.algorithm = LineAlgorithm.Dda
-        self._beginInteractive(RectangleInteractive(
+        self._beginInteractive(RectangleInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
     def actDrawingRectangleBresenham_triggered(self):
         geo = RectangleGeometry()
         geo.algorithm = LineAlgorithm.Bresenham
-        self._beginInteractive(RectangleInteractive(
+        self._beginInteractive(RectangleInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
     def actDrawingCurveBezier_triggered(self):
         geo = CurveGeometry()
         geo.algorithm = CurveAlgorithm.Bezier
-        self._beginInteractive(CurveInteractive(
+        self._beginInteractive(CurveInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
     def actDrawingCurveBSpline_triggered(self):
         geo = CurveGeometry()
         geo.algorithm = CurveAlgorithm.BSpline
-        self._beginInteractive(CurveInteractive(
+        self._beginInteractive(CurveInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
     def actDrawingEllipse_triggered(self):
         geo = EllipseGeometry()
-        self._beginInteractive(EllipseInteractive(
+        self._beginInteractive(EllipseInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
+
+    def _getTransformInteractiveTarget(self) -> Optional[Union[DrawingGroup, Geometry]]:
+        if self.drawing is None:
+            return
+        target = None
+        if isinstance(self.drawing, DrawingGroup):
+            target = self.drawing
+        elif isinstance(self.drawing, GeometryDrawing):
+            target = self.drawing.geometry
+        if target is None:
+            return None
+        return target
+
+    def actTransformTranslate_triggered(self):
+        target = self._getTransformInteractiveTarget()
+        if target is None:
+            return
+        tr = TranslateTransform()
+        self._beginInteractive(TranslateTransformInteractivity(target, tr))
+
+    def actTransformRotate_triggered(self):
+        target = self._getTransformInteractiveTarget()
+        if target is None:
+            return
+        tr = RotateTransform()
+        self._beginInteractive(RotateTransformInteractivity(target, tr))
+
+    def actTransformSkew_triggered(self):
+        target = self._getTransformInteractiveTarget()
+        if target is None:
+            return
+        tr = SkewTransform()
+        self._beginInteractive(SkewTransformInteractivity(target, tr))
+
+    def actTransformScale_triggered(self):
+        target = self._getTransformInteractiveTarget()
+        if target is None:
+            return
+        tr = ScaleTransform()
+        self._beginInteractive(ScaleTransformInteractivity(target, tr))
+
+    def actTransformGroup_triggered(self):
+        target = self._getTransformInteractiveTarget()
+        if target is None:
+            return
+        if target.transform is None:
+            target.transform = TransformGroup()
+
+    def actTransformMatrix_triggered(self):
+        target = self._getTransformInteractiveTarget()
+        if target is None:
+            return
+        if isinstance(target.transform, TransformGroup):
+            target.transform.children.append(MatrixTransform())
+        else:
+            target.transform = MatrixTransform()

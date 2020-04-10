@@ -6,10 +6,10 @@ from ImagingS.drawing import GeometryDrawing
 from ImagingS.geometry import EllipseGeometry
 from ImagingS.Gui import converters
 
-from . import GeometryInteractive
+from . import GeometryInteractivity
 
 
-class EllipseInteractive(GeometryInteractive[EllipseGeometry]):
+class EllipseInteractivity(GeometryInteractivity[EllipseGeometry]):
     def __init__(self, target: GeometryDrawing, geometry: EllipseGeometry, size: Size) -> None:
         super().__init__(target, geometry, size)
 

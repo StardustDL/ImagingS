@@ -210,6 +210,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self._freshProperties()
         self._freshBrushes()
         self._freshDrawings()
+        self._freshTransforms()
 
     def _freshActions(self):
         hasDoc = self.document is not None

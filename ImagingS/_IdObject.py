@@ -1,10 +1,9 @@
 from __future__ import annotations
 
+import uuid
 from typing import Collection, Dict, Iterator, List, Optional, TypeVar, Union
 
 from ImagingS.serialization import PropertySerializable
-
-import uuid
 
 
 class IdObject:

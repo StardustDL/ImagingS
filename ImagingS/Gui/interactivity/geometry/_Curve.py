@@ -5,10 +5,10 @@ from ImagingS.drawing import GeometryDrawing
 from ImagingS.geometry import CurveGeometry
 from ImagingS.Gui import converters
 
-from . import GeometryInteractive
+from . import GeometryInteractivity
 
 
-class CurveInteractive(GeometryInteractive[CurveGeometry]):
+class CurveInteractivity(GeometryInteractivity[CurveGeometry]):
     def __init__(self, target: GeometryDrawing, geometry: CurveGeometry, size: Size) -> None:
         super().__init__(target, geometry, size)
 

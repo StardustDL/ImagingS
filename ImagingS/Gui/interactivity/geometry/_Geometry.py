@@ -11,13 +11,10 @@ from ImagingS.Gui.graphic import DrawingItem
 
 from .. import Interactivity
 
-# from ImagingS.geometry import Geometry
-
-
 _T = TypeVar("_T")
 
 
-class GeometryInteractive(Interactivity, Generic[_T]):
+class GeometryInteractivity(Interactivity, Generic[_T]):
     def __init__(self, target: GeometryDrawing, geometry: _T, size: Size) -> None:
         super().__init__()
         self._target = target

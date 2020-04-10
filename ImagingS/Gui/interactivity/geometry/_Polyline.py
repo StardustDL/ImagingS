@@ -5,10 +5,10 @@ from ImagingS.drawing import GeometryDrawing
 from ImagingS.geometry import PolylineGeometry
 from ImagingS.Gui import converters
 
-from . import GeometryInteractive
+from . import GeometryInteractivity
 
 
-class PolylineInteractive(GeometryInteractive[PolylineGeometry]):
+class PolylineInteractivity(GeometryInteractivity[PolylineGeometry]):
     def __init__(self, target: GeometryDrawing, geometry: PolylineGeometry, size: Size) -> None:
         super().__init__(target, geometry, size)
 
