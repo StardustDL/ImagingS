@@ -391,7 +391,7 @@ class VisualPage(QWidget, ui.VisualPage):
         target = self._getTransformInteractiveTarget()
         if target is None:
             return
-        if target.transform is None:
+        if not isinstance(target.transform, TransformGroup):
             target.transform = TransformGroup()
 
     def actTransformMatrix_triggered(self):

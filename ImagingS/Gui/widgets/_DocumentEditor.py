@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import QWidget
 
 import ImagingS.Gui.ui as ui
 from ImagingS.document import Document
-from ImagingS.Gui import icons
 
 from . import CodePage, CodePageState, VisualPage, VisualPageState
 

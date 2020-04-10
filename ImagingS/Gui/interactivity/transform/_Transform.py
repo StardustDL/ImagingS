@@ -21,7 +21,7 @@ class TransformInteractivity(Interactivity, Generic[_T]):
 
         self._viewItem = QGraphicsPathItem()
         pen = QPen(QColor("purple"))
-        pen.setWidth(2)
+        pen.setWidth(1)
         pen.setStyle(Qt.DashLine)
         pen.setCapStyle(Qt.RoundCap)
         self._viewItem.setPen(pen)

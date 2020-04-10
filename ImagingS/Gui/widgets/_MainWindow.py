@@ -369,15 +369,15 @@ class MainWindow(QMainWindow, ui.MainWindow):
             return
         drawing = self._currentDrawing()
         if isinstance(drawing, GeometryDrawing):
-            if isinstance(drawing.geometry.transform, TransformGroup):
-                drawing.geometry.transform.children.remove(item)
-            elif item == drawing.geometry.transform:
+            if item == drawing.geometry.transform:
                 drawing.geometry.transform = None
+            elif isinstance(drawing.geometry.transform, TransformGroup):
+                drawing.geometry.transform.children.remove(item)
         elif isinstance(drawing, DrawingGroup):
-            if isinstance(drawing.transform, TransformGroup):
-                drawing.transform.children.remove(item)
-            elif item == drawing.transform:
+            if item == drawing.transform:
                 drawing.transform = None
+            elif isinstance(drawing.transform, TransformGroup):
+                drawing.transform.children.remove(item)
         self._freshTransforms()
         self.editor.fresh()
         self.stbMain.showMessage(

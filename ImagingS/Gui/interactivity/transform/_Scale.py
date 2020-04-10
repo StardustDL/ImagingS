@@ -22,17 +22,21 @@ class ScaleTransformInteractivity(TransformInteractivity[ScaleTransform]):
         super().start()
 
     def _updateData(self) -> None:
-        D = 20  # point distance
-        BOUND = 5.0
+        D = 40  # point distance
+        BOUND = 3.0
 
         delta = self._end - self._start
         fx, fy = (max(min(delta.x / D, BOUND), -BOUND),
                   max(min(delta.y / D, BOUND), -BOUND))
         rfx, rfy = fx, fy
         if rfx < 0:
-            rfx = -1.0 / rfx
+            rfx = 1.0 / (1+abs(rfx))
+        else:
+            rfx += 1
         if rfy < 0:
-            rfy = -1.0 / rfy
+            rfy = 1.0 / (1+abs(rfy))
+        else:
+            rfy += 1
         self.transform.factor = rfx, rfy
 
         path = QPainterPath()
