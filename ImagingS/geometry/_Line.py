@@ -83,7 +83,7 @@ class LineClipAlgorithm(Enum):
 class LineGeometry(Geometry):
     def __init__(self) -> None:
         super().__init__()
-        self._start = Point()
+        self.start = Point()
         self.end = Point()
         self.algorithm = LineAlgorithm.Dda
         self.clip = None

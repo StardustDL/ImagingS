@@ -6,11 +6,15 @@ from ImagingS.brush import SolidBrush
 
 from . import converters
 
+refresh: QIcon = qta.icon("mdi.refresh")
+
 list: QIcon = qta.icon("mdi.format-list-numbered")
 
 set: QIcon = qta.icon("mdi.code-braces")
 
 code: QIcon = qta.icon("mdi.code-tags")
+
+fileTree: QIcon = qta.icon("mdi.file-tree")
 
 visual: QIcon = qta.icon("mdi.image")
 

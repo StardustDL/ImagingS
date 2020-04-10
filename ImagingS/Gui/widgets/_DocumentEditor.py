@@ -28,11 +28,9 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
         self.setupUi(self)
         self.setupVisual()
         self.setupCode()
-        self.setupIcon()
 
         self.code.uploaded.connect(self.code_uploaded)
         self.visual.documentChanged.connect(self.visual_documentChanged)
-        self.tbxMain.currentChanged.connect(self.tbxMain_currentChanged)
 
         self.setEnabled(False)
 
@@ -48,10 +46,6 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
         self.grdVisual.addWidget(self.visual, 0, 0, 1, 1)
         self.visual.messaged.connect(self.visualCode_messaged)
 
-    def setupIcon(self) -> None:
-        self.tbxMain.setItemIcon(0, icons.visual)
-        self.tbxMain.setItemIcon(1, icons.code)
-
     @property
     def document(self) -> Optional[Document]:
         if hasattr(self, "_document"):
@@ -62,7 +56,7 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
     @property
     def state(self) -> DocumentEditorState:
         if hasattr(self, "_document"):
-            if self.tbxMain.currentIndex() == 0:
+            if self.swgMain.currentIndex() == 0:
                 return DocumentEditorState.Visual
             else:
                 return DocumentEditorState.Code
@@ -106,7 +100,7 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
             self.messaged("Still in interactive mode.")
             return False
         self.code.enable(self.document)
-        self.tbxMain.setCurrentIndex(1)
+        self.swgMain.setCurrentIndex(1)
         self.stateChanged.emit()
         return True
 
@@ -121,7 +115,7 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
             self.messaged.emit("Code changes not uploaded.")
             return False
         self.visual.enable(self.document)
-        self.tbxMain.setCurrentIndex(0)
+        self.swgMain.setCurrentIndex(0)
         self.stateChanged.emit()
         return True
 
@@ -135,11 +129,3 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
     def visual_documentChanged(self, doc: Document):
         self._document = doc
         self.documentChanged.emit(doc)
-
-    def tbxMain_currentChanged(self, index):
-        if index == 0:
-            if not self.switchVisual():
-                self.tbxMain.setCurrentIndex(1)
-        else:
-            if not self.switchCode():
-                self.tbxMain.setCurrentIndex(0)

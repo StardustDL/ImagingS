@@ -2,9 +2,11 @@ from typing import Dict, Optional
 
 from PyQt5.QtCore import QPointF, QRectF, QSizeF, Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent, QMouseEvent
-from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsScene, QGraphicsView
+from PyQt5.QtWidgets import (QAction, QGraphicsRectItem, QGraphicsScene,
+                             QGraphicsView)
 
 from ImagingS.drawing import Drawing
+from ImagingS.Gui import icons
 from ImagingS.Gui.interactivity import Interactivity
 
 from . import DrawingItem
@@ -16,6 +18,9 @@ class Canvas(QGraphicsView):
     def __init__(self, parent):
         scene = QGraphicsScene(parent)
         super().__init__(scene, parent)
+        self.setupActions()
+        self.setContextMenuPolicy(Qt.ActionsContextMenu)
+
         self.interactivity = None
 
         self.items: Dict[str, DrawingItem] = {}
@@ -25,6 +30,15 @@ class Canvas(QGraphicsView):
         self.scene().addItem(self._sceneBorder)
 
         self.setMouseTracking(True)
+
+    def setupActions(self):
+        self.actRerender = QAction(self)
+        self.actRerender.setObjectName("actactRerender")
+        self.actRerender.triggered.connect(self.actRerender_triggered)
+        self.actRerender.setIcon(icons.refresh)
+        self.actRerender.setText("Rerender")
+        self.actRerender.setShortcut("F5")
+        self.addAction(self.actRerender)
 
     @property
     def interactivity(self) -> Optional[Interactivity]:
@@ -78,6 +92,9 @@ class Canvas(QGraphicsView):
         self.items.clear()
         self.rerender()
 
+    def actRerender_triggered(self) -> None:
+        self.rerender()
+
     def mousePressEvent(self, event: QMouseEvent) -> None:
         pos = self.mapToScene(event.localPos().toPoint())
         if self.interactivity is not None:
@@ -111,8 +128,6 @@ class Canvas(QGraphicsView):
         if self.interactivity is not None:
             inter = self.interactivity
             inter.onKeyPress(event)
-        elif event.key() == Qt.Key_F5:
-            self.rerender()
         super().keyPressEvent(event)
 
     def keyReleaseEvent(self, event: QKeyEvent) -> None:

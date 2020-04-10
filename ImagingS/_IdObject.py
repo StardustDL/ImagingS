@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Collection, Dict, Iterator, List, TypeVar, Union, Optional
+from typing import Collection, Dict, Iterator, List, Optional, TypeVar, Union
 
 from ImagingS.serialization import PropertySerializable
 

@@ -1,6 +1,5 @@
 from enum import Enum, unique
 from io import StringIO
-from typing import Optional
 
 import qtawesome as qta
 from PyQt5.QtCore import pyqtSignal
@@ -8,6 +7,7 @@ from PyQt5.QtWidgets import QWidget
 
 import ImagingS.Gui.ui as ui
 from ImagingS.document import Document, DocumentFormat
+from ImagingS.Gui import icons
 from ImagingS.Gui.models import PropertyModel
 
 
@@ -16,6 +16,13 @@ class CodePageState(Enum):
     Disable = 0,
     Normal = 1,
     Changed = 2
+
+
+def _clonedoc(doc: Document) -> Document:
+    io = StringIO()
+    doc.save(io, DocumentFormat.RAW)
+    io = StringIO(io.getvalue())
+    return Document.load(io, DocumentFormat.RAW)
 
 
 class CodePage(QWidget, ui.CodePage):
@@ -29,60 +36,82 @@ class CodePage(QWidget, ui.CodePage):
         self.setupIcon()
 
         self.modelCode = PropertyModel(self)
-        self.trvCode.setModel(self.modelCode)
-
+        self.modelCode.onlyEditable = True
+        self.trvTree.setModel(self.modelCode)
+        self.modelCode.changed.connect(self.modelCode_changed)
         self.tetCode.textChanged.connect(self.tetCode_textChanged)
-        self.actBuild.triggered.connect(self.actBuild_triggered)
+
         self.actRestore.triggered.connect(self.actRestore_triggered)
         self.actUpload.triggered.connect(self.actUpload_triggered)
+        self.actSwitch.triggered.connect(self.actSwitch_triggered)
+
+        self.swgMain.setCurrentIndex(0)
 
         self.setEnabled(False)
         self._state = CodePageState.Disable
 
     def setupIcon(self) -> None:
-        self.actBuild.setIcon(qta.icon("mdi.play"))
         self.actRestore.setIcon(qta.icon("mdi.restore"))
         self.actUpload.setIcon(qta.icon("mdi.upload"))
-        self.setWindowIcon(qta.icon("mdi.code-tags"))
+        self.actSwitch.setIcon(icons.fileTree)
+        self.setWindowIcon(icons.code)
 
-    def _showdoc(self, doc: Document) -> None:
+    def switchCode(self, force: bool = False) -> None:
+        if self.swgMain.currentIndex() == 0 and not force:
+            return
+
         io = StringIO()
-        doc.save(io, DocumentFormat.RAW)
+        self._curdocument.save(io, DocumentFormat.RAW)
         self.tetCode.setText(io.getvalue())
-        self.modelCode.fresh(doc)
-        width = self.trvCode.size().width() / 2
-        if width > 0:
-            self.trvCode.setColumnWidth(0, width)
-            self.trvCode.setColumnWidth(1, width)
-        self.trvCode.expandAll()
+        self.actSwitch.setIcon(icons.fileTree)
+        self.swgMain.setCurrentIndex(0)
 
-    def _loaddoc(self) -> Optional[Document]:
-        assert self.state is not CodePageState.Disable
+    def switchTree(self, force: bool = False) -> None:
+        if self.swgMain.currentIndex() == 1 and not force:
+            return
 
-        io = StringIO(self.code)
+        io = StringIO(self.tetCode.toPlainText())
         try:
             tdoc = Document.load(io, DocumentFormat.RAW)
-            return tdoc
         except Exception:
-            return None
+            return
+
+        self._curdocument = tdoc
+        self.modelCode.fresh(self._curdocument)
+        width = self.trvTree.size().width() / 2
+        if width > 0:
+            self.trvTree.setColumnWidth(0, width)
+            self.trvTree.setColumnWidth(1, width)
+        self.trvTree.expandAll()
+
+        self.actSwitch.setIcon(icons.code)
+        self.swgMain.setCurrentIndex(1)
 
     def _setState(self, value: CodePageState) -> None:
         self._state = value
+        if self.state is CodePageState.Changed:
+            self.actRestore.setEnabled(True)
+            self.actUpload.setEnabled(True)
+        else:
+            self.actRestore.setEnabled(False)
+            self.actUpload.setEnabled(False)
         self.stateChanged.emit()
 
     def fresh(self) -> None:
         if self.state is not CodePageState.Normal:
             return
 
-        self._showdoc(self._document)
+        self._showdocCode(self._document)
+        self._showdocTree(self._document)
         self._setState(CodePageState.Normal)
 
     def enable(self, doc: Document) -> None:
         assert self.state is CodePageState.Disable
         self.setEnabled(True)
         self._document = doc
+        self._curdocument = _clonedoc(self._document)
+        self.switchCode(True)
         self._setState(CodePageState.Normal)
-        self.fresh()
 
     def disable(self) -> None:
         assert self.state is not CodePageState.Disable
@@ -94,35 +123,27 @@ class CodePage(QWidget, ui.CodePage):
         self._setState(CodePageState.Disable)
 
     @property
-    def code(self) -> str:
-        return self.tetCode.toPlainText()
-
-    @property
     def state(self) -> CodePageState:
         return self._state
 
+    def modelCode_changed(self) -> None:
+        self._setState(CodePageState.Changed)
+
     def tetCode_textChanged(self) -> None:
-        self._state = CodePageState.Changed
-
-    def actBuild_triggered(self) -> None:
-        doc = self._loaddoc()
-
-        if doc is None:
-            self.modelCode.fresh()
-            self.messaged.emit("Loading document from code FAILED.")
-        else:
-            self._showdoc(doc)
+        self._setState(CodePageState.Changed)
 
     def actRestore_triggered(self) -> None:
-        self._showdoc(self._document)
+        self._curdocument = _clonedoc(self._document)
+        self.switchCode(True)
+        self._setState(CodePageState.Normal)
 
     def actUpload_triggered(self) -> None:
-        doc = self._loaddoc()
-        if doc is None:
-            self.modelCode.fresh()
-            self.messaged.emit("Loading document from code FAILED.")
+        self._document = self._curdocument
+        self.actRestore.trigger()
+        self.uploaded.emit(self._document)
+
+    def actSwitch_triggered(self) -> None:
+        if self.swgMain.currentIndex() == 0:
+            self.switchTree()
         else:
-            self._document = doc
-            self._showdoc(doc)
-            self.uploaded.emit(doc)
-            self._state = CodePageState.Normal
+            self.switchCode()

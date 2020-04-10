@@ -91,7 +91,7 @@ class VisualPage(QWidget, ui.VisualPage):
         menu.addActions([self.actDrawingLineDDA, self.actDrawingLineBresenham])
         tb.setDefaultAction(self.actDrawingLineDDA)
         tb.setMenu(menu)
-        tb.setPopupMode(QToolButton.MenuButtonPopup)
+        tb.setPopupMode(QToolButton.DelayedPopup)
         self.tlbMain.addWidget(tb)
 
         tb = QToolButton()
@@ -104,7 +104,7 @@ class VisualPage(QWidget, ui.VisualPage):
                          self.actDrawingRectangleBresenham])
         tb.setDefaultAction(self.actDrawingPolygonDDA)
         tb.setMenu(menu)
-        tb.setPopupMode(QToolButton.MenuButtonPopup)
+        tb.setPopupMode(QToolButton.DelayedPopup)
         self.tlbMain.addWidget(tb)
 
         tb = QToolButton()
@@ -113,7 +113,7 @@ class VisualPage(QWidget, ui.VisualPage):
                          self.actDrawingCurveBSpline])
         tb.setDefaultAction(self.actDrawingCurveBezier)
         tb.setMenu(menu)
-        tb.setPopupMode(QToolButton.MenuButtonPopup)
+        tb.setPopupMode(QToolButton.DelayedPopup)
         self.tlbMain.addWidget(tb)
 
         tb = QToolButton()

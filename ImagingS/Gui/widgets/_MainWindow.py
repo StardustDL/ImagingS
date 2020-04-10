@@ -4,7 +4,8 @@ from typing import Optional
 
 import qtawesome as qta
 from PIL import Image
-from PyQt5.QtWidgets import QColorDialog, QDialog, QFileDialog, QMainWindow
+from PyQt5.QtWidgets import (QAbstractItemView, QColorDialog, QDialog,
+                             QFileDialog, QMainWindow)
 
 import ImagingS.Gui.ui as ui
 from ImagingS import Color
@@ -236,6 +237,20 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.mnuTransform.setEnabled(isVisualNormal)
         self.mnuBrush.setEnabled(isVisualNormal)
         self.mnuTool.setEnabled(isVisualNormal)
+
+        if isVisualNormal:
+            tri = QAbstractItemView.DoubleClicked | QAbstractItemView.EditKeyPressed
+            self.trvTransforms.setEditTriggers(tri)
+            self.trvBrushes.setEditTriggers(tri)
+            self.trvDrawings.setEditTriggers(tri)
+            self.trvProperties.setEditTriggers(tri)
+        else:
+            self.trvTransforms.setEditTriggers(
+                QAbstractItemView.NoEditTriggers)
+            self.trvBrushes.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            self.trvDrawings.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            self.trvProperties.setEditTriggers(
+                QAbstractItemView.NoEditTriggers)
 
     def _freshEditor(self):
         if self.editor.state is not DocumentEditorState.Disable:
@@ -475,6 +490,13 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self._freshDockWidgets()
 
     def editor_stateChanged(self) -> None:
+        if self.editor.state is DocumentEditorState.Visual:
+            self.actViewCode.setChecked(False)
+            self.actViewVisual.setChecked(True)
+        elif self.editor.state is DocumentEditorState.Code:
+            self.actViewCode.setChecked(True)
+            self.actViewVisual.setChecked(False)
+
         self._freshActions()
 
     def modelDrawing_changed(self) -> None:

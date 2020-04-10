@@ -1,4 +1,5 @@
 from typing import Any
+
 from PyQt5.QtCore import QModelIndex, Qt
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 

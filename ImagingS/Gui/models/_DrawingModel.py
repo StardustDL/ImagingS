@@ -1,6 +1,7 @@
 from typing import Any
+
 from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal
-from PyQt5.QtGui import QStandardItem, QStandardItemModel, QIcon
+from PyQt5.QtGui import QIcon, QStandardItem, QStandardItemModel
 
 from ImagingS.drawing import Drawing, DrawingGroup, GeometryDrawing
 from ImagingS.geometry import (CurveGeometry, EllipseGeometry, LineGeometry,
@@ -61,6 +62,7 @@ class DrawingModel(QStandardItemModel):
                         drawing.id = str(value)
                 except Exception:
                     return False
+                self.dataChanged.emit(index, index, [role])
                 self.changed.emit()
                 return True
         return super().setData(index, value, role)

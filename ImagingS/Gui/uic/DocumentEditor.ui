@@ -27,11 +27,8 @@
     <number>0</number>
    </property>
    <item row="0" column="0">
-    <widget class="QToolBox" name="tbxMain">
+    <widget class="QStackedWidget" name="swgMain">
      <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <property name="tabSpacing">
       <number>0</number>
      </property>
      <widget class="QWidget" name="pagVisual">

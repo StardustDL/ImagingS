@@ -37,7 +37,7 @@
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <addaction name="actBuild"/>
+     <addaction name="actSwitch"/>
      <addaction name="actRestore"/>
      <addaction name="actUpload"/>
     </widget>
@@ -58,27 +58,54 @@
        <number>0</number>
       </property>
       <item row="0" column="0">
-       <widget class="QTextEdit" name="tetCode"/>
-      </item>
-      <item row="0" column="2">
-       <widget class="QTreeView" name="trvCode">
-        <property name="editTriggers">
-         <set>QAbstractItemView::NoEditTriggers</set>
+       <widget class="QStackedWidget" name="swgMain">
+        <property name="currentIndex">
+         <number>1</number>
         </property>
+        <widget class="QWidget" name="pagCode">
+         <layout class="QGridLayout" name="grdCode">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QTextEdit" name="tetCode"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="pagTree">
+         <layout class="QGridLayout" name="grdCode">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QTreeView" name="trvTree"/>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
   </layout>
-  <action name="actBuild">
-   <property name="text">
-    <string>Build</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+F5</string>
-   </property>
-  </action>
   <action name="actRestore">
    <property name="text">
     <string>Restore</string>
@@ -90,6 +117,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+U</string>
+   </property>
+  </action>
+  <action name="actSwitch">
+   <property name="text">
+    <string>Switch</string>
    </property>
   </action>
  </widget>
