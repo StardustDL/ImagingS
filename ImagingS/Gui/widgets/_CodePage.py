@@ -78,7 +78,7 @@ class CodePage(QWidget, ui.CodePage):
 
         self._curdocument = tdoc
         self.modelCode.fresh(self._curdocument)
-        width = self.trvTree.size().width() / 2
+        width = round(self.trvTree.size().width() / 2)
         if width > 0:
             self.trvTree.setColumnWidth(0, width)
             self.trvTree.setColumnWidth(1, width)
@@ -101,8 +101,10 @@ class CodePage(QWidget, ui.CodePage):
         if self.state is not CodePageState.Normal:
             return
 
-        self._showdocCode(self._document)
-        self._showdocTree(self._document)
+        if self.swgMain.currentIndex() == 0:
+            self.switchCode(True)
+        else:
+            self.switchTree(True)
         self._setState(CodePageState.Normal)
 
     def enable(self, doc: Document) -> None:

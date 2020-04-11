@@ -12,6 +12,7 @@ if ($args.Count -gt 0) {
             pip install pytest flake8
             pip install pytest-qt pytest-cov
             pip install autopep8 isort
+            pip install PyQt5-stubs
             npm install -g pyright
             if (!$?) {
                 exit 1
@@ -64,12 +65,12 @@ if ($args.Count -gt 0) {
             Write-Output "Lint..."
             Write-Output "Flake8 check..."
             # stop the build if there are Python syntax errors or undefined names
-            flake8 . --count --select="E9,F63,F7,F82" --exclude=".svn,CVS,.bzr,.hg,.git,__pycache__,.tox,.eggs,*.egg,_ui_*.py" --show-source --statistics
+            flake8 . --config=tox_fatal.ini
             if (!$?) {
                 exit 1
             }
             # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-            flake8 . --count --ignore="E501,E121,E123,E126,E226,E24,E704,W503,W504" --exclude=".svn,CVS,.bzr,.hg,.git,__pycache__,.tox,.eggs,*.egg,_ui_*.py" --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+            flake8 .
             if (!$?) {
                 exit 1
             }

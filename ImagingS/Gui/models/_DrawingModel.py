@@ -89,8 +89,7 @@ class DrawingModel(QStandardItemModel):
                 return icons.polygonGeometry
             elif isinstance(value.geometry, PolylineGeometry):
                 return icons.polylineGeometry
-        else:
-            return icons.drawing
+        return icons.drawing
 
     def _addChildren(self, root: QStandardItem, value: DrawingGroup) -> None:
         for drawing in value.children:

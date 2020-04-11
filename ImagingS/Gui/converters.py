@@ -31,7 +31,7 @@ def size(o: Union[QSizeF, QSize]) -> Size:
 
 
 def rect(o: Union[QRectF, QRect]) -> Rect:
-    return Rect(qpoint(o.topLeft()), qsize(o.size()))
+    return Rect(point(o.topLeft()), size(o.size()))
 
 
 def color(o: QColor) -> Color:

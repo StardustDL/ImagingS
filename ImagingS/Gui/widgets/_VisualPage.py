@@ -400,7 +400,7 @@ class VisualPage(QWidget, ui.VisualPage):
                 for j in range(3):
                     trans.matrix[i][j] = float(t[j])
         except Exception:
-            self.messaged("Matrix is invalid.")
+            self.messaged.emit("Matrix is invalid.")
             return
         if isinstance(target.transform, TransformGroup):
             target.transform.children.append(trans)

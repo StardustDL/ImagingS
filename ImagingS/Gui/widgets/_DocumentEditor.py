@@ -96,7 +96,7 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
         if self.visual.state is VisualPageState.Normal:
             self.visual.disable()
         elif self.visual.state is VisualPageState.Interactive:
-            self.messaged("Still in interactive mode.")
+            self.messaged.emit("Still in interactive mode.")
             return False
         self.code.enable(self.document)
         self.swgMain.setCurrentIndex(1)

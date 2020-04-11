@@ -13,7 +13,7 @@ class PainterDrawingContext(DrawingContext):
 
     def point(self, position: Point, color: Color) -> None:
         self._painter.setPen(converters.qcolor(color))
-        self._painter.drawPoint(position.x, position.y)
+        self._painter.drawPoint(converters.qpoint(position))
 
     def rect(self) -> Rect:
         return self._rect

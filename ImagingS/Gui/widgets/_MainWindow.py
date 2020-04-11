@@ -1,6 +1,6 @@
 import os
 from enum import Enum, unique
-from typing import Optional
+from typing import Optional, cast
 
 import qtawesome as qta
 from PIL import Image
@@ -44,7 +44,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.documentChanged = False
 
         self.actClose.triggered.connect(self.actClose_triggered)
-        self.actQuit.triggered.connect(self.close)
+        self.actQuit.triggered.connect(self.actQuit_triggered)
         self.actNew.triggered.connect(self.actNew_triggered)
         self.actSave.triggered.connect(self.actSave_triggered)
         self.actSaveAs.triggered.connect(self.actSaveAs_triggered)
@@ -320,7 +320,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.mnuTool.setEnabled(isVisualNormal)
 
         if isVisualNormal:
-            tri = QAbstractItemView.DoubleClicked | QAbstractItemView.EditKeyPressed
+            tri = cast(QAbstractItemView.EditTriggers,
+                       QAbstractItemView.DoubleClicked | QAbstractItemView.EditKeyPressed)
             self.trvTransforms.setEditTriggers(tri)
             self.trvBrushes.setEditTriggers(tri)
             self.trvDrawings.setEditTriggers(tri)
@@ -505,7 +506,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
     def actClose_triggered(self):
         if self.documentChanged:
             code = QMessageBox.warning(self, "Unsaved changes", "Do you want save changes?",
-                                       QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Yes)
+                                       cast(QMessageBox.StandardButtons, QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel), QMessageBox.Yes)
             if code == QMessageBox.Cancel:
                 return
             elif code == QMessageBox.Yes:
@@ -593,6 +594,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
             Image.fromarray(context.array).save(fileName, ext, quality=95)
 
             self.stbMain.showMessage(f"Exported to {fileName}.")
+
+    def actQuit_triggered(self) -> None:
+        self.close()
 
     def actBrushesRefresh_triggered(self) -> None:
         self._freshBrushes()
