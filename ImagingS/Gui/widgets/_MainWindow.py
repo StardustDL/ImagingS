@@ -4,9 +4,9 @@ from typing import Optional
 
 import qtawesome as qta
 from PIL import Image
-from PyQt5.QtGui import QKeySequence
+from PyQt5.QtGui import QCloseEvent, QKeySequence
 from PyQt5.QtWidgets import (QAbstractItemView, QColorDialog, QDialog,
-                             QFileDialog, QMainWindow, QUndoStack)
+                             QFileDialog, QMainWindow, QMessageBox, QUndoStack)
 
 import ImagingS.Gui.ui as ui
 from ImagingS import Color
@@ -41,6 +41,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.setupIcon()
         self._file = None
         self._document = None
+        self.documentChanged = False
 
         self.actClose.triggered.connect(self.actClose_triggered)
         self.actQuit.triggered.connect(self.close)
@@ -198,6 +199,14 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actViewVisual.setIcon(icons.visual)
         self.setWindowIcon(qta.icon("mdi.pencil-box-multiple", color="purple"))
 
+    def closeEvent(self, event: QCloseEvent) -> None:
+        if self.document is not None:
+            self.actClose.trigger()
+        if self.document is None:
+            event.accept()
+        else:
+            event.ignore()
+
     @property
     def file(self) -> Optional[str]:
         return self._file
@@ -216,14 +225,29 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self._document = value
         self._freshTitle()
 
+    @property
+    def documentChanged(self) -> bool:
+        return self._documentChanged
+
+    @documentChanged.setter
+    def documentChanged(self, value: bool) -> None:
+        self._documentChanged = value
+        self._freshTitle()
+
     def _freshTitle(self) -> None:
         if self.file is None:
             if self.document is None:
                 self.setWindowTitle("ImagingS")
             else:
-                self.setWindowTitle("Untitled - ImagingS")
+                if self.documentChanged:
+                    self.setWindowTitle("Untitled * - ImagingS")
+                else:
+                    self.setWindowTitle("Untitled - ImagingS")
         else:
-            self.setWindowTitle(f"{self.file} - ImagingS")
+            if self.documentChanged:
+                self.setWindowTitle(f"{self.file} * - ImagingS")
+            else:
+                self.setWindowTitle(f"{self.file} - ImagingS")
 
     def _freshBrushes(self):
         hasDoc = self.document is not None
@@ -274,6 +298,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actSave.setEnabled(hasDoc)
         self.actSaveAs.setEnabled(hasDoc)
         self.actExport.setEnabled(hasDoc)
+        self.actNew.setEnabled(not hasDoc)
 
         self.mnuEdit.setEnabled(hasDoc)
         self.mnuView.setEnabled(hasDoc)
@@ -323,6 +348,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
     def _commitDocument(self, message: str):
         assert self.document is not None
+        self.documentChanged = True
         cmt = self.versionController.commit(self.document, message)
         self.undoStack.push(CommitCommand(
             cmt, self.versionController, self.undoCallback))
@@ -477,21 +503,28 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.stbMain.showMessage("Cleared transforms.")
 
     def actClose_triggered(self):
+        if self.documentChanged:
+            code = QMessageBox.warning(self, "Unsaved changes", "Do you want save changes?",
+                                       QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Yes)
+            if code == QMessageBox.Cancel:
+                return
+            elif code == QMessageBox.Yes:
+                self.actSave.trigger()
         self.undoStack.clear()
         self.versionController.clear()
         self.document = None
+        self.documentChanged = False
         self.file = None
         self._freshAll()
 
     def actNew_triggered(self):
-        if self.document is not None:
-            self.actClose.trigger()
         newDialog = NewDocumentDialog()
         if newDialog.exec_() == QDialog.Accepted:
             doc = Document()
             doc.brushes.append(Brushes.Black)
             doc.size = newDialog.documentSize
             self.document = doc
+            self.documentChanged = True
             self.versionController.commit(self.document, "Initial")
             self._freshAll()
             self.stbMain.showMessage(
@@ -508,6 +541,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         else:
             with open(file, mode="wb") as f:
                 self.document.save(f)
+        self.documentChanged = False
         self.stbMain.showMessage(f"Saved to {self.file}.")
 
     def actSaveAs_triggered(self):
@@ -517,14 +551,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
         if not okPressed or not fileName:
             return
         fileName = os.path.realpath(fileName)
-        if fileName.endswith(".isd.json"):
-            with open(fileName, mode="w+") as f:
-                self.document.save(f, DocumentFormat.RAW)
-        else:
-            with open(fileName, mode="wb") as f:
-                self.document.save(f)
         self.file = fileName
-        self.stbMain.showMessage(f"Saved to {self.file}.")
+        self.actSave.trigger()
 
     def actOpen_triggered(self):
         options = QFileDialog.Options()
@@ -541,6 +569,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
                 doc = Document.load(f)
         self.file = fileName
         self.document = doc
+        self.documentChanged = False
         self.versionController.commit(self.document, "Initial")
         self._freshAll()
         self.stbMain.showMessage(f"Opend document at {self.file}.")
