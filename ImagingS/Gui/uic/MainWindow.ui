@@ -64,8 +64,6 @@
     <property name="title">
      <string>&amp;Edit</string>
     </property>
-    <addaction name="actUndo"/>
-    <addaction name="actRedo"/>
    </widget>
    <widget class="QMenu" name="mnuView">
     <property name="title">

@@ -2,7 +2,7 @@ from enum import Enum, unique
 from typing import Optional, Union, cast
 
 from PyQt5.QtCore import QPointF, QSizeF, pyqtSignal
-from PyQt5.QtWidgets import QInputDialog, QMenu, QToolButton, QWidget
+from PyQt5.QtWidgets import QInputDialog, QWidget
 
 import ImagingS.Gui.ui as ui
 from ImagingS.brush import Brush
@@ -39,7 +39,7 @@ class VisualPageState(Enum):
 
 class VisualPage(QWidget, ui.VisualPage):
     messaged = pyqtSignal(str)
-    documentChanged = pyqtSignal(Document)
+    documentCommitted = pyqtSignal(Document, str)
     stateChanged = pyqtSignal()
 
     def __init__(self):
@@ -96,40 +96,41 @@ class VisualPage(QWidget, ui.VisualPage):
         self._state = VisualPageState.Disable
 
     def setupToolBar(self):
-        tb = QToolButton()
-        tb.setDefaultAction(self.actDrawingLine)
-        tb.setPopupMode(QToolButton.DelayedPopup)
-        self.tlbMain.addWidget(tb)
+        # tb = QToolButton()
+        # tb.setDefaultAction(self.actDrawingLine)
+        # tb.setPopupMode(QToolButton.DelayedPopup)
+        # self.tlbMain.addWidget(tb)
 
-        tb = QToolButton()
-        menu = QMenu()
-        menu.addActions([self.actDrawingPolygon,
-                         self.actDrawingPolyline,
-                         self.actDrawingRectangle])
-        tb.setDefaultAction(self.actDrawingPolygon)
-        tb.setMenu(menu)
-        tb.setPopupMode(QToolButton.DelayedPopup)
-        self.tlbMain.addWidget(tb)
+        # tb = QToolButton()
+        # menu = QMenu()
+        # menu.addActions([self.actDrawingPolygon,
+        #                  self.actDrawingPolyline,
+        #                  self.actDrawingRectangle])
+        # tb.setDefaultAction(self.actDrawingPolygon)
+        # tb.setMenu(menu)
+        # tb.setPopupMode(QToolButton.DelayedPopup)
+        # self.tlbMain.addWidget(tb)
 
-        tb = QToolButton()
-        tb.setDefaultAction(self.actDrawingCurve)
-        tb.setPopupMode(QToolButton.DelayedPopup)
-        self.tlbMain.addWidget(tb)
+        # tb = QToolButton()
+        # tb.setDefaultAction(self.actDrawingCurve)
+        # tb.setPopupMode(QToolButton.DelayedPopup)
+        # self.tlbMain.addWidget(tb)
 
-        tb = QToolButton()
-        tb.setDefaultAction(self.actDrawingEllipse)
-        self.tlbMain.addWidget(tb)
+        # tb = QToolButton()
+        # tb.setDefaultAction(self.actDrawingEllipse)
+        # self.tlbMain.addWidget(tb)
 
-        self.tlbMain.addSeparator()
+        # self.tlbMain.addSeparator()
 
-        self.tlbMain.addActions([
-            self.actTransformTranslate,
-            self.actTransformScale,
-            self.actTransformRotate,
-            self.actTransformSkew,
-            self.actTransformMatrix,
-            self.actTransformGroup,
-        ])
+        # self.tlbMain.addActions([
+        #     self.actTransformTranslate,
+        #     self.actTransformScale,
+        #     self.actTransformRotate,
+        #     self.actTransformSkew,
+        #     self.actTransformMatrix,
+        #     self.actTransformGroup,
+        # ])
+        pass
 
     def setupIcon(self):
         self.actDrawingLine.setIcon(icons.lineGeometry)
@@ -248,10 +249,12 @@ class VisualPage(QWidget, ui.VisualPage):
             if isinstance(inter, GeometryInteractivity):
                 drawing = cast(GeometryInteractivity, inter).target
                 self._document.drawings.children.append(drawing)
-                self.documentChanged.emit(self._document)
+                self.documentCommitted.emit(
+                    self._document, f"Create {inter.geometry.__class__.__name__}")
             elif isinstance(inter, TransformInteractivity):
                 if self.drawing is not None:
-                    self.documentChanged.emit(self._document)
+                    self.documentCommitted.emit(
+                        self._document, f"Create {inter.transform.__class__.__name__}")
         self.fresh()
 
     def actDrawingLine_triggered(self):
@@ -374,7 +377,7 @@ class VisualPage(QWidget, ui.VisualPage):
             target.transform = gr
         else:
             return
-        self.documentChanged.emit(self._document)
+        self.documentCommitted.emit(self._document, f"Create TransformGroup")
         self.fresh()
 
     def actTransformMatrix_triggered(self):
@@ -403,5 +406,5 @@ class VisualPage(QWidget, ui.VisualPage):
             target.transform.children.append(trans)
         else:
             target.transform = trans
-        self.documentChanged.emit(self._document)
+        self.documentCommitted.emit(self._document, f"Create MatrixTransform")
         self.fresh()

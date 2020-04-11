@@ -75,6 +75,15 @@ class GeometryGroup(Geometry):
         assert isinstance(value, list)
         self._children = value
 
+    def transformed(self) -> Geometry:
+        if self.transform is None:
+            return self
+        else:
+            result = GeometryGroup()
+            for c in self.children:
+                result.children.append(c.transformed())
+            return result
+
     def strokePoints(self, pen: Pen) -> Iterable[Point]:
         for child in self.children:
             for point in child.strokePoints(pen):

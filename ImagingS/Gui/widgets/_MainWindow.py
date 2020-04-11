@@ -4,18 +4,19 @@ from typing import Optional
 
 import qtawesome as qta
 from PIL import Image
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import (QAbstractItemView, QColorDialog, QDialog,
-                             QFileDialog, QMainWindow)
+                             QFileDialog, QMainWindow, QUndoStack)
 
 import ImagingS.Gui.ui as ui
 from ImagingS import Color
 from ImagingS.brush import Brush, Brushes, SolidBrush
-from ImagingS.document import Document, DocumentFormat
+from ImagingS.document import Document, DocumentFormat, VersionController
 from ImagingS.drawing import (Drawing, DrawingGroup, GeometryDrawing,
                               NumpyArrayDrawingContext)
 from ImagingS.Gui import icons
-from ImagingS.Gui.models import (BrushModel, DrawingModel, PropertyModel,
-                                 TransformModel)
+from ImagingS.Gui.models import (BrushModel, CommitCommand, DrawingModel,
+                                 PropertyModel, TransformModel)
 from ImagingS.transform import Transform, TransformGroup
 
 from . import (DocumentEditor, DocumentEditorState, NewDocumentDialog,
@@ -33,6 +34,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setupUndo()
         self.setupDockWidget()
         self.setupStatusBar()
         self.setupEditor()
@@ -110,6 +112,18 @@ class MainWindow(QMainWindow, ui.MainWindow):
                        self.actToggleTransforms, self.actToggleProperties]
         self.mnuView.addActions(viewActions)
 
+    def setupUndo(self) -> None:
+        self.versionController = VersionController()
+
+        self.undoStack = QUndoStack(self)
+        self.actUndo = self.undoStack.createUndoAction(self, "Undo")
+        self.actUndo.setShortcut(QKeySequence.Undo)
+        self.actRedo = self.undoStack.createRedoAction(self, "Redo")
+        self.actRedo.setShortcut(QKeySequence.Redo)
+
+        self.mnuEdit.addAction(self.actUndo)
+        self.mnuEdit.addAction(self.actRedo)
+
     def setupStatusBar(self) -> None:
         pass
 
@@ -118,10 +132,38 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.editor.setObjectName("editor")
         self.gridLayout.addWidget(self.editor, 0, 0, 1, 1)
         self.editor.messaged.connect(self.editor_messaged)
-        self.editor.documentChanged.connect(self.editor_documentChanged)
+        self.editor.documentCommitted.connect(self.editor_documentCommitted)
         self.editor.stateChanged.connect(self.editor_stateChanged)
         self.editor.visual.stateChanged.connect(self.editor_stateChanged)
         self.editor.code.stateChanged.connect(self.editor_stateChanged)
+
+        self.mnuDrawing.addActions([
+            self.editor.visual.actDrawingLine,
+            self.editor.visual.actDrawingPolyline,
+            self.editor.visual.actDrawingPolygon,
+            self.editor.visual.actDrawingRectangle,
+            self.editor.visual.actDrawingCurve,
+            self.editor.visual.actDrawingEllipse,
+        ])
+        self.mnuDrawing.addSeparator()
+        self.mnuDrawing.addActions([
+            self.actDrawingRemove,
+            self.actDrawingClear
+        ])
+
+        self.mnuTransform.addActions([
+            self.editor.visual.actTransformTranslate,
+            self.editor.visual.actTransformScale,
+            self.editor.visual.actTransformRotate,
+            self.editor.visual.actTransformSkew,
+            self.editor.visual.actTransformMatrix,
+            self.editor.visual.actTransformGroup,
+        ])
+        self.mnuTransform.addSeparator()
+        self.mnuTransform.addActions([
+            self.actTransformRemove,
+            self.actTransformClear
+        ])
 
     def setupIcon(self):
         self.actNew.setIcon(qta.icon("mdi.file"))
@@ -279,6 +321,12 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self._freshEditor()
         self._freshActions()
 
+    def _commitDocument(self, message: str):
+        assert self.document is not None
+        cmt = self.versionController.commit(self.document, message)
+        self.undoStack.push(CommitCommand(
+            cmt, self.versionController, self.undoCallback))
+
     def _currentDrawing(self) -> Optional[Drawing]:
         indexs = self.trvDrawings.selectedIndexes()
         if len(indexs) == 0:
@@ -355,12 +403,14 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.stbMain.showMessage("Cleared drawings.")
 
     def actBrushSolid_triggered(self):
+        assert self.document is not None
         color = QColorDialog.getColor()
         if not color.isValid():
             return
         br = SolidBrush(Color(
             color.red(), color.green(), color.blue()))
         self.document.brushes.append(br)
+        self._commitDocument("Create SolidBrush")
         self._freshBrushes()
         self.stbMain.showMessage(
             f"Add new brush ({br}).")
@@ -427,17 +477,22 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.stbMain.showMessage("Cleared transforms.")
 
     def actClose_triggered(self):
+        self.undoStack.clear()
+        self.versionController.clear()
         self.document = None
         self.file = None
         self._freshAll()
 
     def actNew_triggered(self):
+        if self.document is not None:
+            self.actClose.trigger()
         newDialog = NewDocumentDialog()
         if newDialog.exec_() == QDialog.Accepted:
             doc = Document()
             doc.brushes.append(Brushes.Black)
             doc.size = newDialog.documentSize
             self.document = doc
+            self.versionController.commit(self.document, "Initial")
             self._freshAll()
             self.stbMain.showMessage(
                 f"Created new document with size ({doc.size.width}, {doc.size.height}).")
@@ -486,6 +541,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
                 doc = Document.load(f)
         self.file = fileName
         self.document = doc
+        self.versionController.commit(self.document, "Initial")
         self._freshAll()
         self.stbMain.showMessage(f"Opend document at {self.file}.")
 
@@ -524,9 +580,14 @@ class MainWindow(QMainWindow, ui.MainWindow):
     def editor_messaged(self, message: str) -> None:
         self.stbMain.showMessage(message)
 
-    def editor_documentChanged(self, document: Document) -> None:
+    def editor_documentCommitted(self, document: Document, message: str) -> None:
         self.document = document
+        self._commitDocument(message)
         self._freshDockWidgets()
+
+    def undoCallback(self, document: Document) -> None:
+        self.document = document
+        self._freshAll()
 
     def editor_stateChanged(self) -> None:
         if self.editor.state is DocumentEditorState.Visual:

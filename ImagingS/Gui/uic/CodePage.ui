@@ -39,7 +39,7 @@
      </property>
      <addaction name="actSwitch"/>
      <addaction name="actRestore"/>
-     <addaction name="actUpload"/>
+     <addaction name="actCommit"/>
     </widget>
    </item>
    <item>
@@ -111,12 +111,9 @@
     <string>Restore</string>
    </property>
   </action>
-  <action name="actUpload">
+  <action name="actCommit">
    <property name="text">
-    <string>Upload</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+U</string>
+    <string>Commit</string>
    </property>
   </action>
   <action name="actSwitch">

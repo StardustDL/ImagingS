@@ -26,7 +26,7 @@ def _clonedoc(doc: Document) -> Document:
 
 
 class CodePage(QWidget, ui.CodePage):
-    uploaded = pyqtSignal(Document)
+    documentCommitted = pyqtSignal(Document, str)
     messaged = pyqtSignal(str)
     stateChanged = pyqtSignal()
 
@@ -42,7 +42,7 @@ class CodePage(QWidget, ui.CodePage):
         self.tetCode.textChanged.connect(self.tetCode_textChanged)
 
         self.actRestore.triggered.connect(self.actRestore_triggered)
-        self.actUpload.triggered.connect(self.actUpload_triggered)
+        self.actCommit.triggered.connect(self.actCommit_triggered)
         self.actSwitch.triggered.connect(self.actSwitch_triggered)
 
         self.swgMain.setCurrentIndex(0)
@@ -52,7 +52,7 @@ class CodePage(QWidget, ui.CodePage):
 
     def setupIcon(self) -> None:
         self.actRestore.setIcon(qta.icon("mdi.restore"))
-        self.actUpload.setIcon(qta.icon("mdi.upload"))
+        self.actCommit.setIcon(qta.icon("mdi.check"))
         self.actSwitch.setIcon(icons.fileTree)
         self.setWindowIcon(icons.code)
 
@@ -91,10 +91,10 @@ class CodePage(QWidget, ui.CodePage):
         self._state = value
         if self.state is CodePageState.Changed:
             self.actRestore.setEnabled(True)
-            self.actUpload.setEnabled(True)
+            self.actCommit.setEnabled(True)
         else:
             self.actRestore.setEnabled(False)
-            self.actUpload.setEnabled(False)
+            self.actCommit.setEnabled(False)
         self.stateChanged.emit()
 
     def fresh(self) -> None:
@@ -137,10 +137,10 @@ class CodePage(QWidget, ui.CodePage):
         self.switchCode(True)
         self._setState(CodePageState.Normal)
 
-    def actUpload_triggered(self) -> None:
+    def actCommit_triggered(self) -> None:
         self._document = self._curdocument
         self.actRestore.trigger()
-        self.uploaded.emit(self._document)
+        self.documentCommitted.emit(self._document, "Change Code")
 
     def actSwitch_triggered(self) -> None:
         if self.swgMain.currentIndex() == 0:

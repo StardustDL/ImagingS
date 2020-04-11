@@ -18,7 +18,7 @@ class DocumentEditorState(Enum):
 
 
 class DocumentEditor(QWidget, ui.DocumentEditor):
-    documentChanged = pyqtSignal(Document)
+    documentCommitted = pyqtSignal(Document, str)
     stateChanged = pyqtSignal()
     messaged = pyqtSignal(str)
 
@@ -28,8 +28,8 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
         self.setupVisual()
         self.setupCode()
 
-        self.code.uploaded.connect(self.code_uploaded)
-        self.visual.documentChanged.connect(self.visual_documentChanged)
+        self.code.documentCommitted.connect(self.code_documentCommitted)
+        self.visual.documentCommitted.connect(self.visual_documentCommitted)
 
         self.setEnabled(False)
 
@@ -111,7 +111,7 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
         if self.code.state is CodePageState.Normal:
             self.code.disable()
         elif self.code.state is CodePageState.Changed:
-            self.messaged.emit("Code changes not uploaded.")
+            self.messaged.emit("Code changes not committed.")
             return False
         self.visual.enable(self.document)
         self.swgMain.setCurrentIndex(0)
@@ -121,10 +121,10 @@ class DocumentEditor(QWidget, ui.DocumentEditor):
     def visualCode_messaged(self, message: str) -> None:
         self.messaged.emit(message)
 
-    def code_uploaded(self, doc: Document):
+    def code_documentCommitted(self, doc: Document, message: str):
         self._document = doc
-        self.documentChanged.emit(doc)
+        self.documentCommitted.emit(doc, message)
 
-    def visual_documentChanged(self, doc: Document):
+    def visual_documentCommitted(self, doc: Document, message: str):
         self._document = doc
-        self.documentChanged.emit(doc)
+        self.documentCommitted.emit(doc, message)

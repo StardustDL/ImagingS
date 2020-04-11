@@ -37,6 +37,19 @@
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
+     <addaction name="actDrawingLine"/>
+     <addaction name="actDrawingPolyline"/>
+     <addaction name="actDrawingPolygon"/>
+     <addaction name="actDrawingRectangle"/>
+     <addaction name="actDrawingCurve"/>
+     <addaction name="actDrawingEllipse"/>
+     <addaction name="separator"/>
+     <addaction name="actTransformTranslate"/>
+     <addaction name="actTransformScale"/>
+     <addaction name="actTransformRotate"/>
+     <addaction name="actTransformSkew"/>
+     <addaction name="actTransformMatrix"/>
+     <addaction name="actTransformGroup"/>
     </widget>
    </item>
    <item>

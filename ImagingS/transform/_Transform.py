@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 from ImagingS import IdObject, IdObjectList, Point
 from ImagingS.serialization import PropertySerializable
