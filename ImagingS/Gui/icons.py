@@ -6,6 +6,8 @@ from ImagingS.brush import SolidBrush
 
 from . import converters
 
+grid: QIcon = qta.icon("mdi.grid")
+
 refresh: QIcon = qta.icon("mdi.refresh")
 
 list: QIcon = qta.icon("mdi.format-list-numbered")

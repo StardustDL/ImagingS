@@ -1,9 +1,9 @@
 from typing import Dict, Optional
 
 from PyQt5.QtCore import QPointF, QRectF, QSizeF, Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent, QMouseEvent
-from PyQt5.QtWidgets import (QAction, QGraphicsRectItem, QGraphicsScene,
-                             QGraphicsView)
+from PyQt5.QtGui import QColor, QKeyEvent, QMouseEvent, QPainterPath, QPen
+from PyQt5.QtWidgets import (QAction, QGraphicsPathItem, QGraphicsRectItem,
+                             QGraphicsScene, QGraphicsView)
 
 from ImagingS.drawing import Drawing
 from ImagingS.Gui import icons
@@ -27,7 +27,11 @@ class Canvas(QGraphicsView):
         self._active_item: Optional[DrawingItem] = None
 
         self._sceneBorder = QGraphicsRectItem()
+        self._sceneGrid = QGraphicsPathItem()
+        self._sceneGrid.setVisible(False)
+        self._sceneGrid.setPen(QPen(QColor("lightgray")))
         self.scene().addItem(self._sceneBorder)
+        self.scene().addItem(self._sceneGrid)
 
         self.setMouseTracking(True)
 
@@ -39,6 +43,16 @@ class Canvas(QGraphicsView):
         self.actRerender.setText("Rerender")
         self.actRerender.setShortcut("F5")
         self.addAction(self.actRerender)
+
+        self.actGrid = QAction(self)
+        self.actGrid.setObjectName("actGrid")
+        self.actGrid.triggered.connect(self.actGrid_triggered)
+        self.actGrid.setIcon(icons.grid)
+        self.actGrid.setCheckable(True)
+        self.actGrid.setChecked(False)
+        self.actGrid.setText("Gird")
+        self.actGrid.setShortcut("F4")
+        self.addAction(self.actGrid)
 
     @property
     def interactivity(self) -> Optional[Interactivity]:
@@ -54,6 +68,16 @@ class Canvas(QGraphicsView):
     def resize(self, size: QSizeF):
         self.scene().setSceneRect(QRectF(QPointF(), size))
         self._sceneBorder.setRect(self.scene().sceneRect())
+
+        gridPath = QPainterPath()
+        D = 80
+        for x in range(0, round(size.width()), D):
+            gridPath.moveTo(QPointF(x, 0))
+            gridPath.lineTo(QPointF(x, size.height()))
+        for y in range(0, round(size.height()), D):
+            gridPath.moveTo(QPointF(0, y))
+            gridPath.lineTo(QPointF(size.width(), y))
+        self._sceneGrid.setPath(gridPath)
 
         draws = self.items.values()
 
@@ -94,6 +118,12 @@ class Canvas(QGraphicsView):
 
     def actRerender_triggered(self) -> None:
         self.rerender()
+
+    def actGrid_triggered(self) -> None:
+        if self.actGrid.isChecked():
+            self._sceneGrid.setVisible(True)
+        else:
+            self._sceneGrid.setVisible(False)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         pos = self.mapToScene(event.localPos().toPoint())

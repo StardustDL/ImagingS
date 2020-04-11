@@ -32,13 +32,17 @@ class Drawing(PropertySerializable, IdObject, ABC):
     @property
     def boundingRect(self) -> Rect:
         if not hasattr(self, "_boundingRect"):
-            self._boundingRect = None
-            measurer = BoundingRectMeasurer()
-            self.render(measurer)
-            self._boundingRect = measurer.endMeasure()
-        elif self._boundingRect is None:  # boundingRect is calculating
-            return Rect()
+            if hasattr(self, "_measurering"):
+                return Rect()
+            self._boundingRect = self._calculateBoundingRect()
         return self._boundingRect
+
+    def _calculateBoundingRect(self) -> Rect:
+        self._measurering = True
+        measurer = BoundingRectMeasurer()
+        self.render(measurer)
+        del self._measurering
+        return measurer.endMeasure()
 
     def refreshBoundingRect(self) -> None:
         if hasattr(self, "_boundingRect"):
