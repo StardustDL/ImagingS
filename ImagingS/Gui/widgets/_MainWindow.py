@@ -78,6 +78,15 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actTransformClear.triggered.connect(
             self.actTransformClear_triggered)
 
+        self.actBrushesRefresh.triggered.connect(
+            self.actBrushesRefresh_triggered)
+        self.actDrawingsRefresh.triggered.connect(
+            self.actDrawingsRefresh_triggered)
+        self.actTransformsRefresh.triggered.connect(
+            self.actTransformsRefresh_triggered)
+        self.actPropertiesRefresh.triggered.connect(
+            self.actPropertiesRefresh_triggered)
+
         self.modelProperties = PropertyModel(self)
         self.trvProperties.setModel(self.modelProperties)
 
@@ -135,6 +144,10 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.dwgDrawings.setWindowIcon(icons.drawing)
         self.dwgProperties.setWindowIcon(icons.property)
         self.dwgTransforms.setWindowIcon(icons.transform)
+        self.actDrawingsRefresh.setIcon(icons.refresh)
+        self.actBrushesRefresh.setIcon(icons.refresh)
+        self.actPropertiesRefresh.setIcon(icons.refresh)
+        self.actTransformsRefresh.setIcon(icons.refresh)
         self.actToggleDrawings.setIcon(icons.drawing)
         self.actToggleBrushes.setIcon(icons.brush)
         self.actToggleProperties.setIcon(icons.property)
@@ -297,7 +310,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
     def trvDrawings_clicked(self, index):
         item = self.modelDrawing.getUserData(index)
-        if self.modelProperties.obj is not item:
+        if item is not self.document.drawings and self.modelProperties.obj is not item:
             self.editor.visual.drawing = item
             self._freshTransforms()
             self.modelProperties.fresh(item)
@@ -495,6 +508,18 @@ class MainWindow(QMainWindow, ui.MainWindow):
             Image.fromarray(context.array).save(fileName, ext, quality=95)
 
             self.stbMain.showMessage(f"Exported to {fileName}.")
+
+    def actBrushesRefresh_triggered(self) -> None:
+        self._freshBrushes()
+
+    def actDrawingsRefresh_triggered(self) -> None:
+        self._freshDrawings()
+
+    def actTransformsRefresh_triggered(self) -> None:
+        self._freshTransforms()
+
+    def actPropertiesRefresh_triggered(self) -> None:
+        self.modelProperties.fresh(self.modelProperties.obj)
 
     def editor_messaged(self, message: str) -> None:
         self.stbMain.showMessage(message)

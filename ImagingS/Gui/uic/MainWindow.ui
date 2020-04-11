@@ -382,6 +382,26 @@
     <string>Ctrl+Shift+C</string>
    </property>
   </action>
+  <action name="actDrawingsRefresh">
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+  </action>
+  <action name="actTransformsRefresh">
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+  </action>
+  <action name="actBrushesRefresh">
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+  </action>
+  <action name="actPropertiesRefresh">
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

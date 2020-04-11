@@ -330,6 +330,8 @@ class VisualPage(QWidget, ui.VisualPage):
         target = self._getTransformInteractiveTarget()
         if target is None:
             return
+        if not isinstance(target.transform, (type(None), TransformGroup)):
+            self.actTransformGroup.trigger()
         tr = TranslateTransform()
         self._beginInteractive(TranslateTransformInteractivity(target, tr))
 
@@ -337,6 +339,8 @@ class VisualPage(QWidget, ui.VisualPage):
         target = self._getTransformInteractiveTarget()
         if target is None:
             return
+        if not isinstance(target.transform, (type(None), TransformGroup)):
+            self.actTransformGroup.trigger()
         tr = RotateTransform()
         self._beginInteractive(RotateTransformInteractivity(target, tr))
 
@@ -344,6 +348,8 @@ class VisualPage(QWidget, ui.VisualPage):
         target = self._getTransformInteractiveTarget()
         if target is None:
             return
+        if not isinstance(target.transform, (type(None), TransformGroup)):
+            self.actTransformGroup.trigger()
         tr = SkewTransform()
         self._beginInteractive(SkewTransformInteractivity(target, tr))
 
@@ -351,6 +357,8 @@ class VisualPage(QWidget, ui.VisualPage):
         target = self._getTransformInteractiveTarget()
         if target is None:
             return
+        if not isinstance(target.transform, (type(None), TransformGroup)):
+            self.actTransformGroup.trigger()
         tr = ScaleTransform()
         self._beginInteractive(ScaleTransformInteractivity(target, tr))
 
@@ -358,14 +366,42 @@ class VisualPage(QWidget, ui.VisualPage):
         target = self._getTransformInteractiveTarget()
         if target is None:
             return
-        if not isinstance(target.transform, TransformGroup):
+        if target.transform is None:
             target.transform = TransformGroup()
+        elif not isinstance(target.transform, TransformGroup):
+            gr = TransformGroup()
+            gr.children.append(target.transform)
+            target.transform = gr
+        else:
+            return
+        self.documentChanged.emit(self._document)
+        self.fresh()
 
     def actTransformMatrix_triggered(self):
         target = self._getTransformInteractiveTarget()
         if target is None:
             return
+        if not isinstance(target.transform, (type(None), TransformGroup)):
+            self.actTransformGroup.trigger()
+        trans = MatrixTransform()
+        default = "\n".join([", ".join(map(str, c))
+                             for c in trans.matrix.tolist()])
+        text, okPressed = QInputDialog.getMultiLineText(
+            self, "Input Matrix", "Matrix:", default)
+        if not okPressed or not text:
+            return
+        lines = str(text).strip().splitlines()
+        try:
+            for i in range(3):
+                t = lines[i].split(",")
+                for j in range(3):
+                    trans.matrix[i][j] = float(t[j])
+        except Exception:
+            self.messaged("Matrix is invalid.")
+            return
         if isinstance(target.transform, TransformGroup):
-            target.transform.children.append(MatrixTransform())
+            target.transform.children.append(trans)
         else:
-            target.transform = MatrixTransform()
+            target.transform = trans
+        self.documentChanged.emit(self._document)
+        self.fresh()
