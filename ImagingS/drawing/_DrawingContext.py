@@ -14,30 +14,6 @@ class DrawingContext(ABC):
     def rect(self) -> Rect: pass
 
 
-class BoundingRectMeasurer(DrawingContext):
-    def __init__(self) -> None:
-        super().__init__()
-        self._lx = float("inf")
-        self._ly = float("inf")
-        self._rx = float("-inf")
-        self._ry = float("-inf")
-
-    def endMeasure(self) -> Rect:
-        result = Rect.fromPoints(Point(
-            self._lx, self._ly), Point(self._rx, self._ry))
-        return result
-
-    def point(self, position: Point, color: Color) -> None:
-        x, y = position.asTuple()
-        self._lx = min(self._lx, x)
-        self._ly = min(self._ly, y)
-        self._rx = max(self._rx, x)
-        self._ry = max(self._ry, y)
-
-    def rect(self) -> Rect:
-        return Rect.infinite()
-
-
 class NumpyArrayDrawingContext(DrawingContext):
     @staticmethod
     def create_array(size: Size) -> np.ndarray:

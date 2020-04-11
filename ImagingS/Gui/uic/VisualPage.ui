@@ -58,19 +58,14 @@
     </widget>
    </item>
   </layout>
-  <action name="actDrawingLineDDA">
+  <action name="actDrawingLine">
    <property name="text">
-    <string>Line(DDA)</string>
+    <string>Line</string>
    </property>
   </action>
-  <action name="actDrawingPolygonDDA">
+  <action name="actDrawingCurve">
    <property name="text">
-    <string>Polygon(DDA)</string>
-   </property>
-  </action>
-  <action name="actDrawingCurveBezier">
-   <property name="text">
-    <string>Curve(Bezier)</string>
+    <string>Curve</string>
    </property>
   </action>
   <action name="actDrawingEllipse">
@@ -108,39 +103,19 @@
     <string>Group</string>
    </property>
   </action>
-  <action name="actDrawingLineBresenham">
+  <action name="actDrawingPolygon">
    <property name="text">
-    <string>Line(Bresenham)</string>
+    <string>Polygon</string>
    </property>
   </action>
-  <action name="actDrawingPolygonBresenham">
+  <action name="actDrawingPolyline">
    <property name="text">
-    <string>Polygon(Bresenham)</string>
+    <string>Polyline</string>
    </property>
   </action>
-  <action name="actDrawingCurveBSpline">
+  <action name="actDrawingRectangle">
    <property name="text">
-    <string>Curve(BSpline)</string>
-   </property>
-  </action>
-  <action name="actDrawingPolylineBresenham">
-   <property name="text">
-    <string>Polyline(Bresenham)</string>
-   </property>
-  </action>
-  <action name="actDrawingPolylineDDA">
-   <property name="text">
-    <string>Polyline(DDA)</string>
-   </property>
-  </action>
-  <action name="actDrawingRectangleBresenham">
-   <property name="text">
-    <string>Rectangle(Bresenham)</string>
-   </property>
-  </action>
-  <action name="actDrawingRectangleDDA">
-   <property name="text">
-    <string>Rectangle(DDA)</string>
+    <string>Rectangle</string>
    </property>
   </action>
  </widget>

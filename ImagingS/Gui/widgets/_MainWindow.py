@@ -444,9 +444,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
     def actSaveAs_triggered(self):
         options = QFileDialog.Options()
-        fileName, _ = QFileDialog.getSaveFileName(
+        fileName, okPressed = QFileDialog.getSaveFileName(
             self, "Save As", "", "ImagingS Document (*.isd);; ImagingS Raw Document (*.isd.json)", options=options)
-        if not fileName:
+        if not okPressed or not fileName:
             return
         fileName = os.path.realpath(fileName)
         if fileName.endswith(".isd.json"):
@@ -460,20 +460,21 @@ class MainWindow(QMainWindow, ui.MainWindow):
 
     def actOpen_triggered(self):
         options = QFileDialog.Options()
-        fileName, _ = QFileDialog.getOpenFileName(
+        fileName, okPressed = QFileDialog.getOpenFileName(
             self, "Open", "", "ImagingS Document (*.isd);; ImagingS Raw Document (*.isd.json)", options=options)
-        if fileName:
-            fileName = os.path.realpath(fileName)
-            if fileName.endswith(".isd.json"):
-                with open(fileName, mode="r") as f:
-                    doc = Document.load(f, DocumentFormat.RAW)
-            else:
-                with open(fileName, mode="rb") as f:
-                    doc = Document.load(f)
-            self.file = fileName
-            self.document = doc
-            self._freshAll()
-            self.stbMain.showMessage(f"Opend document at {self.file}.")
+        if not okPressed or not fileName:
+            return
+        fileName = os.path.realpath(fileName)
+        if fileName.endswith(".isd.json"):
+            with open(fileName, mode="r") as f:
+                doc = Document.load(f, DocumentFormat.RAW)
+        else:
+            with open(fileName, mode="rb") as f:
+                doc = Document.load(f)
+        self.file = fileName
+        self.document = doc
+        self._freshAll()
+        self.stbMain.showMessage(f"Opend document at {self.file}.")
 
     def actExport_triggered(self):
         options = QFileDialog.Options()

@@ -2,7 +2,7 @@ from enum import Enum, unique
 from typing import Optional, Union, cast
 
 from PyQt5.QtCore import QPointF, QSizeF, pyqtSignal
-from PyQt5.QtWidgets import QMenu, QToolButton, QWidget
+from PyQt5.QtWidgets import QInputDialog, QMenu, QToolButton, QWidget
 
 import ImagingS.Gui.ui as ui
 from ImagingS.brush import Brush
@@ -65,26 +65,16 @@ class VisualPage(QWidget, ui.VisualPage):
         #     self.actTransformGroup,
         # ]
 
-        self.actDrawingLineDDA.triggered.connect(
-            self.actDrawingLineDDA_triggered)
-        self.actDrawingLineBresenham.triggered.connect(
-            self.actDrawingLineBresenham_triggered)
-        self.actDrawingPolygonDDA.triggered.connect(
-            self.actDrawingPolygonDDA_triggered)
-        self.actDrawingPolygonBresenham.triggered.connect(
-            self.actDrawingPolygonBresenham_triggered)
-        self.actDrawingPolylineDDA.triggered.connect(
-            self.actDrawingPolylineDDA_triggered)
-        self.actDrawingPolylineBresenham.triggered.connect(
-            self.actDrawingPolylineBresenham_triggered)
-        self.actDrawingRectangleDDA.triggered.connect(
-            self.actDrawingRectangleDDA_triggered)
-        self.actDrawingRectangleBresenham.triggered.connect(
-            self.actDrawingRectangleBresenham_triggered)
-        self.actDrawingCurveBezier.triggered.connect(
-            self.actDrawingCurveBezier_triggered)
-        self.actDrawingCurveBSpline.triggered.connect(
-            self.actDrawingCurveBSpline_triggered)
+        self.actDrawingLine.triggered.connect(
+            self.actDrawingLine_triggered)
+        self.actDrawingPolygon.triggered.connect(
+            self.actDrawingPolygon_triggered)
+        self.actDrawingPolyline.triggered.connect(
+            self.actDrawingPolyline_triggered)
+        self.actDrawingRectangle.triggered.connect(
+            self.actDrawingRectangle_triggered)
+        self.actDrawingCurve.triggered.connect(
+            self.actDrawingCurve_triggered)
         self.actDrawingEllipse.triggered.connect(
             self.actDrawingEllipse_triggered)
 
@@ -107,32 +97,22 @@ class VisualPage(QWidget, ui.VisualPage):
 
     def setupToolBar(self):
         tb = QToolButton()
-        menu = QMenu()
-        menu.addActions([self.actDrawingLineDDA, self.actDrawingLineBresenham])
-        tb.setDefaultAction(self.actDrawingLineDDA)
-        tb.setMenu(menu)
+        tb.setDefaultAction(self.actDrawingLine)
         tb.setPopupMode(QToolButton.DelayedPopup)
         self.tlbMain.addWidget(tb)
 
         tb = QToolButton()
         menu = QMenu()
-        menu.addActions([self.actDrawingPolygonDDA,
-                         self.actDrawingPolygonBresenham,
-                         self.actDrawingPolylineDDA,
-                         self.actDrawingPolylineBresenham,
-                         self.actDrawingRectangleDDA,
-                         self.actDrawingRectangleBresenham])
-        tb.setDefaultAction(self.actDrawingPolygonDDA)
+        menu.addActions([self.actDrawingPolygon,
+                         self.actDrawingPolyline,
+                         self.actDrawingRectangle])
+        tb.setDefaultAction(self.actDrawingPolygon)
         tb.setMenu(menu)
         tb.setPopupMode(QToolButton.DelayedPopup)
         self.tlbMain.addWidget(tb)
 
         tb = QToolButton()
-        menu = QMenu()
-        menu.addActions([self.actDrawingCurveBezier,
-                         self.actDrawingCurveBSpline])
-        tb.setDefaultAction(self.actDrawingCurveBezier)
-        tb.setMenu(menu)
+        tb.setDefaultAction(self.actDrawingCurve)
         tb.setPopupMode(QToolButton.DelayedPopup)
         self.tlbMain.addWidget(tb)
 
@@ -152,17 +132,12 @@ class VisualPage(QWidget, ui.VisualPage):
         ])
 
     def setupIcon(self):
-        self.actDrawingLineDDA.setIcon(icons.lineGeometry)
-        self.actDrawingLineBresenham.setIcon(icons.lineGeometry)
-        self.actDrawingCurveBezier.setIcon(icons.curveGeometry)
-        self.actDrawingCurveBSpline.setIcon(icons.curveGeometry)
+        self.actDrawingLine.setIcon(icons.lineGeometry)
+        self.actDrawingCurve.setIcon(icons.curveGeometry)
         self.actDrawingEllipse.setIcon(icons.ellipseGeometry)
-        self.actDrawingPolygonDDA.setIcon(icons.polygonGeometry)
-        self.actDrawingPolygonBresenham.setIcon(icons.polygonGeometry)
-        self.actDrawingPolylineDDA.setIcon(icons.polylineGeometry)
-        self.actDrawingPolylineBresenham.setIcon(icons.polylineGeometry)
-        self.actDrawingRectangleDDA.setIcon(icons.rectangleGeometry)
-        self.actDrawingRectangleBresenham.setIcon(icons.rectangleGeometry)
+        self.actDrawingPolygon.setIcon(icons.polygonGeometry)
+        self.actDrawingPolyline.setIcon(icons.polylineGeometry)
+        self.actDrawingRectangle.setIcon(icons.rectangleGeometry)
         self.actTransformSkew.setIcon(icons.skewTransform)
         self.actTransformScale.setIcon(icons.scaleTransform)
         self.actTransformTranslate.setIcon(icons.translateTransform)
@@ -276,67 +251,61 @@ class VisualPage(QWidget, ui.VisualPage):
                 self.documentChanged.emit(self._document)
             elif isinstance(inter, TransformInteractivity):
                 if self.drawing is not None:
-                    self.drawing.refreshBoundingRect()
                     self.documentChanged.emit(self._document)
         self.fresh()
 
-    def actDrawingLineDDA_triggered(self):
+    def actDrawingLine_triggered(self):
+        algs = [e.name for e in LineAlgorithm]
+        item, okPressed = QInputDialog.getItem(
+            self, "Select Algorithm", "Algorithm:", algs, 0, False)
+        if not okPressed or not item:
+            return
         geo = LineGeometry()
-        geo.algorithm = LineAlgorithm.Dda
+        geo.algorithm = getattr(LineAlgorithm, item)
         self._beginInteractive(LineInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
-    def actDrawingLineBresenham_triggered(self):
-        geo = LineGeometry()
-        geo.algorithm = LineAlgorithm.Bresenham
-        self._beginInteractive(LineInteractivity(
-            self._emptyGeometryDrawing(), geo, self._document.size))
-
-    def actDrawingPolygonDDA_triggered(self):
+    def actDrawingPolygon_triggered(self):
+        algs = [e.name for e in LineAlgorithm]
+        item, okPressed = QInputDialog.getItem(
+            self, "Select Algorithm", "Algorithm:", algs, 0, False)
+        if not okPressed or not item:
+            return
         geo = PolygonGeometry()
-        geo.algorithm = LineAlgorithm.Dda
+        geo.algorithm = getattr(LineAlgorithm, item)
         self._beginInteractive(PolylineInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
-    def actDrawingPolygonBresenham_triggered(self):
-        geo = PolygonGeometry()
-        geo.algorithm = LineAlgorithm.Bresenham
-        self._beginInteractive(PolylineInteractivity(
-            self._emptyGeometryDrawing(), geo, self._document.size))
-
-    def actDrawingPolylineDDA_triggered(self):
+    def actDrawingPolyline_triggered(self):
+        algs = [e.name for e in LineAlgorithm]
+        item, okPressed = QInputDialog.getItem(
+            self, "Select Algorithm", "Algorithm:", algs, 0, False)
+        if not okPressed or not item:
+            return
         geo = PolylineGeometry()
-        geo.algorithm = LineAlgorithm.Dda
+        geo.algorithm = getattr(LineAlgorithm, item)
         self._beginInteractive(PolylineInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
-    def actDrawingPolylineBresenham_triggered(self):
-        geo = PolylineGeometry()
-        geo.algorithm = LineAlgorithm.Bresenham
-        self._beginInteractive(PolylineInteractivity(
-            self._emptyGeometryDrawing(), geo, self._document.size))
-
-    def actDrawingRectangleDDA_triggered(self):
+    def actDrawingRectangle_triggered(self):
+        algs = [e.name for e in LineAlgorithm]
+        item, okPressed = QInputDialog.getItem(
+            self, "Select Algorithm", "Algorithm:", algs, 0, False)
+        if not okPressed or not item:
+            return
         geo = RectangleGeometry()
-        geo.algorithm = LineAlgorithm.Dda
+        geo.algorithm = getattr(LineAlgorithm, item)
         self._beginInteractive(RectangleInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 
-    def actDrawingRectangleBresenham_triggered(self):
-        geo = RectangleGeometry()
-        geo.algorithm = LineAlgorithm.Bresenham
-        self._beginInteractive(RectangleInteractivity(
-            self._emptyGeometryDrawing(), geo, self._document.size))
-
-    def actDrawingCurveBezier_triggered(self):
+    def actDrawingCurve_triggered(self):
+        algs = [e.name for e in CurveAlgorithm]
+        item, okPressed = QInputDialog.getItem(
+            self, "Select Algorithm", "Algorithm:", algs, 0, False)
+        if not okPressed or not item:
+            return
         geo = CurveGeometry()
-        geo.algorithm = CurveAlgorithm.Bezier
-        self._beginInteractive(CurveInteractivity(
-            self._emptyGeometryDrawing(), geo, self._document.size))
-
-    def actDrawingCurveBSpline_triggered(self):
-        geo = CurveGeometry()
-        geo.algorithm = CurveAlgorithm.BSpline
+        geo.algorithm = getattr(CurveAlgorithm, item)
         self._beginInteractive(CurveInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
 

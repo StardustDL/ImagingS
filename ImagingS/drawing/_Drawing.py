@@ -3,12 +3,12 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from ImagingS import Color, IdObject, IdObjectList, Point, Rect
+from ImagingS import Color, IdObject, IdObjectList, Point, Rect, RectMeasurer
 from ImagingS.geometry import Geometry
 from ImagingS.serialization import PropertySerializable
 from ImagingS.transform import Transform
 
-from . import BoundingRectMeasurer, DrawingContext, ProxyDrawingContext
+from . import DrawingContext, ProxyDrawingContext
 
 
 class Drawing(PropertySerializable, IdObject, ABC):
@@ -30,23 +30,8 @@ class Drawing(PropertySerializable, IdObject, ABC):
     def render(self, context: DrawingContext) -> None: pass
 
     @property
-    def boundingRect(self) -> Rect:
-        if not hasattr(self, "_boundingRect"):
-            if hasattr(self, "_measurering"):
-                return Rect()
-            self._boundingRect = self._calculateBoundingRect()
-        return self._boundingRect
-
-    def _calculateBoundingRect(self) -> Rect:
-        self._measurering = True
-        measurer = BoundingRectMeasurer()
-        self.render(measurer)
-        del self._measurering
-        return measurer.endMeasure()
-
-    def refreshBoundingRect(self) -> None:
-        if hasattr(self, "_boundingRect"):
-            del self._boundingRect
+    @abstractmethod
+    def bounds(self) -> Rect: pass
 
 
 class DrawingGroup(Drawing):
@@ -63,6 +48,7 @@ class DrawingGroup(Drawing):
     def children(self, value: IdObjectList[Drawing]) -> None:
         assert isinstance(value, IdObjectList)
         self._children = value
+        self.refreshBounds()
 
     @property
     def transform(self) -> Optional[Transform]:
@@ -72,6 +58,7 @@ class DrawingGroup(Drawing):
     def transform(self, value: Optional[Transform]) -> None:
         assert isinstance(value, (type(None), Transform))
         self._transform = value
+        self.refreshBounds()
 
     def render(self, context: DrawingContext) -> None:
         renderContext = context
@@ -87,3 +74,31 @@ class DrawingGroup(Drawing):
 
         for item in self.children:
             item.render(renderContext)
+
+    @property
+    def bounds(self) -> Rect:
+        if not hasattr(self, "_bounds"):
+            if hasattr(self, "_measurering"):
+                return Rect()
+            self._measurering = True
+            self._bounds = self._calculateBounds()
+            del self._measurering
+        return self._bounds
+
+    def _calculateBounds(self) -> Rect:
+        measurer = RectMeasurer()
+
+        def fpoint(position: Point, color: Color) -> None:
+            measurer.append(position)
+
+        def frect() -> Rect:
+            return Rect.infinite()
+
+        context = ProxyDrawingContext(fpoint, frect)
+
+        self.render(context)
+        return measurer.result()
+
+    def refreshBounds(self) -> None:
+        if hasattr(self, "_bounds"):
+            del self._bounds

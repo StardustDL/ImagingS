@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum, unique
-from typing import Iterable, Iterator, Optional
+from typing import Iterable, Iterator, Optional, cast
 
 from ImagingS import Point, Rect, fsign
 from ImagingS.drawing import Pen
@@ -97,6 +97,7 @@ class LineGeometry(Geometry):
     def start(self, value: Point) -> None:
         assert isinstance(value, Point)
         self._start = value
+        self.refreshBounds()
 
     @property
     def end(self) -> Point:
@@ -106,6 +107,7 @@ class LineGeometry(Geometry):
     def end(self, value: Point) -> None:
         assert isinstance(value, Point)
         self._end = value
+        self.refreshBounds()
 
     @property
     def algorithm(self) -> LineAlgorithm:
@@ -132,18 +134,30 @@ class LineGeometry(Geometry):
     def clipAlgorithm(self, value: LineClipAlgorithm) -> None:
         self._clipAlgorithm = value
 
+    def transformed(self) -> Geometry:
+        if self.transform is None:
+            return self
+        else:
+            start = self.transform.transform(self.start)
+            end = self.transform.transform(self.end)
+            return LineGeometry(start, end, self.algorithm)
+
     def strokePoints(self, pen: Pen) -> Iterable[Point]:
-        start = self.start
-        end = self.end
+        target = self
         if self.transform is not None:
-            start = self.transform.transform(start)
-            end = self.transform.transform(end)
+            target = cast(LineGeometry, self.transformed())
         gen = None
-        if self.algorithm is LineAlgorithm.Dda:
+        if target.algorithm is LineAlgorithm.Dda:
             gen = _genDDA
-        elif self.algorithm is LineAlgorithm.Bresenham:
+        elif target.algorithm is LineAlgorithm.Bresenham:
             gen = _genBresenham
-        return gen(start, end)
+        return gen(target.start, target.end)
 
     def fillPoints(self) -> Iterable[Point]:
         return []
+
+    def _calculateBounds(self) -> Rect:
+        target = self
+        if self.transform is not None:
+            target = cast(LineGeometry, self.transformed())
+        return Rect.fromPoints(target.start, target.end)

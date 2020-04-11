@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
+from ImagingS import Rect
 from ImagingS.brush import Brush, Brushes
 from ImagingS.geometry import Geometry
 
@@ -41,17 +42,23 @@ class GeometryDrawing(Drawing):
     def geometry(self, value: Optional[Geometry]) -> None:
         assert isinstance(value, (type(None), Geometry))
         self._geometry = value
-        self.refreshBoundingRect()
 
     def render(self, context: DrawingContext) -> None:
         if self.geometry is None:
             return
         rect = context.rect()
-        for point in self.geometry.strokePoints(self.stroke):
-            if point in rect:
-                context.point(point,
-                              self.stroke.brush.colorAt(point, self.boundingRect))
         for point in self.geometry.fillPoints():
             if point in rect:
                 context.point(point, self.fill.colorAt(
-                    point, self.boundingRect))
+                    point, self.bounds))
+        for point in self.geometry.strokePoints(self.stroke):
+            if point in rect:
+                context.point(point,
+                              self.stroke.brush.colorAt(point, self.bounds))
+
+    @property
+    def bounds(self) -> Rect:
+        if self.geometry is None:
+            return Rect()
+        else:
+            return self.geometry.bounds

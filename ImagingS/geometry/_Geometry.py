@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Iterable, List, Optional
 
-from ImagingS import Point
+from ImagingS import Point, Rect, RectMeasurer
 from ImagingS.drawing import Pen
 from ImagingS.serialization import PropertySerializable
 from ImagingS.transform import Transform
@@ -20,6 +22,7 @@ class Geometry(PropertySerializable, ABC):
     def transform(self, value: Optional[Transform]) -> None:
         assert isinstance(value, (type(None), Transform))
         self._transform = value
+        self.refreshBounds()
 
     @abstractmethod
     def strokePoints(self, pen: Pen) -> Iterable[Point]: pass
@@ -32,6 +35,30 @@ class Geometry(PropertySerializable, ABC):
 
     def inFill(self, point: Point) -> bool:
         return point in self.fillPoints()
+
+    @abstractmethod
+    def transformed(self) -> Geometry: pass
+
+    @property
+    def bounds(self) -> Rect:
+        if not hasattr(self, "_bounds"):
+            if hasattr(self, "_measurering"):
+                return Rect()
+            self._measurering = True
+            self._bounds = self._calculateBounds()
+            del self._measurering
+        return self._bounds
+
+    def _calculateBounds(self) -> Rect:
+        print("M")
+        measurer = RectMeasurer()
+        for p in self.strokePoints(Pen()):
+            measurer.append(p)
+        return measurer.result()
+
+    def refreshBounds(self) -> None:
+        if hasattr(self, "_bounds"):
+            del self._bounds
 
 
 class GeometryGroup(Geometry):

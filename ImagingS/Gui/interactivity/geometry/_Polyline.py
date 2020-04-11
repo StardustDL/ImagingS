@@ -36,6 +36,6 @@ class PolylineInteractivity(GeometryInteractivity[PolylineGeometry]):
     def onMouseDoubleClick(self, point: QPointF) -> None:
         if len(self.geometry.vertexes) > 1:
             self.geometry.vertexes.remove(self.geometry.vertexes[-1])
-        self.target.refreshBoundingRect()
+        self.update()
         self.end(True)
         super().onMouseDoubleClick(point)

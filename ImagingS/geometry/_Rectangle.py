@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Optional
+from typing import Dict, Optional, cast
 
 from ImagingS import Point, Rect
 
@@ -33,3 +33,10 @@ class RectangleGeometry(PolygonGeometry):
         if PolygonGeometry.S_Vertexes in result:
             del result[PolygonGeometry.S_Vertexes]
         return result
+
+    def _calculateBounds(self) -> Rect:
+        if self.transform is not None:
+            target = cast(PolygonGeometry, self.transformed())
+            return target._calculateBounds()
+        else:
+            return self.rect

@@ -43,7 +43,7 @@ class EllipseInteractivity(GeometryInteractivity[EllipseGeometry]):
         else:
             self._setEndPoint(point)
             self._setGeometry()
-            self.target.refreshBoundingRect()
+            self.update()
             self.end(True)
         super().onMouseRelease(point)
 

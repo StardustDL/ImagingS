@@ -51,9 +51,13 @@ class TransformInteractivity(Interactivity, Generic[_T]):
     def end(self, success: bool) -> None:
         if not success:
             if isinstance(self._oldTransform, TransformGroup):
-                self._oldTransform.children.remove(self.transform)
+                del self._oldTransform.children[self.transform]
             self.target.transform = self._oldTransform
         super().end(success)
+
+    def update(self) -> None:
+        self.target.refreshBounds()
+        super().update()
 
     def onKeyPress(self, key: QKeyEvent) -> None:
         if key.key() == Qt.Key_Escape:

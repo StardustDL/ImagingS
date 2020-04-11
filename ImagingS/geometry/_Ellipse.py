@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, Iterator, Optional, Tuple
+from typing import Iterable, Iterator, Optional, Tuple, cast
 
 from ImagingS import Point, Rect
 from ImagingS.drawing import Pen
@@ -63,6 +63,7 @@ class EllipseGeometry(Geometry):
     def center(self, value: Point) -> None:
         assert isinstance(value, Point)
         self._center = value
+        self.refreshBounds()
 
     @property
     def radius(self) -> Tuple[float, float]:
@@ -72,10 +73,13 @@ class EllipseGeometry(Geometry):
     def radius(self, value: Tuple[float, float]) -> None:
         assert len(value) == 2
         self._radius = float(value[0]), float(value[1])
+        self.refreshBounds()
 
-    def strokePoints(self, pen: Pen) -> Iterable[Point]:
-        center, radius = self.center, self.radius
-        if self.transform is not None:
+    def transformed(self) -> Geometry:
+        if self.transform is None:
+            return self
+        else:
+            center, radius = self.center, self.radius
             lt = Point(center.x - radius[0], center.y - radius[1])
             rt = Point(center.x + radius[0], center.y - radius[1])
             lb = Point(center.x - radius[0], center.y + radius[1])
@@ -86,11 +90,25 @@ class EllipseGeometry(Geometry):
                 lt.x, rt.x, lb.x, rb.x)
             minY, maxY = min(lt.y, rt.y, lb.y, rb.y), max(
                 lt.y, rt.y, lb.y, rb.y)
-            nell = self.fromRect(Rect.fromPoints(
+            return EllipseGeometry.fromRect(Rect.fromPoints(
                 Point(minX, minY), Point(maxX, maxY)))
-            center, radius = nell.center, nell.radius
 
-        return _gen(center, radius)
+    def strokePoints(self, pen: Pen) -> Iterable[Point]:
+        target = self
+        if self.transform is not None:
+            target = cast(EllipseGeometry, self.transformed())
+
+        return _gen(target.center, target.radius)
 
     def fillPoints(self) -> Iterable[Point]:
         return []
+
+    def _calculateBounds(self) -> Rect:
+        target = self
+        if self.transform is not None:
+            target = cast(EllipseGeometry, self.transformed())
+        lt = Point(target.center.x -
+                   target.radius[0], target.center.y - target.radius[1])
+        rb = Point(target.center.x +
+                   target.radius[0], target.center.y + target.radius[1])
+        return Rect.fromPoints(lt, rb)

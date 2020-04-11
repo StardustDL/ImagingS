@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from enum import Enum, unique
-from typing import Iterable, Iterator, List, Optional
+from typing import Iterable, Iterator, List, Optional, cast
 
-from ImagingS import Point
+from ImagingS import Point, Rect, RectMeasurer
 from ImagingS.drawing import Pen
 
 from . import Geometry
@@ -75,6 +75,7 @@ class CurveGeometry(Geometry):
     def controlPoints(self, value: List[Point]) -> None:
         assert isinstance(value, list)
         self._controlPoints = value
+        self.refreshBounds()
 
     @property
     def algorithm(self) -> CurveAlgorithm:
@@ -85,16 +86,31 @@ class CurveGeometry(Geometry):
         assert isinstance(value, CurveAlgorithm)
         self._algorithm = value
 
+    def transformed(self) -> Geometry:
+        if self.transform is None:
+            return self
+        else:
+            vertexes = list(map(self.transform.transform, self.controlPoints))
+            return CurveGeometry(vertexes, self.algorithm)
+
     def strokePoints(self, pen: Pen) -> Iterable[Point]:
-        lp = self.controlPoints
+        target = self
         if self.transform is not None:
-            lp = list(map(self.transform.transform, lp))
+            target = cast(CurveGeometry, self.transformed())
         gen = None
-        if self.algorithm is CurveAlgorithm.Bezier:
+        if target.algorithm is CurveAlgorithm.Bezier:
             gen = _genBezier
-        elif self.algorithm is CurveAlgorithm.BSpline:
+        elif target.algorithm is CurveAlgorithm.BSpline:
             gen = _genBSpline3
-        return gen(lp)
+        return gen(target.controlPoints)
 
     def fillPoints(self) -> Iterable[Point]:
         return []
+
+    def _calculateBounds(self) -> Rect:
+        target = self
+        if self.transform is not None:
+            target = cast(CurveGeometry, self.transformed())
+        measure = RectMeasurer()
+        measure.append(target.controlPoints)
+        return measure.result()

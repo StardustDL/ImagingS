@@ -5,7 +5,8 @@ from PyQt5.QtGui import QIcon, QStandardItem, QStandardItemModel
 
 from ImagingS.drawing import Drawing, DrawingGroup, GeometryDrawing
 from ImagingS.geometry import (CurveGeometry, EllipseGeometry, LineGeometry,
-                               PolygonGeometry)
+                               PolygonGeometry, PolylineGeometry,
+                               RectangleGeometry)
 from ImagingS.Gui import icons
 
 
@@ -82,8 +83,12 @@ class DrawingModel(QStandardItemModel):
                 return icons.curveGeometry
             elif isinstance(value.geometry, EllipseGeometry):
                 return icons.ellipseGeometry
+            elif isinstance(value.geometry, RectangleGeometry):
+                return icons.rectangleGeometry
             elif isinstance(value.geometry, PolygonGeometry):
                 return icons.polygonGeometry
+            elif isinstance(value.geometry, PolylineGeometry):
+                return icons.polylineGeometry
         else:
             return icons.drawing
 

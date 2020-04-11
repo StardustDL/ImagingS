@@ -36,6 +36,6 @@ class CurveInteractivity(GeometryInteractivity[CurveGeometry]):
     def onMouseDoubleClick(self, point: QPointF) -> None:
         if len(self.geometry.controlPoints) > 1:
             self.geometry.controlPoints.remove(self.geometry.controlPoints[-1])
-        self.target.refreshBoundingRect()
+        self.update()
         self.end(True)
         super().onMouseDoubleClick(point)

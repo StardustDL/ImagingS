@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from math import fabs
-from typing import Optional, Tuple
+from typing import Iterable, Optional, Tuple, Union
 
 import numpy as np
 
@@ -169,3 +169,28 @@ class Rect(PropertySerializable):
 
     def vertex(self) -> Point:
         return Point(self.origin.x+self.size.width, self.origin.y+self.size.height)
+
+
+class RectMeasurer:
+    def __init__(self) -> None:
+        super().__init__()
+        self._lx = float("inf")
+        self._ly = float("inf")
+        self._rx = float("-inf")
+        self._ry = float("-inf")
+
+    def result(self) -> Rect:
+        result = Rect.fromPoints(Point(
+            self._lx, self._ly), Point(self._rx, self._ry))
+        return result
+
+    def append(self, position: Union[Point, Iterable[Point]]) -> None:
+        if isinstance(position, Point):
+            x, y = position.asTuple()
+            self._lx = min(self._lx, x)
+            self._ly = min(self._ly, y)
+            self._rx = max(self._rx, x)
+            self._ry = max(self._ry, y)
+        else:
+            for p in position:
+                self.append(p)

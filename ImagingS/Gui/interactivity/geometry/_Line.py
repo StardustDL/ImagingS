@@ -36,7 +36,7 @@ class LineInteractivity(GeometryInteractivity[LineGeometry]):
             self._hasStarted = True
         else:
             self._setEndPoint(point)
-            self.target.refreshBoundingRect()
+            self.update()
             self.end(True)
         super().onMouseRelease(point)
 
