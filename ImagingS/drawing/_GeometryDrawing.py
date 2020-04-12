@@ -6,7 +6,7 @@ from ImagingS import Rect
 from ImagingS.brush import Brush, Brushes
 from ImagingS.geometry import Geometry
 
-from . import Drawing, DrawingContext, Pen
+from . import Drawing, RenderContext, Pen
 
 
 class GeometryDrawing(Drawing):
@@ -43,18 +43,11 @@ class GeometryDrawing(Drawing):
         assert isinstance(value, (type(None), Geometry))
         self._geometry = value
 
-    def render(self, context: DrawingContext) -> None:
+    def render(self, context: RenderContext) -> None:
         if self.geometry is None:
             return
-        rect = context.rect()
-        for point in self.geometry.fillPoints():
-            if point in rect:
-                context.point(point, self.fill.colorAt(
-                    point, self.bounds))
-        for point in self.geometry.strokePoints(self.stroke):
-            if point in rect:
-                context.point(point,
-                              self.stroke.brush.colorAt(point, self.bounds))
+        context.points(self.geometry.fillPoints(), self.fill)
+        context.points(self.geometry.strokePoints(self.stroke), self.stroke.brush)
 
     @property
     def bounds(self) -> Rect:

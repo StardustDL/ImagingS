@@ -1,9 +1,9 @@
-from ._PainterDrawingContext import PainterDrawingContext
+from ._PainterRenderContext import PainterRenderContext
 from ._DrawingItem import DrawingItem
 from ._Canvas import Canvas
 
 __all__ = (
-    "PainterDrawingContext",
+    "PainterRenderContext",
     "DrawingItem",
     "Canvas",
 )

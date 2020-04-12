@@ -1,20 +1,30 @@
 from abc import ABC, abstractmethod
-from typing import Callable
+from typing import Callable, Iterable
 
 import numpy as np
 
 from ImagingS import Color, Point, Rect, Size
+from ImagingS.brush import Brush
 
 
-class DrawingContext(ABC):
+class RenderContext(ABC):
     @abstractmethod
-    def point(self, position: Point, color: Color) -> None: pass
+    def _point(self, position: Point, color: Color) -> None: pass
 
     @abstractmethod
-    def rect(self) -> Rect: pass
+    def bounds(self) -> Rect: pass
+
+    def point(self, position: Point, color: Color) -> None:
+        if position in self.bounds():
+            self._point(position, color)
+
+    def points(self, positions: Iterable[Point], brush: Brush) -> None:
+        bounds = self.bounds()
+        for p in positions:
+            self.point(p, brush.colorAt(p, bounds))
 
 
-class NumpyArrayDrawingContext(DrawingContext):
+class NumpyArrayRenderContext(RenderContext):
     @staticmethod
     def create_array(size: Size) -> np.ndarray:
         result = np.zeros([int(size.height), int(size.width), 3], np.uint8)
@@ -36,27 +46,27 @@ class NumpyArrayDrawingContext(DrawingContext):
         assert len(value.shape) == 3
         assert value.shape[2] == 3
         self._array = value
-        self._rect = Rect(
+        self._bounds = Rect(
             Point(), Size(value.shape[1], value.shape[0]))
 
-    def point(self, position: Point, color: Color) -> None:
+    def _point(self, position: Point, color: Color) -> None:
         x, y = map(int, position.asTuple())
         self.array[y, x, 0] = color.r
         self.array[y, x, 1] = color.g
         self.array[y, x, 2] = color.b
 
-    def rect(self) -> Rect:
-        return self._rect
+    def bounds(self) -> Rect:
+        return self._bounds
 
 
-class ProxyDrawingContext(DrawingContext):
-    def __init__(self, fpoint: Callable[[Point, Color], None], frect: Callable[[], Rect]) -> None:
+class ProxyRenderContext(RenderContext):
+    def __init__(self, fpoint: Callable[[Point, Color], None], fbounds: Callable[[], Rect]) -> None:
         super().__init__()
         self._fpoint = fpoint
-        self._frect = frect
+        self._fbounds = fbounds
 
-    def point(self, position: Point, color: Color) -> None:
+    def _point(self, position: Point, color: Color) -> None:
         self._fpoint(position, color)
 
-    def rect(self) -> Rect:
-        return self._frect()
+    def bounds(self) -> Rect:
+        return self._fbounds()

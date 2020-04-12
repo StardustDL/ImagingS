@@ -1,15 +1,15 @@
 from ._Pen import Pen
-from ._DrawingContext import (DrawingContext,
-                              NumpyArrayDrawingContext, ProxyDrawingContext)
+from ._RenderContext import (RenderContext,
+                              NumpyArrayRenderContext, ProxyRenderContext)
 from ._Drawing import Drawing, DrawingGroup
 from ._GeometryDrawing import GeometryDrawing
 
 __all__ = (
     "Pen",
-    "DrawingContext",
+    "RenderContext",
     "Drawing",
     "DrawingGroup",
     "GeometryDrawing",
-    "NumpyArrayDrawingContext",
-    "ProxyDrawingContext"
+    "NumpyArrayRenderContext",
+    "ProxyRenderContext"
 )

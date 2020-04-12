@@ -8,7 +8,7 @@ from ImagingS import Point, Rect
 from ImagingS.drawing import Drawing
 from ImagingS.Gui import converters
 
-from . import PainterDrawingContext
+from . import PainterRenderContext
 
 
 class DrawingItem(QGraphicsItem):
@@ -29,7 +29,7 @@ class DrawingItem(QGraphicsItem):
         self._is_active = False
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: Optional[QWidget] = None) -> None:
-        context = PainterDrawingContext(
+        context = PainterRenderContext(
             painter, Rect(Point(), converters.size(self._size)))
         self.drawing.render(context)
         if self._is_active:

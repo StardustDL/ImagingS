@@ -8,7 +8,7 @@ from ImagingS.geometry import Geometry
 from ImagingS.serialization import PropertySerializable
 from ImagingS.transform import Transform
 
-from . import DrawingContext, ProxyDrawingContext
+from . import RenderContext, ProxyRenderContext
 
 
 class Drawing(PropertySerializable, IdObject, ABC):
@@ -27,7 +27,7 @@ class Drawing(PropertySerializable, IdObject, ABC):
         self._clip = value
 
     @abstractmethod
-    def render(self, context: DrawingContext) -> None: pass
+    def render(self, context: RenderContext) -> None: pass
 
     @property
     @abstractmethod
@@ -60,17 +60,17 @@ class DrawingGroup(Drawing):
         self._transform = value
         self.refreshBounds()
 
-    def render(self, context: DrawingContext) -> None:
+    def render(self, context: RenderContext) -> None:
         renderContext = context
         if self.transform is not None:
             def fpoint(position: Point, color: Color) -> None:
                 position = self.transform.transform(position)
                 context.point(position, color)
 
-            def frect() -> Rect:
-                return context.rect()
+            def fbounds() -> Rect:
+                return context.bounds()
 
-            renderContext = ProxyDrawingContext(fpoint, frect)
+            renderContext = ProxyRenderContext(fpoint, fbounds)
 
         for item in self.children:
             item.render(renderContext)
@@ -94,7 +94,7 @@ class DrawingGroup(Drawing):
         def frect() -> Rect:
             return Rect.infinite()
 
-        context = ProxyDrawingContext(fpoint, frect)
+        context = ProxyRenderContext(fpoint, frect)
 
         self.render(context)
         return measurer.result()

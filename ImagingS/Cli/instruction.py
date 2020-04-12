@@ -7,7 +7,7 @@ from PIL import Image
 from ImagingS import Color, Point, Rect, Size
 from ImagingS.brush import Brushes, SolidBrush
 from ImagingS.document import Document, DocumentFormat
-from ImagingS.drawing import GeometryDrawing, NumpyArrayDrawingContext, Pen
+from ImagingS.drawing import GeometryDrawing, NumpyArrayRenderContext, Pen
 from ImagingS.geometry import (CurveAlgorithm, CurveGeometry, EllipseGeometry,
                                LineAlgorithm, LineClipAlgorithm, LineGeometry,
                                PolygonGeometry)
@@ -54,8 +54,8 @@ class BuiltinInstruction:
     def saveCanvas(self, argv: List[str]) -> None:
         fileName = os.path.join(self.output_dir, f"{argv[0]}.bmp")
 
-        context = NumpyArrayDrawingContext(
-            NumpyArrayDrawingContext.create_array(self.doc.size))
+        context = NumpyArrayRenderContext(
+            NumpyArrayRenderContext.create_array(self.doc.size))
 
         self.doc.drawings.render(context)
 

@@ -13,7 +13,7 @@ from ImagingS import Color
 from ImagingS.brush import Brush, Brushes, SolidBrush
 from ImagingS.document import Document, DocumentFormat, VersionController
 from ImagingS.drawing import (Drawing, DrawingGroup, GeometryDrawing,
-                              NumpyArrayDrawingContext)
+                              NumpyArrayRenderContext)
 from ImagingS.Gui import icons
 from ImagingS.Gui.models import (BrushModel, CommitCommand, DrawingModel,
                                  PropertyModel, TransformModel)
@@ -586,8 +586,8 @@ class MainWindow(QMainWindow, ui.MainWindow):
             ext = os.path.splitext(fileName)[1].lstrip(".")
             doc = self.document
             assert doc is not None
-            context = NumpyArrayDrawingContext(
-                NumpyArrayDrawingContext.create_array(doc.size))
+            context = NumpyArrayRenderContext(
+                NumpyArrayRenderContext.create_array(doc.size))
 
             doc.drawings.render(context)
 
