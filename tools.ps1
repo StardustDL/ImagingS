@@ -24,7 +24,7 @@ if ($args.Count -gt 0) {
             if (!$?) {
                 exit 1
             }
-            autopep8 -ir .
+            autopep8 -ir . --list-fixes
             if (!$?) {
                 exit 1
             }
@@ -70,7 +70,7 @@ if ($args.Count -gt 0) {
                 exit 1
             }
             # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-            flake8 .
+            flake8 . --exit-zero
             if (!$?) {
                 exit 1
             }

@@ -70,3 +70,8 @@ class ProxyRenderContext(RenderContext):
 
     def bounds(self) -> Rect:
         return self._fbounds()
+
+
+class ClipRenderContext(ProxyRenderContext):
+    def __init__(self, bounds: Rect, innerContext: RenderContext) -> None:
+        super().__init__(innerContext.point, lambda: bounds)

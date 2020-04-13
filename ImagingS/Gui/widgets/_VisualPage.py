@@ -1,5 +1,5 @@
 from enum import Enum, unique
-from typing import Optional, Union, cast
+from typing import Any, Dict, Optional, Tuple, Union, cast
 
 from PyQt5.QtCore import QPointF, QSizeF, pyqtSignal
 from PyQt5.QtWidgets import QInputDialog, QWidget
@@ -29,6 +29,13 @@ from ImagingS.transform import (MatrixTransform, RotateTransform,
                                 ScaleTransform, SkewTransform, TransformGroup,
                                 TranslateTransform)
 
+_TransformInteractiveCreateMap: Dict[str, Tuple[Any, Any]] = {
+    "Translate": (TranslateTransform, TranslateTransformInteractivity),
+    "Rotate": (RotateTransform, RotateTransformInteractivity),
+    "Scale": (ScaleTransform, ScaleTransformInteractivity),
+    "Skew": (SkewTransform, SkewTransformInteractivity),
+}
+
 
 @unique
 class VisualPageState(Enum):
@@ -56,14 +63,11 @@ class VisualPage(QWidget, ui.VisualPage):
         #     self.actDrawingEllipse,
         # ]
 
-        # self.actionTransforms = [
-        #     self.actTransformTranslate,
-        #     self.actTransformScale,
-        #     self.actTransformRotate,
-        #     self.actTransformSkew,
-        #     self.actTransformMatrix,
-        #     self.actTransformGroup,
-        # ]
+        for act in [self.actTransformTranslate,
+                    self.actTransformScale,
+                    self.actTransformRotate,
+                    self.actTransformSkew]:
+            act.triggered.connect(self.actTransformCreate_triggered)
 
         self.actDrawingLine.triggered.connect(
             self.actDrawingLine_triggered)
@@ -77,19 +81,6 @@ class VisualPage(QWidget, ui.VisualPage):
             self.actDrawingCurve_triggered)
         self.actDrawingEllipse.triggered.connect(
             self.actDrawingEllipse_triggered)
-
-        self.actTransformTranslate.triggered.connect(
-            self.actTransformTranslate_triggered)
-        self.actTransformRotate.triggered.connect(
-            self.actTransformRotate_triggered)
-        self.actTransformSkew.triggered.connect(
-            self.actTransformSkew_triggered)
-        self.actTransformScale.triggered.connect(
-            self.actTransformScale_triggered)
-        self.actTransformGroup.triggered.connect(
-            self.actTransformGroup_triggered)
-        self.actTransformMatrix.triggered.connect(
-            self.actTransformMatrix_triggered)
 
         self.setEnabled(False)
         self._drawing = None
@@ -329,41 +320,21 @@ class VisualPage(QWidget, ui.VisualPage):
             return None
         return target
 
-    def actTransformTranslate_triggered(self):
+    def actTransformCreate_triggered(self):
         target = self._getTransformInteractiveTarget()
         if target is None:
             return
-        if not isinstance(target.transform, (type(None), TransformGroup)):
-            self.actTransformGroup.trigger()
-        tr = TranslateTransform()
-        self._beginInteractive(TranslateTransformInteractivity(target, tr))
 
-    def actTransformRotate_triggered(self):
-        target = self._getTransformInteractiveTarget()
-        if target is None:
-            return
-        if not isinstance(target.transform, (type(None), TransformGroup)):
-            self.actTransformGroup.trigger()
-        tr = RotateTransform()
-        self._beginInteractive(RotateTransformInteractivity(target, tr))
+        sender = self.sender()
+        tname = sender.objectName()[len("actTransform"):]
+        assert tname in _TransformInteractiveCreateMap
+        transType, interType = _TransformInteractiveCreateMap[tname]
 
-    def actTransformSkew_triggered(self):
-        target = self._getTransformInteractiveTarget()
-        if target is None:
-            return
         if not isinstance(target.transform, (type(None), TransformGroup)):
             self.actTransformGroup.trigger()
-        tr = SkewTransform()
-        self._beginInteractive(SkewTransformInteractivity(target, tr))
 
-    def actTransformScale_triggered(self):
-        target = self._getTransformInteractiveTarget()
-        if target is None:
-            return
-        if not isinstance(target.transform, (type(None), TransformGroup)):
-            self.actTransformGroup.trigger()
-        tr = ScaleTransform()
-        self._beginInteractive(ScaleTransformInteractivity(target, tr))
+        tr = transType.__call__()
+        self._beginInteractive(interType.__call__(target, tr))
 
     def actTransformGroup_triggered(self):
         target = self._getTransformInteractiveTarget()

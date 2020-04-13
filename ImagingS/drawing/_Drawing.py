@@ -4,11 +4,10 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from ImagingS import Color, IdObject, IdObjectList, Point, Rect, RectMeasurer
-from ImagingS.geometry import Geometry
 from ImagingS.serialization import PropertySerializable
 from ImagingS.transform import Transform
 
-from . import RenderContext, ProxyRenderContext
+from . import ClipRenderContext, ProxyRenderContext, RenderContext
 
 
 class Drawing(PropertySerializable, IdObject, ABC):
@@ -16,15 +15,6 @@ class Drawing(PropertySerializable, IdObject, ABC):
         super().__init__()
         self.clip = None
         self.setParent(None)
-
-    @property
-    def clip(self) -> Optional[Geometry]:
-        return self._clip
-
-    @clip.setter
-    def clip(self, value: Optional[Geometry]) -> None:
-        assert isinstance(value, (type(None), Geometry))
-        self._clip = value
 
     @abstractmethod
     def render(self, context: RenderContext) -> None: pass
@@ -60,6 +50,15 @@ class DrawingGroup(Drawing):
         self._transform = value
         self.refreshBounds()
 
+    @property
+    def clip(self) -> Optional[Rect]:
+        return self._clip
+
+    @clip.setter
+    def clip(self, value: Optional[Rect]) -> None:
+        assert isinstance(value, (type(None), Rect))
+        self._clip = value
+
     def render(self, context: RenderContext) -> None:
         renderContext = context
         if self.transform is not None:
@@ -71,6 +70,9 @@ class DrawingGroup(Drawing):
                 return context.bounds()
 
             renderContext = ProxyRenderContext(fpoint, fbounds)
+
+        if self.clip is not None:
+            renderContext = ClipRenderContext(self.clip, renderContext)
 
         for item in self.children:
             item.render(renderContext)

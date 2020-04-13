@@ -6,7 +6,7 @@ from ImagingS import Rect
 from ImagingS.brush import Brush, Brushes
 from ImagingS.geometry import Geometry
 
-from . import Drawing, RenderContext, Pen
+from . import Drawing, Pen, RenderContext
 
 
 class GeometryDrawing(Drawing):
