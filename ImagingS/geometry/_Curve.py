@@ -24,7 +24,7 @@ def _calcPointCount(points: List[Point]) -> int:
 
 
 def _genBezier(points: List[Point]) -> Iterator[Point]:
-    if len(points) < 4:
+    if len(points) < 2:
         return
 
     def casteljau(ps: List[Point], t: float) -> Point:

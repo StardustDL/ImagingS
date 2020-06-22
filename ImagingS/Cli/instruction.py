@@ -3,6 +3,7 @@ import os
 from typing import List
 
 from PIL import Image
+import numpy as np
 
 from ImagingS import Color, Point, Rect, Size
 from ImagingS.brush import Brushes, SolidBrush
@@ -58,8 +59,7 @@ class BuiltinInstruction:
             NumpyArrayRenderContext.create_array(self.doc.size))
 
         self.doc.drawings.render(context)
-
-        Image.fromarray(context.array).save(fileName, "bmp")
+        Image.fromarray(np.flipud(context.array)).save(fileName, "bmp")
 
     def setColor(self, argv: List[str]) -> None:
         self.brush = SolidBrush(
@@ -120,7 +120,7 @@ class BuiltinInstruction:
         drawing = self.doc.drawings.children[argv[0]]
         assert isinstance(drawing, GeometryDrawing)
         _append_transform(drawing, RotateTransform(
-            Point(int(argv[1]), int(argv[2])), int(argv[3]) / 360 * 2 * math.pi))
+            Point(int(argv[1]), int(argv[2])), -int(argv[3]) / 360 * 2 * math.pi))
 
     def scale(self, argv: List[str]) -> None:
         drawing = self.doc.drawings.children[argv[0]]

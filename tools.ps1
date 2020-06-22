@@ -1,33 +1,23 @@
+$ErrorActionPreference = "Stop"
+
 if ($args.Count -gt 0) {
     switch ($args[0]) {
         "dep" {
             Write-Output "Install dependencies..."
-            pip install -r requirements.txt
-            if (!$?) {
-                exit 1
-            }
+            pip install -r requirements.txt || exit $LASTEXITCODE
         }
         "dep-dev" {
             Write-Output "Install dependencies for development..."
-            pip install pytest flake8
-            pip install pytest-qt pytest-cov
-            pip install autopep8 isort
-            pip install PyQt5-stubs
-            npm install -g pyright
-            if (!$?) {
-                exit 1
-            }
+            pip install pytest flake8  || exit $LASTEXITCODE
+            pip install pytest-qt pytest-cov  || exit $LASTEXITCODE
+            pip install autopep8 isort  || exit $LASTEXITCODE
+            pip install PyQt5-stubs  || exit $LASTEXITCODE
+            npm install -g pyright  || exit $LASTEXITCODE
         }
         "format" {
             Write-Output "Formatting..."
-            isort -rc -ac -s __init__.py -y
-            if (!$?) {
-                exit 1
-            }
-            autopep8 -ir . --list-fixes
-            if (!$?) {
-                exit 1
-            }
+            isort -rc -ac -s __init__.py -y || exit $LASTEXITCODE
+            autopep8 -ir . --list-fixes || exit $LASTEXITCODE
         }
         "clean" {
             Write-Output "Clean generated files.."
@@ -42,64 +32,37 @@ if ($args.Count -gt 0) {
         }
         "gen-ui" {
             Write-Output "Generate UI files..."
-            python -m ImagingS.Gui.uic
-            if (!$?) {
-                exit 1
-            }
+            python -m ImagingS.Gui.uic || exit $LASTEXITCODE
         }
         "gui" {
             Write-Output "Run GUI..."
-            python -m ImagingS.Gui
-            if (!$?) {
-                exit 1
-            }
+            python -m ImagingS.Gui || exit $LASTEXITCODE
         }
         "cli" {
             Write-Output "Run CLI..."
-            python -m ImagingS.Cli
-            if (!$?) {
-                exit 1
-            }
+            python -m ImagingS.Cli || exit $LASTEXITCODE
         }
         "lint" {
             Write-Output "Lint..."
             Write-Output "Flake8 check..."
             # stop the build if there are Python syntax errors or undefined names
-            flake8 . --config=tox_fatal.ini
-            if (!$?) {
-                exit 1
-            }
+            flake8 . --config=tox_fatal.ini || exit $LASTEXITCODE
             # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-            flake8 . --exit-zero
-            if (!$?) {
-                exit 1
-            }
+            flake8 . --exit-zero || exit $LASTEXITCODE
             Write-Output "Pyright check..."
-            pyright
-            if (!$?) {
-                exit 1
-            }
+            pyright || exit $LASTEXITCODE
         }
         "test" {
             Write-Output "Test..."
-            pytest --verbose
-            if (!$?) {
-                exit 1
-            }
+            pytest --verbose || exit $LASTEXITCODE
         }
         "testcov" {
             Write-Output "Test and coverage..."
-            pytest --verbose --cov=. --cov-report=term --cov-report=html
-            if (!$?) {
-                exit 1
-            }
+            pytest --verbose --cov=. --cov-report=term --cov-report=html || exit $LASTEXITCODE
         }
         "testcov-noui" {
             Write-Output "Test and coverage (without UI)..."
-            pytest --verbose --ignore test/gui --cov=. --cov-report=term --cov-report=html
-            if (!$?) {
-                exit 1
-            }
+            pytest --verbose --ignore test/gui --cov=. --cov-report=term --cov-report=html || exit $LASTEXITCODE
         }
         Default {
             Write-Output "Unrecognized command"

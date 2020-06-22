@@ -68,6 +68,9 @@ class VisualPage(QWidget, ui.VisualPage):
                     self.actTransformRotate,
                     self.actTransformSkew]:
             act.triggered.connect(self.actTransformCreate_triggered)
+        
+        self.actTransformMatrix.triggered.connect(self.actTransformMatrix_triggered)
+        self.actTransformGroup.triggered.connect(self.actTransformGroup_triggered)
 
         self.actDrawingLine.triggered.connect(
             self.actDrawingLine_triggered)
