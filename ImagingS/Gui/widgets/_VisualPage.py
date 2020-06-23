@@ -10,11 +10,12 @@ from ImagingS.document import Document
 from ImagingS.drawing import Drawing, DrawingGroup, GeometryDrawing, Pen
 from ImagingS.geometry import (CurveAlgorithm, CurveGeometry, EllipseGeometry,
                                Geometry, LineAlgorithm, LineGeometry,
+                               LineClipAlgorithm,
                                PolygonGeometry, PolylineGeometry,
                                RectangleGeometry)
 from ImagingS.Gui import converters, icons
 from ImagingS.Gui.graphic import Canvas
-from ImagingS.Gui.interactivity import Interactivity, InteractivityState
+from ImagingS.Gui.interactivity import Interactivity, InteractivityState, RectClipInteractivity
 from ImagingS.Gui.interactivity.geometry import (CurveInteractivity,
                                                  EllipseInteractivity,
                                                  GeometryInteractivity,
@@ -85,6 +86,8 @@ class VisualPage(QWidget, ui.VisualPage):
         self.actDrawingEllipse.triggered.connect(
             self.actDrawingEllipse_triggered)
 
+        self.actClip.triggered.connect(self.actClip_triggered)
+
         self.setEnabled(False)
         self._drawing = None
         self._state = VisualPageState.Disable
@@ -139,6 +142,7 @@ class VisualPage(QWidget, ui.VisualPage):
         self.actTransformRotate.setIcon(icons.rotateTransform)
         self.actTransformMatrix.setIcon(icons.matrixTransform)
         self.actTransformGroup.setIcon(icons.transformGroup)
+        self.actClip.setIcon(icons.clip)
 
     def setupCanvas(self):
         self.cvsMain = Canvas(self.widMain)
@@ -249,6 +253,10 @@ class VisualPage(QWidget, ui.VisualPage):
                 if self.drawing is not None:
                     self.documentCommitted.emit(
                         self._document, f"Create {inter.transform.__class__.__name__}")
+            elif isinstance(inter, RectClipInteractivity):
+                if self.drawing is not None:
+                    self.documentCommitted.emit(
+                        self._document, f"Clip {self.drawing.id}")
         self.fresh()
 
     def actDrawingLine_triggered(self):
@@ -310,6 +318,27 @@ class VisualPage(QWidget, ui.VisualPage):
         geo = EllipseGeometry()
         self._beginInteractive(EllipseInteractivity(
             self._emptyGeometryDrawing(), geo, self._document.size))
+
+    def actClip_triggered(self):
+        if self.drawing is None:
+            return
+        target = None
+        if isinstance(self.drawing, DrawingGroup):
+            # target = self.drawing TODO
+            pass
+        elif isinstance(self.drawing, GeometryDrawing) and isinstance(self.drawing.geometry, LineGeometry):
+            target = self.drawing.geometry
+        if target is None:
+            return
+        algs = [e.name for e in LineClipAlgorithm]
+        item, okPressed = QInputDialog.getItem(
+            self, "Select Algorithm", "Algorithm:", algs, 0, False)
+        if not okPressed or not item:
+            return
+        target.clip = None
+        target.clipAlgorithm = getattr(LineClipAlgorithm, item)
+        self._beginInteractive(RectClipInteractivity(
+            target, self._document.size))
 
     def _getTransformInteractiveTarget(self) -> Optional[Union[DrawingGroup, Geometry]]:
         if self.drawing is None:

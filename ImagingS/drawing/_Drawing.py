@@ -13,7 +13,6 @@ from . import ClipRenderContext, ProxyRenderContext, RenderContext
 class Drawing(PropertySerializable, IdObject, ABC):
     def __init__(self) -> None:
         super().__init__()
-        self.clip = None
         self.setParent(None)
 
     @abstractmethod
@@ -29,6 +28,7 @@ class DrawingGroup(Drawing):
         super().__init__()
         self.children = IdObjectList()
         self.transform = None
+        self.clip = None
 
     @property
     def children(self) -> IdObjectList[Drawing]:

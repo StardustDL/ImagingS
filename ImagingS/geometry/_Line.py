@@ -80,7 +80,7 @@ def _clipCohenSutherland(start: Point, end: Point, area: Rect) -> Optional[Tuple
             return start, end
         else:
             return None
-    aori, aver = area.origin, area.vertex
+    aori, aver = area.origin, area.vertex()
     LEFT, RIGHT, BOTTOM, TOP = 1, 2, 4, 8
 
     def encodePoint(p: Point) -> int:
@@ -111,7 +111,7 @@ def _clipCohenSutherland(start: Point, end: Point, area: Rect) -> Optional[Tuple
         elif (TOP & c) != 0:
             pt = Point(p0.x + (p1.x - p0.x) * (aver.y - p0.y) / (p1.y - p0.y), aver.y)
         else:
-            assert False  # not full zero
+            assert False  # will not full zero, not happend
         if c == c0:
             p0 = pt
             c0 = encodePoint(p0)
@@ -127,7 +127,7 @@ def _clipLiangBarsky(start: Point, end: Point, area: Rect) -> Optional[Tuple[Poi
             return start, end
         else:
             return None
-    aori, aver = area.origin, area.vertex
+    aori, aver = area.origin, area.vertex()
     EPS = 1e-5
 
     def clipTest(a: float, b: float, t0: float, t1: float) -> Optional[Tuple[float, float]]:
@@ -255,7 +255,7 @@ class LineGeometry(Geometry):
         if self.transform is not None:
             target = cast(LineGeometry, self.transformed())
 
-        # line clip special begin
+        # line clip special begin TODO
 
         if self.clip is not None:
             cliped = None
