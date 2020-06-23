@@ -1,6 +1,6 @@
 import math
 import os
-from typing import List
+from typing import List, cast
 
 from PIL import Image
 import numpy as np
@@ -11,7 +11,7 @@ from ImagingS.document import Document, DocumentFormat
 from ImagingS.drawing import GeometryDrawing, NumpyArrayRenderContext, Pen
 from ImagingS.geometry import (CurveAlgorithm, CurveGeometry, EllipseGeometry,
                                LineAlgorithm, LineClipAlgorithm, LineGeometry,
-                               PolygonGeometry)
+                               LineClipper, PolygonGeometry)
 from ImagingS.transform import (RotateTransform, ScaleTransform, Transform,
                                 TransformGroup, TranslateTransform)
 
@@ -134,9 +134,24 @@ class BuiltinInstruction:
         assert isinstance(drawing.geometry, LineGeometry)
         lt = Point(int(argv[1]), int(argv[2]))
         rb = Point(int(argv[3]), int(argv[4]))
-        drawing.geometry.clip = Rect.fromPoints(lt, rb)
-        drawing.geometry.clipAlgorithm = LineClipAlgorithm.CohenSutherland if argv[
+
+        area = Rect.fromPoints(lt, rb)
+        clipAlgorithm = LineClipAlgorithm.CohenSutherland if argv[
             5] == "Cohen-Sutherland" else LineClipAlgorithm.LiangBarsky
+        
+        geo = drawing.geometry
+        clipper = LineClipper(cast(LineGeometry, geo.transformed()))
+        clipped = clipper.clip(area, clipAlgorithm)
+
+        if clipped is None:
+            parent = drawing.parent()
+            if parent is None:
+                return
+            del parent[drawing.id]
+        else:
+            geo.start = clipped.start
+            geo.end = clipped.end
+            geo.transform = None  # clear transform
 
     def execute(self, ins: str) -> None:
         ins = ins.strip()
