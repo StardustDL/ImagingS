@@ -1,7 +1,8 @@
 from ._Geometry import Geometry, GeometryGroup
 from ._Curve import CurveGeometry, CurveAlgorithm
 from ._Ellipse import EllipseGeometry
-from ._Line import LineGeometry, LineClipAlgorithm, LineAlgorithm
+from ._Line import LineGeometry, LineAlgorithm, LineClipAlgorithm
+from ._LineClipper import LineClipper
 from ._Polyline import PolygonGeometry, PolylineGeometry
 from ._Rectangle import RectangleGeometry
 
@@ -17,4 +18,5 @@ __all__ = (
     "PolygonGeometry",
     "PolylineGeometry",
     "RectangleGeometry",
+    "LineClipper",
 )

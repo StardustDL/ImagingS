@@ -10,7 +10,7 @@ from ImagingS.document import Document
 from ImagingS.drawing import Drawing, DrawingGroup, GeometryDrawing, Pen
 from ImagingS.geometry import (CurveAlgorithm, CurveGeometry, EllipseGeometry,
                                Geometry, LineAlgorithm, LineGeometry,
-                               LineClipAlgorithm,
+                               LineClipAlgorithm, LineClipper,
                                PolygonGeometry, PolylineGeometry,
                                RectangleGeometry)
 from ImagingS.Gui import converters, icons
@@ -217,7 +217,7 @@ class VisualPage(QWidget, ui.VisualPage):
 
     def cvsMain_mouseMoved(self, point: QPointF):
         self.messaged.emit(str((round(point.x()), round(point.y()))))
-    
+
     def cvsMain_mouseReleased(self, point: QPointF):
         if self.state is VisualPageState.Normal:
             p = converters.point(point)
@@ -265,8 +265,27 @@ class VisualPage(QWidget, ui.VisualPage):
                         self._document, f"Create {inter.transform.__class__.__name__}")
             elif isinstance(inter, RectClipInteractivity):
                 if self.drawing is not None:
-                    self.documentCommitted.emit(
-                        self._document, f"Clip {self.drawing.id}")
+                    if isinstance(self.drawing, GeometryDrawing) and isinstance(self.drawing.geometry, LineGeometry):
+                        drawingId = self.drawing.id
+
+                        geo = self.drawing.geometry
+                        clipper = LineClipper(cast(LineGeometry, geo.transformed()))
+                        clipped = None
+                        if inter.clip is not None:
+                            clipped = clipper.clip(inter.clip, inter.clipAlgorithm)
+
+                        if clipped is None:
+                            parent = self.drawing.parent()
+                            if parent is None:
+                                return
+                            del parent[drawingId]
+                        else:
+                            geo.start = clipped.start
+                            geo.end = clipped.end
+                            geo.transform = None  # clear transform
+
+                        self.documentCommitted.emit(
+                            self._document, f"Clip {drawingId}")
         self.fresh()
 
     def actDrawingLine_triggered(self):
@@ -345,10 +364,11 @@ class VisualPage(QWidget, ui.VisualPage):
             self, "Select Algorithm", "Algorithm:", algs, 0, False)
         if not okPressed or not item:
             return
-        target.clip = None
-        target.clipAlgorithm = getattr(LineClipAlgorithm, item)
-        self._beginInteractive(RectClipInteractivity(
-            target, self._document.size))
+        rectClipInter = RectClipInteractivity(
+            target, self._document.size)
+        rectClipInter.clip = None
+        rectClipInter.clipAlgorithm = getattr(LineClipAlgorithm, item)
+        self._beginInteractive(rectClipInter)
 
     def _getTransformInteractiveTarget(self) -> Optional[Union[DrawingGroup, Geometry]]:
         if self.drawing is None:

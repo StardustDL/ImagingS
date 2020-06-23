@@ -1,6 +1,6 @@
 from typing import Optional, Union
 
-from ImagingS.geometry import LineGeometry
+from ImagingS.geometry import LineGeometry, LineClipAlgorithm
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QColor, QKeyEvent, QPainterPath, QPen
@@ -32,6 +32,22 @@ class RectClipInteractivity(Interactivity):
     def target(self) -> Union[DrawingGroup, LineGeometry]:
         return self._target
 
+    @property
+    def clip(self) -> Optional[Rect]:
+        return self._clip
+
+    @clip.setter
+    def clip(self, value: Optional[Rect]) -> None:
+        self._clip = value
+
+    @property
+    def clipAlgorithm(self) -> LineClipAlgorithm:
+        return self._clipAlgorithm
+
+    @clipAlgorithm.setter
+    def clipAlgorithm(self, value: LineClipAlgorithm) -> None:
+        self._clipAlgorithm = value
+
     def start(self) -> None:
         self._hasStarted = False
         self._isShift = False
@@ -53,9 +69,16 @@ class RectClipInteractivity(Interactivity):
 
     def end(self, success: bool) -> None:
         if not success:
-            self.target.clip = None
+            if isinstance(self.target, LineGeometry):
+                self.clip = None
+            else:
+                self.target.clip = None
         else:
-            self.target.clip = Rect.fromPoints(self._start, self._end)
+            if isinstance(self.target, LineGeometry):
+                self.clip = Rect.fromPoints(self._start, self._end)
+            else:
+                self.target.clip = Rect.fromPoints(self._start, self._end)
+            
         super().end(success)
 
     def _setEndPoint(self, point: QPointF) -> None:
