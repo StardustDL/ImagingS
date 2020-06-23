@@ -13,7 +13,8 @@ from . import DrawingItem
 
 
 class Canvas(QGraphicsView):
-    mousePositionMoved = pyqtSignal(QPointF)
+    mouseMoved = pyqtSignal(QPointF)
+    mouseReleased = pyqtSignal(QPointF)
 
     def __init__(self, parent):
         scene = QGraphicsScene(parent)
@@ -137,7 +138,7 @@ class Canvas(QGraphicsView):
         if self.interactivity is not None:
             inter = self.interactivity
             inter.onMouseMove(pos)
-        self.mousePositionMoved.emit(pos)
+        self.mouseMoved.emit(pos)
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
@@ -145,6 +146,7 @@ class Canvas(QGraphicsView):
         if self.interactivity is not None:
             inter = self.interactivity
             inter.onMouseRelease(pos)
+        self.mouseReleased.emit(pos)
         super().mouseReleaseEvent(event)
 
     def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:

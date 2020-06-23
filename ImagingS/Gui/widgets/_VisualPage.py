@@ -149,8 +149,10 @@ class VisualPage(QWidget, ui.VisualPage):
         self.cvsMain.setObjectName("cvsMain")
         self.grdMain.addWidget(self.cvsMain, 0, 0, 1, 1)
         self.cvsMain.resize(QSizeF(600, 600))
-        self.cvsMain.mousePositionMoved.connect(
-            self.cvsMain_mousePositionMoved)
+        self.cvsMain.mouseMoved.connect(
+            self.cvsMain_mouseMoved)
+        self.cvsMain.mouseReleased.connect(
+            self.cvsMain_mouseReleased)
 
     def enable(self, doc: Document) -> None:
         assert self.state is VisualPageState.Disable
@@ -213,8 +215,16 @@ class VisualPage(QWidget, ui.VisualPage):
         for dr in self._document.drawings.children:
             self.cvsMain.add(dr)
 
-    def cvsMain_mousePositionMoved(self, point: QPointF):
+    def cvsMain_mouseMoved(self, point: QPointF):
         self.messaged.emit(str((round(point.x()), round(point.y()))))
+    
+    def cvsMain_mouseReleased(self, point: QPointF):
+        if self.state is VisualPageState.Normal:
+            p = converters.point(point)
+            for dr in reversed(self._document.drawings.children.items):
+                if p in dr.bounds:
+                    self.drawing = dr
+                    break
 
     def _emptyGeometryDrawing(self) -> GeometryDrawing:
         drawing = GeometryDrawing()
