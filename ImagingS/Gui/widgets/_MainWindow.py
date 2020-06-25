@@ -160,6 +160,9 @@ class MainWindow(QMainWindow, ui.MainWindow):
             self.editor.visual.actTransformMatrix,
             self.editor.visual.actTransformGroup,
         ])
+        self.mnuTool.addActions([
+            self.editor.visual.actClip
+        ])
         self.mnuTransform.addSeparator()
         self.mnuTransform.addActions([
             self.actTransformRemove,
