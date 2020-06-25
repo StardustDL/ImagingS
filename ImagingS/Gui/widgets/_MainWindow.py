@@ -419,12 +419,14 @@ class MainWindow(QMainWindow, ui.MainWindow):
         if parent is None:
             return
         del parent[item.id]
+        self._commitDocument(f"Deleted drawing ({item}).")
         self._freshDrawings()
         self.editor.fresh()
         self.stbMain.showMessage(f"Deleted drawing ({item}).")
 
     def actDrawingClear_triggered(self):
         self.document.drawings.children.clear()
+        self._commitDocument("Cleared drawings")
         self._freshDrawings()
         self.editor.fresh()
         self.stbMain.showMessage("Cleared drawings.")
@@ -450,12 +452,14 @@ class MainWindow(QMainWindow, ui.MainWindow):
         if parent is None:
             return
         del parent[item.id]
+        self._commitDocument(f"Deleted brush ({item})")
         self._freshBrushes()
         self.stbMain.showMessage(
             f"Deleted brush ({item}).")
 
     def actBrushClear_triggered(self):
         self.document.brushes.clear()
+        self._commitDocument("Cleared brushes")
         self._freshBrushes()
         self.stbMain.showMessage("Cleared brushes.")
 
@@ -480,6 +484,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
                 if parent is None:
                     return
                 del parent[item.id]
+        self._commitDocument(f"Deleted transform ({item})")
         self._freshTransforms()
         self.editor.fresh()
         self.stbMain.showMessage(
@@ -499,6 +504,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
                 drawing.transform.children.clear()
             else:
                 drawing.transform = None
+        self._commitDocument("Cleared transforms")
         self._freshTransforms()
         self.editor.fresh()
         self.stbMain.showMessage("Cleared transforms.")

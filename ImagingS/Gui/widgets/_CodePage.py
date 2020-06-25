@@ -74,6 +74,7 @@ class CodePage(QWidget, ui.CodePage):
         try:
             tdoc = Document.load(io, DocumentFormat.RAW)
         except Exception:
+            self.messaged.emit("Some syntax errors in code")
             return
 
         self._curdocument = tdoc
@@ -140,6 +141,17 @@ class CodePage(QWidget, ui.CodePage):
         self._setState(CodePageState.Normal)
 
     def actCommit_triggered(self) -> None:
+        if self.swgMain.currentIndex() == 0 and self.state is CodePageState.Changed:
+            io = StringIO(self.tetCode.toPlainText())
+            try:
+                tdoc = Document.load(io, DocumentFormat.RAW)
+            except Exception:
+                self.messaged.emit("Some syntax errors in code")
+                return
+
+            self._curdocument = tdoc
+
+        self.modelCode.fresh(self._curdocument)
         self._document = self._curdocument
         self.actRestore.trigger()
         self.documentCommitted.emit(self._document, "Change Code")

@@ -10,7 +10,7 @@ from . import Geometry
 
 def _gen(center: Point, radius: Tuple[float, float]) -> Iterator[Point]:
     def genFirst(a: int, b: int) -> Iterator[Point]:
-        if a == 0 or b == 0:
+        if a <= 2 or b <= 2:
             return
         x, y = 0, b
         a2, b2 = a**2, b**2

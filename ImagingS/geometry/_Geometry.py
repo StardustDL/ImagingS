@@ -50,7 +50,6 @@ class Geometry(PropertySerializable, ABC):
         return self._bounds
 
     def _calculateBounds(self) -> Rect:
-        print("M")
         measurer = RectMeasurer()
         for p in self.strokePoints(Pen()):
             measurer.append(p)

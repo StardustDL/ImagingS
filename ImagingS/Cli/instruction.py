@@ -138,7 +138,7 @@ class BuiltinInstruction:
         area = Rect.fromPoints(lt, rb)
         clipAlgorithm = LineClipAlgorithm.CohenSutherland if argv[
             5] == "Cohen-Sutherland" else LineClipAlgorithm.LiangBarsky
-        
+
         geo = drawing.geometry
         clipper = LineClipper(cast(LineGeometry, geo.transformed()))
         clipped = clipper.clip(area, clipAlgorithm)

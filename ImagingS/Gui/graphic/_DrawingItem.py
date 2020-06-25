@@ -5,7 +5,8 @@ from PyQt5.QtGui import QColor, QPainter
 from PyQt5.QtWidgets import QGraphicsItem, QStyleOptionGraphicsItem, QWidget
 
 from ImagingS import Point, Rect
-from ImagingS.drawing import Drawing
+from ImagingS.drawing import Drawing, GeometryDrawing
+from ImagingS.geometry import Geometry
 from ImagingS.Gui import converters
 
 from . import PainterRenderContext
@@ -23,6 +24,8 @@ class DrawingItem(QGraphicsItem):
         return self._drawing
 
     def activate(self) -> None:
+        if isinstance(self.drawing, GeometryDrawing):
+            self.drawing.geometry.refreshBounds()
         self._is_active = True
 
     def deactivate(self) -> None:
