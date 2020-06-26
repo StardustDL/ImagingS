@@ -126,7 +126,7 @@ class BuiltinInstruction:
         drawing = self.doc.drawings.children[argv[0]]
         assert isinstance(drawing, GeometryDrawing)
         _append_transform(drawing, ScaleTransform(
-            Point(int(argv[1]), int(argv[2])), (int(argv[3]), int(argv[3]))))
+            Point(int(argv[1]), int(argv[2])), (float(argv[3]), float(argv[3]))))
 
     def clip(self, argv: List[str]) -> None:
         drawing = self.doc.drawings.children[argv[0]]
