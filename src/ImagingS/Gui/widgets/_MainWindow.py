@@ -44,6 +44,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.documentChanged = False
 
         self.actClose.triggered.connect(self.actClose_triggered)
+        self.actAbout.triggered.connect(self.actAbout_triggered)
         self.actQuit.triggered.connect(self.actQuit_triggered)
         self.actNew.triggered.connect(self.actNew_triggered)
         self.actSave.triggered.connect(self.actSave_triggered)
@@ -176,6 +177,7 @@ class MainWindow(QMainWindow, ui.MainWindow):
         self.actSaveAs.setIcon(qta.icon("mdi.content-save-move"))
         self.actExport.setIcon(qta.icon("mdi.export"))
         self.actClose.setIcon(qta.icon("mdi.close"))
+        self.actAbout.setIcon(qta.icon("mdi.information"))
         self.actQuit.setIcon(qta.icon("mdi.exit-to-app"))
         self.actUndo.setIcon(qta.icon("mdi.undo"))
         self.actRedo.setIcon(qta.icon("mdi.redo"))
@@ -603,6 +605,13 @@ class MainWindow(QMainWindow, ui.MainWindow):
             Image.fromarray(context.array).save(fileName, ext, quality=95)
 
             self.stbMain.showMessage(f"Exported to {fileName}.")
+
+    def actAbout_triggered(self) -> None:
+        QMessageBox.information(self, "About ImagingS", """
+Author    StardustDL
+Project   https://github.com/StardustDL/ImagingS
+License   MPL-2.0
+""".strip())
 
     def actQuit_triggered(self) -> None:
         self.close()

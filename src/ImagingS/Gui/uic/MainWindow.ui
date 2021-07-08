@@ -58,6 +58,7 @@
     <addaction name="separator"/>
     <addaction name="actClose"/>
     <addaction name="separator"/>
+    <addaction name="actAbout"/>
     <addaction name="actQuit"/>
    </widget>
    <widget class="QMenu" name="mnuEdit">
@@ -299,6 +300,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F4</string>
+   </property>
+  </action>
+  <action name="actAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
   <action name="actQuit">
