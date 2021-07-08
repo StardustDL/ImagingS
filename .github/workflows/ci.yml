@@ -31,7 +31,7 @@ jobs:
     - name: Compile UI
       run: pwsh -c ./tools.ps1 gen-ui
     - name: Lint
-      run: pwsh -c ./tools.ps1 lint || exit 0
+      run: pwsh -c ./tools.ps1 lint
     - name: Test
       if: matrix.os != 'ubuntu-latest'
       run: pwsh -c ./tools.ps1 testcov
@@ -44,6 +44,7 @@ jobs:
         name: test-${{ matrix.os }}-${{ matrix.python-version }}
         path: ./htmlcov
   build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -54,6 +55,10 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip || exit $LASTEXITCODE

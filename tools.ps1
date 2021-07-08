@@ -52,11 +52,11 @@ if ($args.Count -gt 0) {
             Write-Output "Lint..."
             Write-Output "Flake8 check..."
             # stop the build if there are Python syntax errors or undefined names
-            flake8 . --config=tox_fatal.ini || exit $LASTEXITCODE
+            flake8 . --config=tox_fatal.ini
             # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-            flake8 . --exit-zero || exit $LASTEXITCODE
+            flake8 . --exit-zero
             Write-Output "Pyright check..."
-            pyright || exit $LASTEXITCODE
+            pyright
         }
         "test" {
             Write-Output "Test..."
