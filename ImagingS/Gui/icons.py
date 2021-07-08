@@ -20,8 +20,6 @@ fileTree: QIcon = qta.icon("mdi.file-tree")
 
 visual: QIcon = qta.icon("mdi.image")
 
-dict: QIcon = qta.icon("mdi.dictionary")
-
 vertex: QIcon = qta.icon("mdi.vector-point")
 
 stroke: QIcon = qta.icon("mdi.border-color")
