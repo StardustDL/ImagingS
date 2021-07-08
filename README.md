@@ -1,6 +1,6 @@
 # ImagingS
 
-![CI](https://github.com/StardustDL/ImagingS/workflows/CI/badge.svg)
+![CI](https://github.com/StardustDL/ImagingS/workflows/CI/badge.svg) ![](https://img.shields.io/github/license/StardustDL/ImagingS.svg) [![](https://img.shields.io/pypi/dm/imagings)](https://pypi.org/project/imagings/)
 
 ![](https://repository-images.githubusercontent.com/226446069/77831900-b856-11ea-95ef-6fd6c38a9edc)
 
@@ -36,6 +36,17 @@ A toolset for computer graphics and imaging processing.
 
 ## Usage
 
+```sh
+# Install
+pip install imagings
+# Launch GUI
+imagings
+# or use
+python -m ImagingS.Gui
+```
+
+## Development
+
 1. Clone this repository.
 2. Install dependencies.
 
@@ -60,7 +71,3 @@ python -m ImagingS.Gui
 ```sh
 python -m ImagingS.Cli input.txt output_dir
 ```
-
-# License
-
-All rights reserved.

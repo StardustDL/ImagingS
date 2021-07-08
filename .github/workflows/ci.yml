@@ -31,7 +31,7 @@ jobs:
     - name: Compile UI
       run: pwsh -c ./tools.ps1 gen-ui
     - name: Lint
-      run: pwsh -c ./tools.ps1 lint
+      run: pwsh -c ./tools.ps1 lint || exit 0
     - name: Test
       if: matrix.os != 'ubuntu-latest'
       run: pwsh -c ./tools.ps1 testcov
@@ -43,3 +43,29 @@ jobs:
       with:
         name: test-${{ matrix.os }}-${{ matrix.python-version }}
         path: ./htmlcov
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.3.4
+      with:
+        persist-credentials: false
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip || exit $LASTEXITCODE
+        pwsh -c ./tools.ps1 dep || exit $LASTEXITCODE
+        pwsh -c ./tools.ps1 dep-dev || exit $LASTEXITCODE
+    - name: Compile UI
+      run: pwsh -c ./tools.ps1 gen-ui
+    - name: Build package
+      run: |
+        python -m build
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: dist
+        path: ./dist

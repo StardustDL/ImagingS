@@ -28,19 +28,25 @@ if ($args.Count -gt 0) {
         }
         "clean-ui" {
             Write-Output "Clean generated UI files.."
-            Get-ChildItem ./ImagingS/Gui/ui -Exclude .gitignore | Remove-item -Recurse
+            Get-ChildItem ./src/ImagingS/Gui/ui -Exclude .gitignore | Remove-item -Recurse
         }
         "gen-ui" {
             Write-Output "Generate UI files..."
+            Set-Location src
             python -m ImagingS.Gui.uic || exit $LASTEXITCODE
+            Set-Location ..
         }
         "gui" {
             Write-Output "Run GUI..."
+            Set-Location src
             python -m ImagingS.Gui || exit $LASTEXITCODE
+            Set-Location ..
         }
         "cli" {
             Write-Output "Run CLI..."
+            Set-Location src
             python -m ImagingS.Cli || exit $LASTEXITCODE
+            Set-Location ..
         }
         "lint" {
             Write-Output "Lint..."
