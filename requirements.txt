@@ -3,5 +3,5 @@ Pillow==8.3.1
 PyQt5==5.15.4
 pyqt5-tools==5.15.4.3.2
 qtawesome==1.0.3
-build==0.5.1
+build==0.6.0.post1
 twine==3.4.1
