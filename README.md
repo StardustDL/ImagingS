@@ -1,6 +1,6 @@
-# ImagingS
+![ImagingS](https://socialify.git.ci/StardustDL/ImagingS/image?description=1&forks=1&issues=1&language=1&owner=1&pulls=1&stargazers=1&theme=Light)
 
-![CI](https://github.com/StardustDL/ImagingS/workflows/CI/badge.svg) ![](https://img.shields.io/github/license/StardustDL/ImagingS.svg) [![](https://img.shields.io/pypi/dm/imagings)](https://pypi.org/project/imagings/)
+![CI](https://github.com/StardustDL/ImagingS/workflows/CI/badge.svg) ![](https://img.shields.io/github/license/StardustDL/ImagingS.svg) [![](https://img.shields.io/pypi/v/imagings.svg?logo=pypi)](https://pypi.org/project/imagings/) [![Downloads](https://pepy.tech/badge/imagings)](https://pepy.tech/project/imagings)
 
 ![](https://repository-images.githubusercontent.com/226446069/77831900-b856-11ea-95ef-6fd6c38a9edc)
 
