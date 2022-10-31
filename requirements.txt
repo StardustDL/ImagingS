@@ -1,5 +1,5 @@
 numpy==1.21.0
-Pillow==8.3.1
+Pillow==9.3.0
 PyQt5==5.15.4
 pyqt5-tools==5.15.4.3.2
 qtawesome==1.0.3
